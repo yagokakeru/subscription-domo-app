@@ -1,43 +1,40 @@
 'use client'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 
+import type { SubscriptionInfo } from '@/app/types';
 
 
-import Stripe from 'stripe'
-// Stripeクライアントを作成
-const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY as string)
-
-
-
-export default async function Pricing() {
+export default function Pricing() {
     /**
      * Setting
      */
+    const [ subscriptionInfo, setSubscriptionInfo ] = useState<any>([]) // Subscription情報を保存
     const { push } = useRouter()
 
-    // useEffect(() => {
-    //     (async () => {
-            const prices = await stripe.prices.list({
-                limit: 3,
-              });
-        
-            console.log(prices);
-    //     })
-    // }, [])
+    useEffect(() => {
+        // サブスクリプションの情報を取得
+        ;(async () => {
+            const response = await fetch('/api/getSubscriptionInfo', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            }).then((data) => data.json())
 
+            setSubscriptionInfo(response.subscriptionInfo)
+        })()
+    }, [])
 
     /**
      * Functions
      */
     // サブスクリプションの支払画面へ遷移
-    const onClickCheckout = async () => {
+    const onClickCheckout = async (priceId: SubscriptionInfo["price_id"]) => {
         const response = await fetch('/api/checkout', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                priceID: "price_1Qpms9ClMx9BUZ3JQxVAlPkW", // priceIDを渡す price_ から始まるID
+                priceID: priceId, // priceIDを渡す price_ から始まるID
             }),
         }).then((data) => data.json())
 
@@ -46,29 +43,17 @@ export default async function Pricing() {
     
     return (
         <div className="grid md:grid-cols-2 gap-8 max-w-xl mx-auto">
-            <div>
-                <h2 className="text-2xl font-medium text-gray-900 mb-2">Base</h2>
-                <p className="text-4xl font-medium text-gray-900 mb-6">¥500<span className="text-xl font-normal text-gray-600">per user / month</span></p>
-                <form action="/create-checkout-session" method="POST">
-                    <input type="hidden" name="lookup_key" value="price_1QpmrVClMx9BUZ3JExMMOzIk" />
-                    <Button id="checkout-and-portal-button" type="submit">
-                        Checkout
-                    </Button>
-                </form>
-            </div>
-            <div>
-                <h2 className="text-2xl font-medium text-gray-900 mb-2">Puls</h2>
-                <p className="text-4xl font-medium text-gray-900 mb-6">¥1000<span className="text-xl font-normal text-gray-600">per user / month</span></p>
-                <form action="./api/checkout" method="POST">
-                    <input type="hidden" name="lookup_key" value="price_1Qpms9ClMx9BUZ3JQxVAlPkW" />
-                    <Button id="checkout-and-portal-button" type="submit">
-                        Checkout
-                    </Button>
-                </form>
-                <Button id="checkout-and-portal-button" type="submit" onClick={onClickCheckout}>
-                    Checkout
-                </Button>
-            </div>
+            {
+                subscriptionInfo.map((item: SubscriptionInfo, index: number) => {
+                    return(
+                        <div key={index}>
+                            <h2 className="text-2xl font-medium text-gray-900 mb-2">{item.name}</h2>
+                            <p className="text-4xl font-medium text-gray-900 mb-6">¥{item.price}<span className="text-xl font-normal text-gray-600">per user / month</span></p>
+                            <Button id="checkout-and-portal-button" type="submit" onClick={() => onClickCheckout(item.price_id)}>Checkout</Button>
+                        </div>
+                    )
+                })
+            }
         </div>
     )
 }
