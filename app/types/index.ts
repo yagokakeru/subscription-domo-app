@@ -5,5 +5,4 @@ export interface SubscriptionInfo {
     prod_id: string | Stripe.Product | Stripe.DeletedProduct
     name: string
     interval: Stripe.PriceListParams.Recurring.Interval
-    price: number | null
-}
+    price: number

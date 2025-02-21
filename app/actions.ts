@@ -2,6 +2,7 @@
 
 import { encodedRedirect } from "@/utils/utils";
 import { createClient } from "@/utils/supabase/server";
+import { createClient as createClientAdmin } from "@supabase/supabase-js";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -132,3 +133,26 @@ export const signOutAction = async () => {
   await supabase.auth.signOut();
   return redirect("/sign-in");
 };
+
+export const deleteAccountAction = async (formData: FormData) => {
+  const userID = formData.get("user_id")?.toString();
+  const supabase = await createClient();
+  const supabaseAdmin = createClientAdmin(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY!, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  })
+  
+  if (userID) {
+    const { data, error } = await supabaseAdmin.auth.admin.deleteUser(userID)
+    await supabase.auth.signOut();
+    return redirect("/");
+  } else {
+    return encodedRedirect(
+      "error",
+      "/protected",
+      "Delete account failed",
+    );
+  }
+}

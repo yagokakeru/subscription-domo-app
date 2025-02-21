@@ -1,6 +1,7 @@
 'use client'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react';
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 import type { SubscriptionInfo } from '@/app/types';
@@ -49,7 +50,10 @@ export default function Pricing() {
                         <div key={index}>
                             <h2 className="text-2xl font-medium text-gray-900 mb-2">{item.name}</h2>
                             <p className="text-4xl font-medium text-gray-900 mb-6">¥{item.price}<span className="text-xl font-normal text-gray-600">per user / month</span></p>
-                            <Button id="checkout-and-portal-button" type="submit" onClick={() => onClickCheckout(item.price_id)}>Checkout</Button>
+                            {/* <Button id="checkout-and-portal-button" type="submit" onClick={() => onClickCheckout(item.price_id)}>Checkout</Button> */}
+                            <Button id="checkout-and-portal-button" type="submit">
+                                <Link href="/sign-up">Checkout</Link>
+                            </Button>
                         </div>
                     )
                 })

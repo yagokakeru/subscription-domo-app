@@ -16,8 +16,6 @@ const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY as string)
 
 
 export async function POST(req: NextRequest, res: NextResponse) {
-    // const subscriptionInfo: SubscriptionInfo[] = [];
-
     // 全ての価格情報を取得
     const prices = await stripe.prices.list({
         limit: 100,
@@ -25,14 +23,20 @@ export async function POST(req: NextRequest, res: NextResponse) {
     // 製品IDから価格情報を取得し必要な情報を格納
     const subscriptionInfo: SubscriptionInfo[] = await Promise.all(prices.data.map(async(price) => {
         const product = await stripe.products.retrieve(price.product as string);
+
         return ({
             price_id: price.id,
             prod_id: price.product,
             name: product.name,
             interval: price.recurring!.interval,
-            price: price.unit_amount
+            price: price.unit_amount ? price.unit_amount : 0
         });
     }));
 
-    return NextResponse.json({ subscriptionInfo: subscriptionInfo }, { status: 200 })
+    // 配列のpriceが昇順になるようにソート
+    subscriptionInfo.sort((a, b) => {
+        return a.price -b.price;
+    });
+
+    return NextResponse.json({ subscriptionInfo: subscriptionInfo }, { status: 200 });
 }
