@@ -7,9 +7,11 @@ import Link from "next/link";
 import { SmtpMessage } from "../smtp-message";
 
 export default async function Signup(props: {
-  searchParams: Promise<Message>;
+  searchParams: Promise<Message | {priceID: string}>;
 }) {
   const searchParams = await props.searchParams;
+  const priceID = 'priceID' in searchParams ? searchParams.priceID : '';
+
   if ("message" in searchParams) {
     return (
       <div className="w-full flex-1 flex items-center h-screen sm:max-w-md justify-center gap-2 p-4">
@@ -29,14 +31,16 @@ export default async function Signup(props: {
           </Link>
         </p>
         <div className="flex flex-col gap-2 [&>input]:mb-3 mt-8">
+          <Input type="hidden" name="priceid" value={priceID} />
           <Label htmlFor="email">Email</Label>
-          <Input name="email" placeholder="you@example.com" required />
+          <Input name="email" placeholder="you@example.com" autoComplete={"email"} required />
           <Label htmlFor="password">Password</Label>
           <Input
             type="password"
             name="password"
             placeholder="Your password"
             minLength={6}
+            autoComplete={"current-password"}
             required
           />
           <SubmitButton formAction={signUpAction} pendingText="Signing up...">

@@ -5,13 +5,21 @@ import { createClient } from "@/utils/supabase/server";
 import { createClient as createClientAdmin } from "@supabase/supabase-js";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import Stripe from 'stripe'
+
+import { getUserInfo } from '@/lib/getUserInfo';
+import { getCheckoutUrl } from "@/lib/getCheckoutUrl";
 
 export const signUpAction = async (formData: FormData) => {
+  const priceID = formData.get("priceid")?.toString();
   const email = formData.get("email")?.toString();
   const password = formData.get("password")?.toString();
   const supabase = await createClient();
-  const origin = (await headers()).get("origin");
+  // const origin = (await headers()).get("origin");
+  // Stripeクライアントを作成
+  const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY as string)
 
+  // emailかpasswordの入力がなければサインアップページにリダイレクト
   if (!email || !password) {
     return encodedRedirect(
       "error",
@@ -20,23 +28,57 @@ export const signUpAction = async (formData: FormData) => {
     );
   }
 
-  const { error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      emailRedirectTo: `${origin}/auth/callback`,
-    },
-  });
+  // ユーザーを作成
+  const { data, error } = await supabase.auth.signUp({
+    email: email,
+    password: password
+  })
+  // Stripeの顧客情報を作成
+  if (data.user) {
+    const customer = await stripe.customers.create({
+      email: data.user.email,
+    });
+
+    // SupabeseとStripeのユーザIDをDBに挿入
+    const { error } = await supabase.from('profile').insert({ stripe_uuid: customer.id, supabase_uuid: data.user.id })
+    if (error) {
+      console.error(error.code + " " + error.message);
+      return encodedRedirect("error", "/sign-up", error.message);
+    }
+  }
 
   if (error) {
     console.error(error.code + " " + error.message);
     return encodedRedirect("error", "/sign-up", error.message);
   } else {
-    return encodedRedirect(
-      "success",
-      "/sign-up",
-      "Thanks for signing up! Please check your email for a verification link.",
-    );
+    // 登録したユーザーをログインさせる
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+  
+    if (error) {
+      return encodedRedirect("error", "/sign-in", error.message);
+    }
+
+    // priceIDがあったらプランを購入する新規ユーザー
+    if(priceID){
+        // ログインユーザー情報を取得
+        const userData = await getUserInfo();
+
+        if(userData.data){
+          const customerID = userData.data[0].stripe_uuid;
+          const sessionURL = await getCheckoutUrl(priceID, customerID);
+
+          if(sessionURL){
+            return redirect(sessionURL);
+          }
+        }else{
+          return encodedRedirect("error", "/sign-in", userData.error.message);
+        }
+    }
+
+    return redirect("/protected");
   }
 };
 
@@ -143,9 +185,24 @@ export const deleteAccountAction = async (formData: FormData) => {
       persistSession: false
     }
   })
+  // Stripeクライアントを作成
+  const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY as string)
   
   if (userID) {
-    const { data, error } = await supabaseAdmin.auth.admin.deleteUser(userID)
+    const { data, error } = await supabase.from('profile').select('stripe_uuid')
+    .eq('supabase_uuid', userID);
+
+    if(data) {
+      const deleted = await stripe.customers.del(data[0].stripe_uuid); // stripe顧客情報削除
+      const { error: deleteUserError } = await supabaseAdmin.auth.admin.deleteUser(userID) // supabase authユーザー情報削除
+      const response = await supabase.from('profile').delete().eq('supabase_uuid', userID); // supabase profile情報削除2
+    }
+
+    if(error){
+      console.error('error', error);
+      return redirect("/protected");
+    }
+    
     await supabase.auth.signOut();
     return redirect("/");
   } else {

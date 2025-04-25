@@ -11,18 +11,29 @@ export default function Pricing() {
     /**
      * Setting
      */
-    const [ subscriptionInfo, setSubscriptionInfo ] = useState<any>([]) // Subscription情報を保存
+    const [ subscriptionInfo, setSubscriptionInfo ] = useState<SubscriptionInfo[]>([]) // Subscription情報を保存
+    const [ userInfo, setUserInfo ] = useState<any>([]) // ログインユーザー情報を保存
     const { push } = useRouter()
 
     useEffect(() => {
-        // サブスクリプションの情報を取得
         ;(async () => {
-            const response = await fetch('/api/getSubscriptionInfo', {
+            // サブスクリプションの情報を取得
+            const getSubscriptionInfoRes = await fetch('/api/getSubscriptionInfo', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
             }).then((data) => data.json())
+            setSubscriptionInfo(getSubscriptionInfoRes.subscriptionInfo)
 
-            setSubscriptionInfo(response.subscriptionInfo)
+            // ログインユーザー情報を取得
+            const getUserInfoRes = await fetch('/api/getUserInfo', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            }).then((data) => data.json());
+            setUserInfo(getUserInfoRes.userInfo);
+
+            if(getUserInfoRes.error){
+                console.error('error',getUserInfoRes.error);
+            }
         })()
     }, [])
 
@@ -36,12 +47,13 @@ export default function Pricing() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 priceID: priceId, // priceIDを渡す price_ から始まるID
+                customerID: userInfo.stripe_uuid, // customerIDを渡す cus_ から始まるID
             }),
         }).then((data) => data.json())
 
         push(response.checkout_url)
     }
-    
+
     return (
         <div className="grid md:grid-cols-2 gap-8 max-w-xl mx-auto">
             {
@@ -50,10 +62,16 @@ export default function Pricing() {
                         <div key={index}>
                             <h2 className="text-2xl font-medium text-gray-900 mb-2">{item.name}</h2>
                             <p className="text-4xl font-medium text-gray-900 mb-6">¥{item.price}<span className="text-xl font-normal text-gray-600">per user / month</span></p>
-                            {/* <Button id="checkout-and-portal-button" type="submit" onClick={() => onClickCheckout(item.price_id)}>Checkout</Button> */}
-                            <Button id="checkout-and-portal-button" type="submit">
+                            {userInfo // ログインしていなければ登録画面へ遷移させる
+                                ? <Button id="checkout-and-portal-button" type="submit" onClick={() => onClickCheckout(item.price_id)}>Checkout</Button>
+                                : <Button id="checkout-and-portal-button">
+                                    <Link href={`/sign-up?priceID=${item.price_id}`}>Checkout</Link>
+                                  </Button>
+                            }
+
+                            {/* <Button id="checkout-and-portal-button" type="submit">
                                 <Link href="/sign-up">Checkout</Link>
-                            </Button>
+                            </Button> */}
                         </div>
                     )
                 })

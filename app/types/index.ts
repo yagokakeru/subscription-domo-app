@@ -6,3 +6,4 @@ export interface SubscriptionInfo {
     name: string
     interval: Stripe.PriceListParams.Recurring.Interval
     price: number
+}

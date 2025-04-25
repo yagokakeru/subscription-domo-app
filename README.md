@@ -17,6 +17,15 @@
 </p>
 <br/>
 
+## 今日のタスク
+- タスクリスト  
+  - [ ]@/lib/getUserInfoにJSDocを記載する
+  - [ ]@/lib/getCheckoutUrlにJSDocを記載する
+  - [ ]新規ユーザかつプラン購入者がSign Upをミスった時にpriceIDを保持できるようにする。今のところミスるとリダイレクトされてURLパラメータはエラーメッセージで上書きされる
+  - [ ]本番と開発URLを環境変数で管理する
+  - [ ]コメントないと理解できないんだからいちいちコメント書け
+  - [ ]textareaを作ってデータベースに保存できるようにする。ユーザーごとに表示する
+
 ## Features
 
 - Works across the entire [Next.js](https://nextjs.org) stack

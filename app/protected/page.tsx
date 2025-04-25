@@ -4,6 +4,8 @@ import { Input } from "@/components/ui/input";
 import FetchDataSteps from "@/components/tutorial/fetch-data-steps";
 import { createClient } from "@/utils/supabase/server";
 import { InfoIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { SubmitButton } from "@/components/submit-button";
@@ -21,8 +23,6 @@ export default async function ProtectedPage(props: {
     return redirect("/sign-in");
   }
 
-  console.log(user.id);
-
   return (
     <div className="flex-1 w-full flex flex-col gap-12">
       <div className="w-full">
@@ -32,12 +32,17 @@ export default async function ProtectedPage(props: {
           user
         </div>
       </div>
-      <div>
-        <form>
-          <Input type="hidden" name="user_id" value={user.id} />
-          <SubmitButton formAction={deleteAccountAction} pendingText="Deleting account...">Delete Account</SubmitButton>
-        </form>
-        <FormMessage message={searchParams} />
+      <div className="flex gap-2">
+        <div>
+          <form>
+            <Input type="hidden" name="user_id" value={user.id} />
+            <SubmitButton formAction={deleteAccountAction} pendingText="Deleting account...">Delete Account</SubmitButton>
+          </form>
+          <FormMessage message={searchParams} />
+        </div>
+        <Button asChild size="sm" variant={"destructive"}>
+          <Link href="/pricing">Pleace Subscribe!!</Link>
+        </Button>
       </div>
       <div className="flex flex-col gap-2 items-start">
         <h2 className="font-bold text-2xl mb-4">Your user details</h2>
