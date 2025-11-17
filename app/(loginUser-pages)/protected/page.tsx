@@ -1,27 +1,27 @@
+"use client"
+
+import { useAtomValue } from "jotai";
 import { deleteAccountAction } from "@/app/actions";
 import { FormMessage, Message } from "@/components/form-message";
 import { Input } from "@/components/ui/input";
-import FetchDataSteps from "@/components/tutorial/fetch-data-steps";
-import { createClient } from "@/utils/supabase/server";
 import { InfoIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { use } from 'react'
+
+import { userProfileAtom } from "@/lib/atoms/authUser";
 
 import { SubmitButton } from "@/components/submit-button";
 
-export default async function ProtectedPage(props: {
-  searchParams: Promise<Message>}) {
-  const supabase = await createClient();
-  const searchParams = await props.searchParams;
+export default function ProtectedPage({
+  searchParams,
+}: {
+  searchParams: Promise<Message>
+}) {
+  const messages = use(searchParams);
+  const userProfile = useAtomValue(userProfileAtom);
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return redirect("/sign-in");
-  }
+  if (!userProfile) return <div>Loading...</div>;
 
   return (
     <div className="flex-1 w-full flex flex-col gap-12">
@@ -31,28 +31,29 @@ export default async function ProtectedPage(props: {
           This is a protected page that you can only see as an authenticated
           user
         </div>
+        <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
+          <InfoIcon size="16" strokeWidth={2} />
+          mypageの名前を更新できるようにする。
+          formを送った後に成功したか失敗したかをユーザーにどう伝えるか
+        </div>
       </div>
       <div className="flex gap-2">
         <div>
           <form>
-            <Input type="hidden" name="user_id" value={user.id} />
+            <Input type="hidden" name="user_id" value={userProfile.user_id} />
             <SubmitButton formAction={deleteAccountAction} pendingText="Deleting account...">Delete Account</SubmitButton>
           </form>
-          <FormMessage message={searchParams} />
+          <FormMessage message={messages} />
         </div>
         <Button asChild size="sm" variant={"destructive"}>
           <Link href="/pricing">Pleace Subscribe!!</Link>
         </Button>
       </div>
       <div className="flex flex-col gap-2 items-start">
-        <h2 className="font-bold text-2xl mb-4">Your user details</h2>
-        <pre className="text-xs font-mono p-3 rounded border max-h-32 overflow-auto">
-          {JSON.stringify(user, null, 2)}
+        <h2 className="font-bold text-2xl mb-4">Your User Profile Infomation</h2>
+        <pre className="text-xs font-mono p-3 rounded border overflow-auto break-all whitespace-pre-wrap">
+          {JSON.stringify(userProfile, null, 2)}
         </pre>
-      </div>
-      <div>
-        <h2 className="font-bold text-2xl mb-4">Next steps</h2>
-        <FetchDataSteps />
       </div>
     </div>
   );

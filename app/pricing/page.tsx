@@ -1,10 +1,13 @@
-'use client'
+"use client"
+
+import { useSetAtom } from 'jotai';
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react';
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-import type { SubscriptionInfo } from '@/app/types';
+import { priceIdAtom } from '@/lib/atoms/handOver';
+
+import { SubscriptionInfo } from '@/types/subscriptionInfo';
 
 
 export default function Pricing() {
@@ -13,7 +16,8 @@ export default function Pricing() {
      */
     const [ subscriptionInfo, setSubscriptionInfo ] = useState<SubscriptionInfo[]>([]) // Subscription情報を保存
     const [ userInfo, setUserInfo ] = useState<any>([]) // ログインユーザー情報を保存
-    const { push } = useRouter()
+    const setPriceId = useSetAtom(priceIdAtom);
+    const { push } = useRouter();
 
     useEffect(() => {
         ;(async () => {
@@ -64,14 +68,11 @@ export default function Pricing() {
                             <p className="text-4xl font-medium text-gray-900 mb-6">¥{item.price}<span className="text-xl font-normal text-gray-600">per user / month</span></p>
                             {userInfo // ログインしていなければ登録画面へ遷移させる
                                 ? <Button id="checkout-and-portal-button" type="submit" onClick={() => onClickCheckout(item.price_id)}>Checkout</Button>
-                                : <Button id="checkout-and-portal-button">
-                                    <Link href={`/sign-up?priceID=${item.price_id}`}>Checkout</Link>
-                                  </Button>
+                                : <Button id="checkout-and-portal-button" onClick={() => {
+                                    setPriceId(item.price_id);
+                                    push('/sign-up');
+                                }}>Checkout</Button>
                             }
-
-                            {/* <Button id="checkout-and-portal-button" type="submit">
-                                <Link href="/sign-up">Checkout</Link>
-                            </Button> */}
                         </div>
                     )
                 })

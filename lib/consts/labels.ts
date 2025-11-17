@@ -1,0 +1,15 @@
+export const LABELS = {
+  NAME: '名前',
+  EMAIL: 'メールアドレス',
+  PASSWORD: 'パスワード',
+  PASSWORD_CONFIRMATION: 'パスワード（確認用）',
+  PHONE: '電話番号',
+  POSTAL_CODE: '郵便番号',
+  ADDRESS: '住所',
+  URL: 'URL',
+  DATE: '日付',
+  TIME: '時刻',
+  COLOR: 'カラーコード',
+  USERNAME: 'ユーザー名',
+  NUMBER: '数値',
+} as const

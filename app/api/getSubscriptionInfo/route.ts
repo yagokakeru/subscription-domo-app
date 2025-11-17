@@ -9,7 +9,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 
 // 型をインポート
-import { SubscriptionInfo } from '@/app/types'
+import { SubscriptionInfo } from '@/types/subscriptionInfo'
 
 // Stripeクライアントを作成
 const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY as string)

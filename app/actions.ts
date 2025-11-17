@@ -10,12 +10,13 @@ import Stripe from 'stripe'
 import { getUserInfo } from '@/lib/getUserInfo';
 import { getCheckoutUrl } from "@/lib/getCheckoutUrl";
 
-export const signUpAction = async (formData: FormData) => {
-  const priceID = formData.get("priceid")?.toString();
-  const email = formData.get("email")?.toString();
-  const password = formData.get("password")?.toString();
+import { signupFormValues, loginFormValues } from "@/lib/validation/schema";
+
+export const signUpAction = async (formData: signupFormValues) => {
+  const priceID = formData.priceid;
+  const email = formData.email;
+  const password = formData.password;
   const supabase = await createClient();
-  // const origin = (await headers()).get("origin");
   // Stripeクライアントを作成
   const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY as string)
 
@@ -33,6 +34,7 @@ export const signUpAction = async (formData: FormData) => {
     email: email,
     password: password
   })
+
   // Stripeの顧客情報を作成
   if (data.user) {
     const customer = await stripe.customers.create({
@@ -40,7 +42,7 @@ export const signUpAction = async (formData: FormData) => {
     });
 
     // SupabeseとStripeのユーザIDをDBに挿入
-    const { error } = await supabase.from('profile').insert({ stripe_uuid: customer.id, supabase_uuid: data.user.id })
+    const { error } = await supabase.from('profile').insert({ stripe_uuid: customer.id, supabase_uuid: data.user.id, email: email })
     if (error) {
       console.error(error.code + " " + error.message);
       return encodedRedirect("error", "/sign-up", error.message);
@@ -82,9 +84,10 @@ export const signUpAction = async (formData: FormData) => {
   }
 };
 
-export const signInAction = async (formData: FormData) => {
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
+export const signInAction = async (formData: loginFormValues) => {
+  const email = formData.email;
+  const password = formData.password;
+
   const supabase = await createClient();
 
   const { error } = await supabase.auth.signInWithPassword({
