@@ -36,6 +36,10 @@ export default function ProtectedPage({
           mypageの名前を更新できるようにする。
           formを送った後に成功したか失敗したかをユーザーにどう伝えるか
         </div>
+        <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
+          <InfoIcon size="16" strokeWidth={2} />
+          eslintを入れてコードを整形する
+        </div>
       </div>
       <div className="flex gap-2">
         <div>
