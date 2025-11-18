@@ -16,8 +16,6 @@ export const loginSchema = z.object({
 
 // プロフィール用スキーマ
 export const profileSchema = z.object({
-    id: supabaceIdValidation,
-    email: emailValidation,
     name: nameValidation
 });
 

@@ -38,30 +38,29 @@ export function useProfileFrom() {
     const form = useForm<profileFormValues>({
         resolver: zodResolver(profileSchema), // ZodをRHFに接続
         defaultValues: {
-            id: userProfile?.user_id,
-            name: userProfile?.name
+            name: userProfile?.name,
         }
     });
 
-    const onSubmit = (data: profileFormValues) => {
-        alert(JSON.stringify(data));
-        // try {
-        //     const res = await axios.post('/api/editProfile', {
-        //         id: data.id,
-        //         name: data.name
-        //     });
+    const onSubmit = async (data: profileFormValues) => {
+        // alert(JSON.stringify(data));
+        try {
+            const res = await axios.post('/api/editProfile', {
+                id: userProfile?.user_id,
+                name: data.name
+            });
 
-        //     console.log(res);
+            console.log(res);
 
-        //     if (res.data.data) {
-        //         // setUserProfile(res.data.data);
-        //         return { ok: true };
-        //     } else {
-        //         return { ok: false };
-        //     }
-        // } catch (err) {
-        //     return { ok: false };
-        // }
+            if (res.data.data) {
+                // setUserProfile(res.data.data);
+                return { ok: true };
+            } else {
+                return { ok: false };
+            }
+        } catch (err) {
+            return { ok: false };
+        }
     };
 
     return {form, onSubmit};
