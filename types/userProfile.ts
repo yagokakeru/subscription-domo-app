@@ -5,4 +5,5 @@ export type userProfile = {
     profile_id: number;
     stripe_uuid: string;
     name: string;
+    avatar_url: string;
 }

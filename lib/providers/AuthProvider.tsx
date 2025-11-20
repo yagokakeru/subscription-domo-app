@@ -4,8 +4,6 @@ import { Provider, createStore } from "jotai";
 import { userProfileAtom } from "@/lib/atoms/authUser";
 import { userProfile } from "@/types/userProfile";
 
-import { Session } from "@supabase/supabase-js";
-
 export function AuthProvider({
   children,
   userProfile,

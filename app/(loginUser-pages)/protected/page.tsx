@@ -33,8 +33,8 @@ export default function ProtectedPage({
         </div>
         <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
           <InfoIcon size="16" strokeWidth={2} />
-          mypageの名前を更新できるようにする。
-          formを送った後に成功したか失敗したかをユーザーにどう伝えるか
+          アバター画像を更新できるようにする
+          メールアドレスはとりあえず変更不可にする。Stripeとか色々面倒くさそう
         </div>
         <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
           <InfoIcon size="16" strokeWidth={2} />

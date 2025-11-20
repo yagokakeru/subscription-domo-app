@@ -7,6 +7,7 @@ import { signupSchema, signupFormValues, loginSchema, loginFormValues, profileSc
 import { useAtom } from "jotai";
 import { userProfileAtom } from "@/lib/atoms/authUser";
 import axios from 'axios';
+// import { getUserInfo } from '@/lib/getUserInfo';
 
 export function useSignupFrom() {
     const form = useForm<signupFormValues>({
@@ -42,24 +43,25 @@ export function useProfileFrom() {
         }
     });
 
-    const onSubmit = async (data: profileFormValues) => {
-        // alert(JSON.stringify(data));
+    const onSubmit = async (data: profileFormValues): Promise<{ status: "success" | "error", message: string }> => {
         try {
+            // プロフィール情報を更新
             const res = await axios.post('/api/editProfile', {
                 id: userProfile?.user_id,
                 name: data.name
             });
 
-            console.log(res);
+            if (res.status === 200 && !res.data.error) {
+                // 最新ユーザー情報を取得してAtomを更新
+                const getUserInfoRes = await axios.post('/api/getUserInfo');
+                setUserProfile(getUserInfoRes.data.userInfo);
 
-            if (res.data.data) {
-                // setUserProfile(res.data.data);
-                return { ok: true };
+                return { status: 'success', message: 'プロフィールを更新しました。'};
             } else {
-                return { ok: false };
+                return { status: 'error', message: 'プロフィールを更新できませんでした。'};
             }
         } catch (err) {
-            return { ok: false };
+            return { status: 'error', message: 'プロフィールを更新できませんでした。'};
         }
     };
 

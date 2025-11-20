@@ -2,7 +2,6 @@ import Header from "@/components/header";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
-import { createClient } from "@/utils/supabase/server";
 import { AuthProvider } from "@/lib/providers/AuthProvider";
 import { getUserInfo } from '@/lib/getUserInfo';
 
@@ -26,7 +25,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const supabase = await createClient();
   const { data } = await getUserInfo();
   const userProfile = data?.[0];
 

@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useProfileFrom } from "@/lib/validation/hooks";
 import { useState } from "react";
+import { profileFormValues } from "@/lib/validation/schema";
+import Image from "next/image";
 
 
 export function MypageComponent() {
@@ -16,11 +18,25 @@ export function MypageComponent() {
     const [msgType, setMsgType] = useState<"success" | "error" | null>(null);
     const { form, onSubmit } = useProfileFrom();
 
+    const handleSubmit = async(data: profileFormValues) => {
+        const result = await onSubmit(data);
+
+        setMsgType(result.status);
+        setMsg(result.message);
+
+        setTimeout(() => {
+            setMsg(null);
+            setMsgType(null);
+        }, 3000);
+    }
+
     return (
         <>
             <h2 className="font-bold text-2xl mb-4">マイページ</h2>
             <div>
-                <form onSubmit={form.handleSubmit(onSubmit)}>
+                <form onSubmit={form.handleSubmit(handleSubmit)}>
+                    <Image src={userProfile?.avatar_url || '/default-avatar.jpg'} alt="Avatar" width={100} height={100} className="rounded-full mb-4" />
+                    <Input type="file" name="avatar_url" accept="image/png, image/jpeg" />
                     <div className="flex">
                         <div>メールアドレス</div>
                         <div>{userProfile?.email}</div>
