@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { priceidValidation, emailValidation, passwordValidation, nameValidation, supabaceIdValidation } from "./validation";
+import { priceidValidation, emailValidation, passwordValidation, nameValidation, avatarValidation } from "./validation";
 
 // サインアップ用スキーマ
 export const signupSchema = z.object({
@@ -16,6 +16,7 @@ export const loginSchema = z.object({
 
 // プロフィール用スキーマ
 export const profileSchema = z.object({
+    avatar: avatarValidation,
     name: nameValidation
 });
 

@@ -36,7 +36,12 @@ export function MypageComponent() {
             <div>
                 <form onSubmit={form.handleSubmit(handleSubmit)}>
                     <Image src={userProfile?.avatar_url || '/default-avatar.jpg'} alt="Avatar" width={100} height={100} className="rounded-full mb-4" />
-                    <Input type="file" name="avatar_url" accept="image/png, image/jpeg" />
+                    <Input type="file" {...form.register("avatar")} accept="image/png, image/jpeg" />
+                    {form.formState.errors.avatar && typeof form.formState.errors.avatar.message === "string" && (
+                        <p className="text-red-500 text-sm">
+                            {form.formState.errors.avatar.message}
+                        </p>
+                    )}
                     <div className="flex">
                         <div>メールアドレス</div>
                         <div>{userProfile?.email}</div>
