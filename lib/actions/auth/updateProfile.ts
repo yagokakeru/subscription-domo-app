@@ -2,6 +2,7 @@
 
 import { createClient } from '@/utils/supabase/server';
 import { profileFormValues } from "@/lib/validation/schema";
+import { uploadImage } from '@/lib/actions/auth/uploadImage';
 import type { userProfile } from '@/types/userProfile';
 
 export const updateProfile = async (
@@ -12,7 +13,10 @@ export const updateProfile = async (
         message: string
     }> => {
     const supabase = await createClient();
-    const { name } = formData;
+    const { name, avatar } = formData;
+
+    const image = await uploadImage(avatar[0], id);
+    console.log(image);
 
     // プロフィール情報を更新
     const { error } = await supabase

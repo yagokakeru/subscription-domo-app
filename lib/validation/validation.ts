@@ -18,13 +18,22 @@ export const passwordValidation = z.string().min(8, MESSAGES.MIN_LENGTH(LABELS.P
 export const nameValidation = z.string().max(255, MESSAGES.MAX_LENGTH(LABELS.NAME, 255));
 
 // アバター画像のバリデーション
-export const avatarValidation = z.any()
-        .refine((file) => file?.length === 1, "ファイルを選択してください")
-        .refine(
-            (file) => file?.[0]?.size <= 1 * 1024 * 1024,
-            "1MB以下の画像をアップロードしてください"
-        )
-        .refine(
-            (file) => ["image/jpeg", "image/png"].includes(file?.[0]?.type),
-            "JPEGまたはPNGのみアップロードできます"
-        );
+export const avatarValidation = z
+    .any()
+    .refine(
+        (file) => !file || file.length === 0 || file.length === 1,
+        "ファイルは1つだけ選択してください"
+    )
+    .refine(
+        (file) =>
+        !file || file.length === 0 || file[0]?.size <= 1 * 1024 * 1024,
+        "1MB以下の画像をアップロードしてください"
+    )
+    .refine(
+        (file) =>
+        !file ||
+        file.length === 0 ||
+        ["image/jpeg", "image/png"].includes(file[0]?.type),
+        "JPEGまたはPNGのみアップロードできます"
+    );
+

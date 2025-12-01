@@ -46,26 +46,6 @@ export function useProfileFrom() {
     });
 
     const onSubmit = async (data: profileFormValues): Promise<{ status: "success" | "error", message: string }> => {
-        // try {
-        //     // プロフィール情報を更新
-        //     const res = await axios.post('/api/editProfile', {
-        //         id: userProfile?.user_id,
-        //         name: data.name
-        //     });
-
-        //     if (res.status === 200 && !res.data.error) {
-        //         // 最新ユーザー情報を取得してAtomを更新
-        //         const getUserInfoRes = await axios.post('/api/getUserInfo');
-        //         setUserProfile(getUserInfoRes.data.userInfo);
-
-        //         return { status: 'success', message: 'プロフィールを更新しました。'};
-        //     } else {
-        //         return { status: 'error', message: 'プロフィールを更新できませんでした。'};
-        //     }
-        // } catch (err) {
-        //     return { status: 'error', message: 'プロフィールを更新できませんでした。'};
-        // }
-
         return await updateProfile(data, userProfile!.user_id);
     };
 
