@@ -7,9 +7,6 @@ import { signupSchema, signupFormValues, loginSchema, loginFormValues, profileSc
 import { useAtom } from "jotai";
 import { userProfileAtom } from "@/lib/atoms/authUser";
 import { updateProfile } from '@/lib/actions/auth/updateProfile';
-import type { userProfile } from '@/types/userProfile';
-// import axios from 'axios';
-// import { getUserInfo } from '@/lib/getUserInfo';
 
 export function useSignupFrom() {
     const form = useForm<signupFormValues>({

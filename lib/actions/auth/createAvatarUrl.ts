@@ -7,8 +7,6 @@ export const createAvatarUrl = async (avatarPath: string): Promise<string> => {
         .from("avatars")
         .createSignedUrl(avatarPath, 3600);
 
-        console.log(data, error);
-
     if (error || !data) {
         throw new Error("Failed to create signed URL for avatar.");
     }

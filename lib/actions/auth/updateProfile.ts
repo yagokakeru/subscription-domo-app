@@ -1,5 +1,6 @@
 "use server";
 
+import { encodedRedirect } from "@/utils/utils";
 import { createClient } from '@/utils/supabase/server';
 import { profileFormValues } from "@/lib/validation/schema";
 import { uploadImage } from '@/lib/actions/auth/uploadImage';
@@ -15,8 +16,8 @@ export const updateProfile = async (
     const supabase = await createClient();
     const { name, avatar } = formData;
 
-    const image = await uploadImage(avatar[0], id);
-    console.log(image);
+    // アバターを更新
+    await uploadImage(avatar[0], id);
 
     // プロフィール情報を更新
     const { error } = await supabase
@@ -25,8 +26,8 @@ export const updateProfile = async (
         .eq("supabase_uuid", id)
 
     if ( !error ) {
-        return { status: 'success', message: 'プロフィールを更新しました。'};
+        return encodedRedirect("success", "/protected/mypage", "プロフィールを更新しました。");
     } else {
-        return { status: 'error', message: `プロフィールを更新できませんでした。${error?.message}` };
+        return encodedRedirect("error", "/protected/mypage", `プロフィールを更新できませんでした。${error?.message}`);
     }
 }

@@ -1,7 +1,7 @@
 "use server";
 
+import { encodedRedirect } from "@/utils/utils";
 import { createClient } from '@/utils/supabase/server';
-import { profileFormValues } from "@/lib/validation/schema";
 import type { userProfile } from '@/types/userProfile';
 
 export const uploadImage = async ( file: File, id:userProfile["user_id"] ) => {
@@ -26,12 +26,12 @@ export const uploadImage = async ( file: File, id:userProfile["user_id"] ) => {
     const { error: uploadError } = await supabase.storage
         .from("avatars")
         .upload(filePath, buffer, {
-        upsert: true,
-        contentType: file.type,
+            upsert: true,
+            contentType: file.type,
         });
 
     if (uploadError) {
-        return { error: "画像アップロードに失敗しました。" };
+        return encodedRedirect("error", "/protected/mypage", `画像アップロードに失敗しました。${uploadError?.message}`);
     }
 
     // 3. profile.avatar_url を更新
@@ -41,16 +41,11 @@ export const uploadImage = async ( file: File, id:userProfile["user_id"] ) => {
         .eq("supabase_uuid", id);
 
     if (updateError) {
-        return { error: "プロフィールの更新に失敗しました。" };
+        return encodedRedirect("error", "/protected/mypage", `プロフィールの更新に失敗しました。${updateError?.message}`);
     }
 
     // 4. 古いファイルを削除（安全のため最後に）
     if (oldPath) {
         await supabase.storage.from("avatars").remove([oldPath]);
     }
-
-    // 5. 再描画
-    // revalidatePath("/mypage");
-
-    return { success: true };
 }
