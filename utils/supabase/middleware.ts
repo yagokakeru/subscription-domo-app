@@ -5,7 +5,7 @@ export const updateSession = async (request: NextRequest) => {
   try {
     let supabaseResponse = NextResponse.next({
       request,
-    })
+    });
 
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -41,12 +41,10 @@ export const updateSession = async (request: NextRequest) => {
 
     if (
       !user.error &&
-      (
-        request.nextUrl.pathname === "/" ||
+      (request.nextUrl.pathname === "/" ||
         request.nextUrl.pathname.startsWith("/forgot-password") ||
         request.nextUrl.pathname.startsWith("/sign-in") ||
-        request.nextUrl.pathname.startsWith("/sign-up")
-      )
+        request.nextUrl.pathname.startsWith("/sign-up"))
     ) {
       return NextResponse.redirect(new URL("/protected", request.url));
     }
@@ -56,6 +54,7 @@ export const updateSession = async (request: NextRequest) => {
     // If you are here, a Supabase client could not be created!
     // This is likely because you have not set up environment variables.
     // Check out http://localhost:3000 for Next Steps.
+    console.error("Supabase client creation failed:", e);
     return NextResponse.next({
       request: {
         headers: request.headers,

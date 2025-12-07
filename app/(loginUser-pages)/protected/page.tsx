@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useAtomValue } from "jotai";
 import { deleteAccountAction } from "@/app/actions";
@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { InfoIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { use } from 'react'
+import { use } from "react";
 
 import { userProfileAtom } from "@/lib/atoms/authUser";
 
@@ -16,7 +16,7 @@ import { SubmitButton } from "@/components/submit-button";
 export default function ProtectedPage({
   searchParams,
 }: {
-  searchParams: Promise<Message>
+  searchParams: Promise<Message>;
 }) {
   const messages = use(searchParams);
   const userProfile = useAtomValue(userProfileAtom);
@@ -45,7 +45,12 @@ export default function ProtectedPage({
         <div>
           <form>
             <Input type="hidden" name="user_id" value={userProfile.user_id} />
-            <SubmitButton formAction={deleteAccountAction} pendingText="Deleting account...">Delete Account</SubmitButton>
+            <SubmitButton
+              formAction={deleteAccountAction}
+              pendingText="Deleting account..."
+            >
+              Delete Account
+            </SubmitButton>
           </form>
           <FormMessage message={messages} />
         </div>
@@ -54,7 +59,9 @@ export default function ProtectedPage({
         </Button>
       </div>
       <div className="flex flex-col gap-2 items-start">
-        <h2 className="font-bold text-2xl mb-4">Your User Profile Infomation</h2>
+        <h2 className="font-bold text-2xl mb-4">
+          Your User Profile Infomation
+        </h2>
         <pre className="text-xs font-mono p-3 rounded border overflow-auto break-all whitespace-pre-wrap">
           {JSON.stringify(userProfile, null, 2)}
         </pre>

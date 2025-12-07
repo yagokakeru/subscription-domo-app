@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useAtomValue } from "jotai";
 import { FormMessage, Message } from "@/components/form-message";
@@ -10,7 +10,7 @@ import { SmtpMessage } from "@/app/(auth-pages)/smtp-message";
 import { priceIdAtom } from "@/lib/atoms/handOver";
 import { useSignupFrom } from "@/lib/validation/hooks";
 
-export function SignUpForm({ message }: { message: Message; }) {
+export function SignUpForm({ message }: { message: Message }) {
   const priceID = useAtomValue(priceIdAtom);
   const { form, onSubmit } = useSignupFrom();
 
@@ -24,7 +24,10 @@ export function SignUpForm({ message }: { message: Message; }) {
 
   return (
     <>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col min-w-64 max-w-64 mx-auto">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex flex-col min-w-64 max-w-64 mx-auto"
+      >
         <h1 className="text-2xl font-medium">Sign up</h1>
         <p className="text-sm text text-foreground">
           Already have an account?{" "}
@@ -35,9 +38,15 @@ export function SignUpForm({ message }: { message: Message; }) {
         <div className="flex flex-col gap-2 [&>input]:mb-3 mt-8">
           <Input {...form.register("priceid")} type="hidden" value={priceID} />
           <Label htmlFor="email">Email</Label>
-          <Input {...form.register("email")} placeholder="you@example.com" autoComplete={"email"} />
+          <Input
+            {...form.register("email")}
+            placeholder="you@example.com"
+            autoComplete={"email"}
+          />
           {form.formState.errors.email && (
-            <p className="text-red-500 text-sm">{form.formState.errors.email.message}</p>
+            <p className="text-red-500 text-sm">
+              {form.formState.errors.email.message}
+            </p>
           )}
 
           <Label htmlFor="password">Password</Label>
@@ -48,12 +57,12 @@ export function SignUpForm({ message }: { message: Message; }) {
             autoComplete={"current-password"}
           />
           {form.formState.errors.password && (
-            <p className="text-red-500 text-sm">{form.formState.errors.password.message}</p>
+            <p className="text-red-500 text-sm">
+              {form.formState.errors.password.message}
+            </p>
           )}
-          
-          <SubmitButton pendingText="Signing up...">
-            Sign up
-          </SubmitButton>
+
+          <SubmitButton pendingText="Signing up...">Sign up</SubmitButton>
           <FormMessage message={message} />
         </div>
       </form>

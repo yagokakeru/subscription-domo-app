@@ -19,4 +19,4 @@ export const REGEX = {
     SYMBOL: /[!@#$%^&*(),.?":{}|<>_\-]/,
   },
   FILE_EXTENSION: /\.[0-9a-z]+$/i,
-}
+};

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { signOutAction } from "@/app/actions";
 import { ThemeSwitcher } from "@/components/theme-switcher";
@@ -19,31 +19,31 @@ export default function Header() {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          {
-            userProfile ? (
-              <div className="flex items-center gap-4">
-                Hey, {userProfile.email}!
-                <Button asChild size="sm" variant={"outline"}>
-                  <Link href="/protected/mypage/">My Page</Link>
+          {userProfile ? (
+            <div className="flex items-center gap-4">
+              Hey, {userProfile.email}!
+              <Button asChild size="sm" variant={"outline"}>
+                <Link href="/protected/mypage/">My Page</Link>
+              </Button>
+              <form action={signOutAction}>
+                <Button type="submit" variant={"outline"}>
+                  Sign out
                 </Button>
-                <form action={signOutAction}>
-                  <Button type="submit" variant={"outline"}>Sign out</Button>
-                </form>
-              </div>
-            ) : (
-              <div className="flex gap-2">
-                <Button asChild size="sm" variant={"destructive"}>
-                  <Link href="/pricing">Pricing</Link>
-                </Button>
-                <Button asChild size="sm" variant={"outline"}>
-                  <Link href="/sign-in">Sign in</Link>
-                </Button>
-                <Button asChild size="sm" variant={"default"}>
-                  <Link href="/sign-up">Sign up</Link>
-                </Button>
-              </div>
-            )
-          }
+              </form>
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <Button asChild size="sm" variant={"destructive"}>
+                <Link href="/pricing">Pricing</Link>
+              </Button>
+              <Button asChild size="sm" variant={"outline"}>
+                <Link href="/sign-in">Sign in</Link>
+              </Button>
+              <Button asChild size="sm" variant={"default"}>
+                <Link href="/sign-up">Sign up</Link>
+              </Button>
+            </div>
+          )}
           <ThemeSwitcher />
         </div>
       </div>

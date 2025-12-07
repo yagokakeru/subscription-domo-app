@@ -1,4 +1,4 @@
-import { atom } from 'jotai';
+import { atom } from "jotai";
 
 // priceIDを保持するAtom
-export const priceIdAtom = atom('');
+export const priceIdAtom = atom("");
