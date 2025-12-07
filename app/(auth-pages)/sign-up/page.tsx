@@ -1,10 +1,10 @@
-import { Message } from "@/components/form-message";
-import { SignUpForm } from "@/components/app/auth-pages/sign-up";
+import { Message } from '@/components/form-message'
+import { SignUpForm } from '@/components/app/auth-pages/sign-up'
 
 export default async function Signup(props: {
-  searchParams: Promise<Message>;
+    searchParams: Promise<Message>
 }) {
-  const searchParams = await props.searchParams;
+    const searchParams = await props.searchParams
 
-  return <SignUpForm message={searchParams} />;
+    return <SignUpForm message={searchParams} />
 }

@@ -1,64 +1,64 @@
-import { createServerClient } from "@supabase/ssr";
-import { type NextRequest, NextResponse } from "next/server";
+import { createServerClient } from '@supabase/ssr'
+import { type NextRequest, NextResponse } from 'next/server'
 
 export const updateSession = async (request: NextRequest) => {
-  try {
-    let supabaseResponse = NextResponse.next({
-      request,
-    });
+    try {
+        let supabaseResponse = NextResponse.next({
+            request,
+        })
 
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return request.cookies.getAll();
-          },
-          setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value }) =>
-              request.cookies.set(name, value),
-            );
-            supabaseResponse = NextResponse.next({
-              request,
-            });
-            cookiesToSet.forEach(({ name, value, options }) =>
-              supabaseResponse.cookies.set(name, value, options),
-            );
-          },
-        },
-      },
-    );
+        const supabase = createServerClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+            {
+                cookies: {
+                    getAll() {
+                        return request.cookies.getAll()
+                    },
+                    setAll(cookiesToSet) {
+                        cookiesToSet.forEach(({ name, value }) =>
+                            request.cookies.set(name, value)
+                        )
+                        supabaseResponse = NextResponse.next({
+                            request,
+                        })
+                        cookiesToSet.forEach(({ name, value, options }) =>
+                            supabaseResponse.cookies.set(name, value, options)
+                        )
+                    },
+                },
+            }
+        )
 
-    // This will refresh session if expired - required for Server Components
-    // https://supabase.com/docs/guides/auth/server-side/nextjs
-    const user = await supabase.auth.getUser();
+        // This will refresh session if expired - required for Server Components
+        // https://supabase.com/docs/guides/auth/server-side/nextjs
+        const user = await supabase.auth.getUser()
 
-    // protected routes
-    if (request.nextUrl.pathname.startsWith("/protected") && user.error) {
-      return NextResponse.redirect(new URL("/sign-in", request.url));
+        // protected routes
+        if (request.nextUrl.pathname.startsWith('/protected') && user.error) {
+            return NextResponse.redirect(new URL('/sign-in', request.url))
+        }
+
+        if (
+            !user.error &&
+            (request.nextUrl.pathname === '/' ||
+                request.nextUrl.pathname.startsWith('/forgot-password') ||
+                request.nextUrl.pathname.startsWith('/sign-in') ||
+                request.nextUrl.pathname.startsWith('/sign-up'))
+        ) {
+            return NextResponse.redirect(new URL('/protected', request.url))
+        }
+
+        return supabaseResponse
+    } catch (e) {
+        // If you are here, a Supabase client could not be created!
+        // This is likely because you have not set up environment variables.
+        // Check out http://localhost:3000 for Next Steps.
+        console.error('Supabase client creation failed:', e)
+        return NextResponse.next({
+            request: {
+                headers: request.headers,
+            },
+        })
     }
-
-    if (
-      !user.error &&
-      (request.nextUrl.pathname === "/" ||
-        request.nextUrl.pathname.startsWith("/forgot-password") ||
-        request.nextUrl.pathname.startsWith("/sign-in") ||
-        request.nextUrl.pathname.startsWith("/sign-up"))
-    ) {
-      return NextResponse.redirect(new URL("/protected", request.url));
-    }
-
-    return supabaseResponse;
-  } catch (e) {
-    // If you are here, a Supabase client could not be created!
-    // This is likely because you have not set up environment variables.
-    // Check out http://localhost:3000 for Next Steps.
-    console.error("Supabase client creation failed:", e);
-    return NextResponse.next({
-      request: {
-        headers: request.headers,
-      },
-    });
-  }
-};
+}
