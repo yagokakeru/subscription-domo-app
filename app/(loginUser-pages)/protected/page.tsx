@@ -33,7 +33,7 @@ export default function ProtectedPage({
                 </div>
                 <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                     <InfoIcon size="16" strokeWidth={2} />
-                    git add .する前にlint 整形をするようにする
+                    git add .する前にlintとprettierをするようにする
                 </div>
                 <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                     <InfoIcon size="16" strokeWidth={2} />
