@@ -113,3 +113,105 @@ Please file feedback and issues over on the [Supabase GitHub org](https://github
 - [Supabase Auth and the Next.js App Router](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
 
 # subscription-domo-app
+
+# Subscription Domo App
+
+サブスクリプション管理用の Web アプリケーションです。  
+Next.js + Supabase を使った個人開発プロジェクト。
+
+---
+
+## 🔧 技術スタック
+
+- **Framework**: Next.js (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **State Management**: Jotai
+- **Backend / Auth**: Supabase
+- **Payment**: Stripe
+- **Lint**: ESLint
+- **Formatter**: Prettier
+- **Package Manager**: pnpm
+
+---
+
+## 🚀 セットアップ
+
+### 1. リポジトリをクローン
+
+```bash
+git clone https://github.com/yagokakeru/subscription-domo-app.git
+```
+
+### 2. 依存関係をインストール
+
+```bash
+pnpm install
+```
+
+### 3. 環境変数を設定
+
+```bash
+cp .env.example .env.local
+```
+
+.env.local に以下を設定してください：
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY=
+
+NEXT_PUBLIC_STRIPE_SECRET_KEY=
+```
+
+## 🧑‍💻 開発
+
+### 開発サーバー起動
+
+```bash
+pnpm dev
+```
+
+http://localhost:3000で確認できます。
+
+## 🧹 Lint / Format
+
+### ESLint（コード品質チェック）
+
+```bash
+pnpm lint
+```
+
+### Prettier（フォーマット）
+
+```bash
+pnpm prettier
+```
+
+### フォーマットルール
+
+・ESLint: ロジック・バグ検出  
+・Prettier: コード整形  
+・保存時: ESLint → Prettier の順で自動実行  
+・commit 前: lint-staged により差分のみチェック
+
+### Git Hooks
+
+・husky + lint-staged を使用  
+・commit 時に以下が自動実行されます：
+
+```bash
+eslint --fix
+prettier --write
+```
+
+## 📂 ディレクトリ構成（抜粋）
+
+```
+app/                # Next.js App Router
+components/         # UI コンポーネント
+lib/                # ロジック・ユーティリティ
+eslint.config.js    # ESLint 設定
+prettier.config.cjs # Prettier 設定
+```
