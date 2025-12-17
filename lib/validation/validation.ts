@@ -40,3 +40,8 @@ export const avatarValidation = z
             ['image/jpeg', 'image/png'].includes(file[0]?.type),
         'JPEGまたはPNGのみアップロードできます'
     )
+
+// scriptのバリデーション
+export const scriptValidation = z
+    .string()
+    .min(1, MESSAGES.MIN_LENGTH(LABELS.SCRIPT, 1))

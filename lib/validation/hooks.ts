@@ -10,10 +10,13 @@ import {
     loginFormValues,
     profileSchema,
     profileFormValues,
+    scriptSchema,
+    scriptFormValues,
 } from './schema'
 import { useAtomValue } from 'jotai'
 import { userProfileAtom } from '@/lib/atoms/authUser'
 import { updateProfile } from '@/lib/actions/auth/updateProfile'
+import { postScript } from '@/lib/actions/script/createScript'
 
 export function useSignupFrom() {
     const form = useForm<signupFormValues>({
@@ -53,6 +56,20 @@ export function useProfileFrom() {
         data: profileFormValues
     ): Promise<{ status: 'success' | 'error'; message: string }> => {
         return await updateProfile(data, userProfile!.user_id)
+    }
+
+    return { form, onSubmit }
+}
+
+export function useScriptFrom() {
+    const userProfile = useAtomValue(userProfileAtom)
+
+    const form = useForm<scriptFormValues>({
+        resolver: zodResolver(scriptSchema), // ZodをRHFに接続
+    })
+
+    const onSubmit = (data: scriptFormValues) => {
+        postScript(data, userProfile!.user_id)
     }
 
     return { form, onSubmit }

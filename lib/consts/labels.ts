@@ -12,4 +12,5 @@ export const LABELS = {
     COLOR: 'カラーコード',
     USERNAME: 'ユーザー名',
     NUMBER: '数値',
+    SCRIPT: '台本',
 } as const
