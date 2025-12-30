@@ -10,13 +10,16 @@ import {
     loginFormValues,
     profileSchema,
     profileFormValues,
-    scriptSchema,
-    scriptFormValues,
+    createScriptSchema,
+    createScriptFormValues,
+    editScriptSchema,
+    editScriptFormValues,
 } from './schema'
 import { useAtomValue } from 'jotai'
 import { userProfileAtom } from '@/lib/atoms/authUser'
 import { updateProfile } from '@/lib/actions/auth/updateProfile'
 import { postScript } from '@/lib/actions/script/createScript'
+import { editScript } from '@/lib/actions/script/editScript'
 
 export function useSignupFrom() {
     const form = useForm<signupFormValues>({
@@ -61,15 +64,27 @@ export function useProfileFrom() {
     return { form, onSubmit }
 }
 
-export function useScriptFrom() {
+export function useCreateScriptFrom() {
     const userProfile = useAtomValue(userProfileAtom)
 
-    const form = useForm<scriptFormValues>({
-        resolver: zodResolver(scriptSchema), // ZodをRHFに接続
+    const form = useForm<createScriptFormValues>({
+        resolver: zodResolver(createScriptSchema), // ZodをRHFに接続
     })
 
-    const onSubmit = (data: scriptFormValues) => {
+    const onSubmit = (data: createScriptFormValues) => {
         postScript(data, userProfile!.user_id)
+    }
+
+    return { form, onSubmit }
+}
+
+export function useEditScriptFrom() {
+    const form = useForm<editScriptFormValues>({
+        resolver: zodResolver(editScriptSchema), // ZodをRHFに接続
+    })
+
+    const onSubmit = (data: editScriptFormValues) => {
+        editScript(data)
     }
 
     return { form, onSubmit }

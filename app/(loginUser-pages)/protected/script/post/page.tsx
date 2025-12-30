@@ -1,4 +1,4 @@
-import { PostComponent } from '@/components/app/loginUser-pages/post'
+import { PostComponent } from '@/components/app/loginUser-pages/script/post'
 import { Message } from '@/components/form-message'
 
 export default async function Postpage(props: {

@@ -2,19 +2,20 @@
 
 import { encodedRedirect } from '@/utils/utils'
 import { createClient } from '@/utils/supabase/server'
-import { scriptFormValues } from '@/lib/validation/schema'
+import { createScriptFormValues } from '@/lib/validation/schema'
 import type { userProfile } from '@/types/userProfile'
 
 export const postScript = async (
-    formData: scriptFormValues,
+    formData: createScriptFormValues,
     userID: userProfile['user_id']
 ) => {
     const supabase = await createClient()
     const { script } = formData
+    const name = formData.name || 'defaultName'
 
-    const { error } = await supabase.from('sript').insert({
+    const { error } = await supabase.from('script').insert({
         user_id: userID,
-        title: '無題の台本',
+        title: name,
         script: script,
         favorite: false,
     })
@@ -28,5 +29,9 @@ export const postScript = async (
         )
     }
 
-    return encodedRedirect('success', '/protected/post', '投稿しました。')
+    return encodedRedirect(
+        'success',
+        '/protected/script/post',
+        '投稿しました。'
+    )
 }

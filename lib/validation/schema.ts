@@ -6,6 +6,7 @@ import {
     nameValidation,
     avatarValidation,
     scriptValidation,
+    scriptIdValidation,
 } from './validation'
 
 // サインアップ用スキーマ
@@ -27,13 +28,22 @@ export const profileSchema = z.object({
     name: nameValidation,
 })
 
-// script用のスキーマ
-export const scriptSchema = z.object({
+// script作成用のスキーマ
+export const createScriptSchema = z.object({
     script: scriptValidation,
+    name: nameValidation,
+})
+
+// script編集用のスキーマ
+export const editScriptSchema = z.object({
+    id: scriptIdValidation,
+    script: scriptValidation,
+    name: nameValidation,
 })
 
 // スキーマから型を自動生成
 export type signupFormValues = z.infer<typeof signupSchema>
 export type loginFormValues = z.infer<typeof loginSchema>
 export type profileFormValues = z.infer<typeof profileSchema>
-export type scriptFormValues = z.infer<typeof scriptSchema>
+export type createScriptFormValues = z.infer<typeof createScriptSchema>
+export type editScriptFormValues = z.infer<typeof editScriptSchema>

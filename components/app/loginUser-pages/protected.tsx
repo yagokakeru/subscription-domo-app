@@ -12,7 +12,15 @@ import { userProfileAtom } from '@/lib/atoms/authUser'
 
 import { SubmitButton } from '@/components/submit-button'
 
-export function Protected({ message }: { message: Message }) {
+import type { script } from '@/types/script'
+
+export function Protected({
+    message,
+    script,
+}: {
+    message: Message
+    script: script
+}) {
     const userProfile = useAtomValue(userProfileAtom)
 
     if (!userProfile) return <div>Loading...</div>
@@ -24,6 +32,14 @@ export function Protected({ message }: { message: Message }) {
                     <InfoIcon size="16" strokeWidth={2} />
                     This is a protected page that you can only see as an
                     authenticated user
+                </div>
+                <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
+                    <InfoIcon size="16" strokeWidth={2} />
+                    いいね機能
+                </div>
+                <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
+                    <InfoIcon size="16" strokeWidth={2} />
+                    WISYWIGエディタ導入
                 </div>
             </div>
             <div className="flex gap-2">
@@ -55,15 +71,48 @@ export function Protected({ message }: { message: Message }) {
                     {JSON.stringify(userProfile, null, 2)}
                 </pre>
             </div>
-            <div className="flex items-start gap-3">
-                <div>
-                    <div className="border-2 border-solid border-gray-400 rounded flex items-center justify-center w-28 h-40"></div>
-                    <p>タイトル</p>
-                </div>
+            <div className="flex items-start gap-3 flex-wrap">
+                {script.data ? (
+                    script.data.map((script) => {
+                        return (
+                            <div key={script.id} className="w-28">
+                                <a href={`protected/script/edit/${script.id}`}>
+                                    <div className="border-2 border-solid border-gray-400 rounded flex items-center justify-center w-full h-40"></div>
+                                    <p>{script.title}</p>
+                                </a>
+                                <svg
+                                    className="cursor-pointer w-1/4"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 20 19"
+                                >
+                                    <path
+                                        className={
+                                            script.favorite
+                                                ? 'fill-yellow-500'
+                                                : 'fill-black'
+                                        }
+                                        d="M6.85,14.83l3.15-1.9,3.15,1.93-.83-3.6,2.78-2.4-3.65-.33-1.45-3.4-1.45,3.38-3.65.33,2.78,2.43-.83,3.58ZM3.83,19l1.63-7.03L0,7.25l7.2-.63L10,0l2.8,6.63,7.2.63-5.45,4.73,1.63,7.03-6.18-3.73-6.18,3.73Z"
+                                    />
+                                    <polygon
+                                        className={
+                                            script.favorite
+                                                ? 'fill-yellow-500'
+                                                : 'fill-transparent'
+                                        }
+                                        points="10 4.97 8.5 8.45 4.74 8.79 7.6 11.29 6.75 14.98 10 13.02 13.25 15 12.4 11.29 15.26 8.81 11.5 8.48 10 4.97"
+                                    />
+                                </svg>
+                            </div>
+                        )
+                    })
+                ) : (
+                    <p className="w-full">{script.error}</p>
+                )}
+
                 <div>
                     <a
                         className="border-2 border-solid border-gray-400 rounded flex items-center justify-center w-28 h-40"
-                        href="/protected/post"
+                        href="/protected/script/post"
                     >
                         +
                     </a>

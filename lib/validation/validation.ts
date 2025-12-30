@@ -45,3 +45,6 @@ export const avatarValidation = z
 export const scriptValidation = z
     .string()
     .min(1, MESSAGES.MIN_LENGTH(LABELS.SCRIPT, 1))
+
+// scriptIdのバリデーション
+export const scriptIdValidation = z.string()
