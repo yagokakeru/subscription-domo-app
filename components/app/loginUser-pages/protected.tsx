@@ -2,11 +2,17 @@
 
 import { useAtomValue } from 'jotai'
 import { deleteAccountAction } from '@/app/actions'
+import {
+    insertFavorite,
+    deleteFavorite,
+    isFavorited,
+} from '@/lib/actions/script/favorite'
 import { FormMessage, Message } from '@/components/form-message'
 import { Input } from '@/components/ui/input'
 import { InfoIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import { useState, useEffect } from 'react'
 
 import { userProfileAtom } from '@/lib/atoms/authUser'
 
@@ -22,6 +28,28 @@ export function Protected({
     script: script
 }) {
     const userProfile = useAtomValue(userProfileAtom)
+    type ScriptItem = NonNullable<script['data']>[number]
+    const [scriptMap, setScriptMap] = useState<Array<{
+        data: ScriptItem
+        isFavorite: boolean
+    }> | null>(null)
+
+    useEffect(() => {
+        if (!script.data) return
+
+        const fetchFavorites = async () => {
+            const results = await Promise.all(
+                script.data!.map(async (s) => {
+                    const isFav = await isFavorited(s.id)
+                    return { data: s, isFavorite: isFav }
+                })
+            )
+
+            setScriptMap(results)
+        }
+
+        fetchFavorites()
+    }, [script.data])
 
     if (!userProfile) return <div>Loading...</div>
 
@@ -35,7 +63,7 @@ export function Protected({
                 </div>
                 <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                     <InfoIcon size="16" strokeWidth={2} />
-                    いいね機能
+                    削除機能
                 </div>
                 <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                     <InfoIcon size="16" strokeWidth={2} />
@@ -71,23 +99,51 @@ export function Protected({
                     {JSON.stringify(userProfile, null, 2)}
                 </pre>
             </div>
-            <div className="flex items-start gap-3 flex-wrap">
-                {script.data ? (
-                    script.data.map((script) => {
+
+            <div className="flex gap-2">
+                {scriptMap ? (
+                    scriptMap.map((item) => {
+                        const { data, isFavorite } = item
                         return (
-                            <div key={script.id} className="w-28">
-                                <a href={`protected/script/edit/${script.id}`}>
+                            <div key={data['id']} className="w-28">
+                                <a href={`/protected/script/edit/${data.id}`}>
                                     <div className="border-2 border-solid border-gray-400 rounded flex items-center justify-center w-full h-40"></div>
-                                    <p>{script.title}</p>
+                                    <p>{data.title}</p>
                                 </a>
                                 <svg
                                     className="cursor-pointer w-1/4"
                                     xmlns="http://www.w3.org/2000/svg"
                                     viewBox="0 0 20 19"
+                                    onClick={() => {
+                                        if (isFavorite) {
+                                            deleteFavorite(
+                                                data.id,
+                                                userProfile.user_id
+                                            )
+                                        } else {
+                                            insertFavorite(
+                                                data.id,
+                                                userProfile.user_id
+                                            )
+                                        }
+
+                                        // お気に入りステータス更新
+                                        setScriptMap((prev) =>
+                                            prev!.map((item) =>
+                                                item.data.id === data.id
+                                                    ? {
+                                                          ...item,
+                                                          isFavorite:
+                                                              !item.isFavorite,
+                                                      }
+                                                    : item
+                                            )
+                                        )
+                                    }}
                                 >
                                     <path
                                         className={
-                                            script.favorite
+                                            isFavorite
                                                 ? 'fill-yellow-500'
                                                 : 'fill-black'
                                         }
@@ -95,7 +151,7 @@ export function Protected({
                                     />
                                     <polygon
                                         className={
-                                            script.favorite
+                                            isFavorite
                                                 ? 'fill-yellow-500'
                                                 : 'fill-transparent'
                                         }
