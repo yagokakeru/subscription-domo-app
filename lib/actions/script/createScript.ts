@@ -17,7 +17,6 @@ export const postScript = async (
         user_id: userID,
         title: name,
         script: script,
-        favorite: false,
     })
 
     if (error) {

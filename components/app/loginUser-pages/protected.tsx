@@ -7,12 +7,15 @@ import {
     deleteFavorite,
     isFavorited,
 } from '@/lib/actions/script/favorite'
+import { deleteScript } from '@/lib/actions/script/deleteScript'
 import { FormMessage, Message } from '@/components/form-message'
 import { Input } from '@/components/ui/input'
 import { InfoIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
 import { userProfileAtom } from '@/lib/atoms/authUser'
 
@@ -33,6 +36,7 @@ export function Protected({
         data: ScriptItem
         isFavorite: boolean
     }> | null>(null)
+    const router = useRouter()
 
     useEffect(() => {
         if (!script.data) return
@@ -158,6 +162,17 @@ export function Protected({
                                         points="10 4.97 8.5 8.45 4.74 8.79 7.6 11.29 6.75 14.98 10 13.02 13.25 15 12.4 11.29 15.26 8.81 11.5 8.48 10 4.97"
                                     />
                                 </svg>
+                                <Image
+                                    className="cursor-pointer w-1/4"
+                                    src={'/delete.svg'}
+                                    width={100}
+                                    height={100}
+                                    alt="削除"
+                                    onClick={async () => {
+                                        await deleteScript(data.id)
+                                        router.refresh()
+                                    }}
+                                />
                             </div>
                         )
                     })
