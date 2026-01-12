@@ -4,16 +4,21 @@ import { encodedRedirect } from '@/utils/utils'
 import { createClient } from '@/utils/supabase/server'
 import { editScriptFormValues } from '@/lib/validation/schema'
 
-export const editScript = async (formData: editScriptFormValues) => {
+export const editScript = async (
+    formData: editScriptFormValues,
+    jsonS: string,
+    id: number
+) => {
     const supabase = await createClient()
-    const { id, script } = formData
     const name = formData.name || 'defaultName'
+    // jsonが文字列で渡されるのでパースする
+    const jsonP = JSON.parse(jsonS)
 
     const { error } = await supabase
         .from('script')
         .update({
             title: name,
-            script: script,
+            content: jsonP,
         })
         .eq('id', id)
 

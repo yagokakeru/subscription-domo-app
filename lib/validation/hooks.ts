@@ -21,6 +21,8 @@ import { updateProfile } from '@/lib/actions/auth/updateProfile'
 import { postScript } from '@/lib/actions/script/createScript'
 import { editScript } from '@/lib/actions/script/editScript'
 
+import type { scriptData } from '@/types/script'
+
 export function useSignupFrom() {
     const form = useForm<signupFormValues>({
         resolver: zodResolver(signupSchema), // ZodをRHFに接続
@@ -72,19 +74,29 @@ export function useCreateScriptFrom() {
     })
 
     const onSubmit = (data: createScriptFormValues) => {
-        postScript(data, userProfile!.user_id)
+        // action serverに受け渡すときにjsonのattrsが消え、fontsizeが保持されないので一度文字列にする
+        const jsonS = JSON.stringify(data.content, null, 2)
+
+        postScript(data, jsonS, userProfile!.user_id)
     }
 
     return { form, onSubmit }
 }
 
-export function useEditScriptFrom() {
+export function useEditScriptFrom(initialData: scriptData) {
     const form = useForm<editScriptFormValues>({
         resolver: zodResolver(editScriptSchema), // ZodをRHFに接続
+        defaultValues: {
+            name: initialData.title ?? '無題の台本',
+            content: initialData.content ?? null,
+        },
     })
 
     const onSubmit = (data: editScriptFormValues) => {
-        editScript(data)
+        // action serverに受け渡すときにjsonのattrsが消え、fontsizeが保持されないので一度文字列にする
+        const jsonS = JSON.stringify(data.content, null, 2)
+
+        editScript(data, jsonS, initialData.id)
     }
 
     return { form, onSubmit }

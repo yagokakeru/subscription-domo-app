@@ -1,3 +1,43 @@
+/* tiptapのスタイル初期化 */
+.prose-content {
+    /* reset を戻す */
+    all: revert;
+
+    /* プロジェクト共通で揃えたい部分だけ再定義 */
+    font-family: inherit;
+    line-height: 1.7;
+    color: #111;
+}
+
+.prose-content :where(h1, h2, h3, h4, h5, h6) {
+    font-size: revert;
+    font-weight: revert;
+    /* margin: revert; */
+}
+
+/* .prose-content p {
+    margin: revert;
+}
+
+.prose-content ul,
+.prose-content ol {
+    margin: revert;
+    padding-left: revert;
+}
+
+.prose-content li {
+    margin: revert;
+} */
+
+.prose-content a {
+    color: #2563eb; /* tailwind blue-600 */
+    text-decoration: underline;
+}
+
+/* .prose-content strong {
+    font-weight: bolder;
+} */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -66,43 +106,4 @@
     body {
         @apply bg-background text-foreground;
     }
-}
-
-.prose-content {
-    /* reset を戻す */
-    all: revert;
-
-    /* プロジェクト共通で揃えたい部分だけ再定義 */
-    font-family: inherit;
-    line-height: 1.7;
-    color: #111;
-}
-
-.prose-content :where(h1, h2, h3, h4, h5, h6) {
-    font-size: revert;
-    font-weight: revert;
-    margin: revert;
-}
-
-.prose-content p {
-    margin: revert;
-}
-
-.prose-content ul,
-.prose-content ol {
-    margin: revert;
-    padding-left: revert;
-}
-
-.prose-content li {
-    margin: revert;
-}
-
-.prose-content a {
-    color: #2563eb; /* tailwind blue-600 */
-    text-decoration: underline;
-}
-
-.prose-content strong {
-    font-weight: bolder;
 }

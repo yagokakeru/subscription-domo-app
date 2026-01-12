@@ -1,12 +1,22 @@
+import type { JSONContent } from '@tiptap/react'
+
+export type scriptData = {
+    id: number
+    user_id: string
+    title: string
+    content: JSONContent
+    inserted_at: string
+    updated_at: string
+}
+
 export type script = {
     success: boolean
-    data?: {
-        id: number
-        user_id: string
-        title: string
-        script: string
-        inserted_at: string
-        updated_at: string
-    }[]
+    data?: scriptData[]
+    error?: string
+}
+
+export type getEditScript = {
+    success: boolean
+    data?: scriptData
     error?: string
 }

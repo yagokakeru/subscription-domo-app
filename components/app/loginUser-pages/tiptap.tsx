@@ -6,26 +6,42 @@ import Paragraph from '@tiptap/extension-paragraph'
 import Text from '@tiptap/extension-text'
 import Heading from '@tiptap/extension-heading'
 import Bold from '@tiptap/extension-bold'
-import { TextStyle, FontSize } from '@tiptap/extension-text-style'
+import { FontSize, TextStyle } from '@tiptap/extension-text-style'
+import { useEffect } from 'react'
+import { UseFormReturn } from 'react-hook-form'
+import { editScriptFormValues } from '@/lib/validation/schema'
 
-const Tiptap = () => {
+const Tiptap = (form: UseFormReturn<editScriptFormValues>) => {
+    const extensions = [
+        Document,
+        Paragraph,
+        Text,
+        Bold,
+        TextStyle,
+        FontSize,
+        Heading.configure({
+            levels: [1, 2, 3],
+        }),
+    ]
+
     const editor = useEditor({
-        extensions: [
-            Document,
-            Paragraph,
-            Text,
-            Bold,
-            TextStyle,
-            FontSize,
-            Heading.configure({
-                levels: [1, 2, 3],
-            }),
-        ],
-        content:
-            '今日は少しだけ時間に余裕があったので、いつもよりゆっくりコーヒーを飲みました。窓の外を見ると、特別な景色があるわけではないのに、なぜか落ち着いた気持ちになります。忙しい日が続くと、こうした何気ない時間の大切さを忘れてしまいがちですが、ほんの数分立ち止まるだけで頭の中が整理される気がします。たまには何も考えず、ただ目の前のことに集中するのも悪くないですね。',
+        extensions: extensions,
+        content: '',
         // Don't render immediately on the server to avoid SSR issues
         immediatelyRender: false,
+        // contentのvalue値にエディターに入力した値を反映
+        onUpdate: ({ editor }) => {
+            form.setValue('content', editor.getJSON(), {
+                shouldValidate: true,
+            })
+        },
     })
+
+    useEffect(() => {
+        if (editor && form.getValues('content')) {
+            editor.commands.setContent(form.getValues('content'))
+        }
+    }, [editor, form])
 
     const editorState = useEditorState({
         editor,
@@ -60,8 +76,8 @@ const Tiptap = () => {
     return (
         <>
             <div className="control-group">
-                <div className="button-group">
-                    <button
+                <div className="button-group flex">
+                    <div
                         onClick={() =>
                             editor
                                 .chain()
@@ -73,8 +89,8 @@ const Tiptap = () => {
                             ${editorState?.isH1 ? 'bg-black text-white' : ''}`}
                     >
                         H1
-                    </button>
-                    <button
+                    </div>
+                    <div
                         onClick={() =>
                             editor
                                 .chain()
@@ -86,8 +102,8 @@ const Tiptap = () => {
                             ${editorState?.isH2 ? 'bg-black text-white' : ''}`}
                     >
                         H2
-                    </button>
-                    <button
+                    </div>
+                    <div
                         onClick={() =>
                             editor
                                 .chain()
@@ -101,8 +117,8 @@ const Tiptap = () => {
                             ${editorState?.isH3 ? 'bg-black text-white' : ''}`}
                     >
                         H3
-                    </button>
-                    <button
+                    </div>
+                    <div
                         onClick={() =>
                             editor.chain().focus().toggleBold().run()
                         }
@@ -114,10 +130,10 @@ const Tiptap = () => {
                             }`}
                     >
                         bold
-                    </button>
+                    </div>
                 </div>
-                <div className="button-group">
-                    <button
+                <div className="button-group flex">
+                    <div
                         onClick={() =>
                             editor.chain().focus().setFontSize('28px').run()
                         }
@@ -131,8 +147,8 @@ const Tiptap = () => {
                             }`}
                     >
                         Font size 28px
-                    </button>
-                    <button
+                    </div>
+                    <div
                         onClick={() =>
                             editor.chain().focus().setFontSize('32px').run()
                         }
@@ -146,8 +162,8 @@ const Tiptap = () => {
                             }`}
                     >
                         Font size 32px
-                    </button>
-                    <button
+                    </div>
+                    <div
                         onClick={() =>
                             editor.chain().focus().unsetFontSize().run()
                         }
@@ -157,10 +173,10 @@ const Tiptap = () => {
                         data-test-id="unsetFontSize"
                     >
                         Unset font size
-                    </button>
+                    </div>
                 </div>
                 <div className="button-group">
-                    <button
+                    <div
                         onClick={() => {
                             editor.chain().focus().unsetAllMarks().run()
                             editor.chain().focus().clearNodes().run()
@@ -170,10 +186,13 @@ const Tiptap = () => {
                             px-10`}
                     >
                         delete style
-                    </button>
+                    </div>
                 </div>
             </div>
-            <EditorContent editor={editor} className="prose-content" />
+            <EditorContent
+                editor={editor}
+                className="prose-content border-2 border-solid border-gray-400 rounded"
+            />
         </>
     )
 }

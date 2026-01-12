@@ -5,18 +5,19 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { SubmitButton } from '@/components/submit-button'
 import { useEditScriptFrom } from '@/lib/validation/hooks'
-import type { script } from '@/types/script'
+import type { getEditScript, scriptData } from '@/types/script'
+import Tiptap from '@/components/app/loginUser-pages/tiptap'
 
 export function EditComponent({
     message,
     script,
 }: {
     message: Message
-    script: script
+    script: getEditScript
 }) {
-    const { form, onSubmit } = useEditScriptFrom()
+    const { form, onSubmit } = useEditScriptFrom(script.data as scriptData)
 
-    if (script.success === false) {
+    if (!script.success) {
         return <p className="text-center">{script.error}</p>
     }
 
@@ -25,29 +26,17 @@ export function EditComponent({
             <h2 className="font-bold text-2xl mb-4">Post page</h2>
 
             <form onSubmit={form.handleSubmit(onSubmit)}>
-                <Input
-                    {...form.register('id')}
-                    defaultValue={script.data?.[0].id || ''}
-                    type="hidden"
-                />
                 <Label htmlFor="name">ファイル名</Label>
-                <Input
-                    {...form.register('name')}
-                    defaultValue={script.data?.[0].title || '無題の台本'}
-                />
-                <Label htmlFor="script">台本</Label>
-                <textarea
-                    className="border-2 border-solid border-gray-400 rounded flex items-center justify-center w-96"
-                    {...form.register('script')}
-                    id="script"
-                    rows={9}
-                    defaultValue={script.data?.[0].script || ''}
-                ></textarea>
-                {form.formState.errors.script && (
+                <Input {...form.register('name')} />
+
+                <Label htmlFor="content">台本</Label>
+                <Tiptap {...form} />
+                {form.formState.errors.content && (
                     <p className="text-red-500 text-sm">
-                        {form.formState.errors.script.message}
+                        {String(form.formState.errors.content.message)}
                     </p>
                 )}
+
                 <SubmitButton pendingText="creating">編集</SubmitButton>
             </form>
 

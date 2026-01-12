@@ -7,16 +7,18 @@ import type { userProfile } from '@/types/userProfile'
 
 export const postScript = async (
     formData: createScriptFormValues,
+    jsonS: string,
     userID: userProfile['user_id']
 ) => {
     const supabase = await createClient()
-    const { script } = formData
     const name = formData.name || 'defaultName'
+    // jsonが文字列で渡されるのでパースする
+    const jsonP = JSON.parse(jsonS)
 
     const { error } = await supabase.from('script').insert({
         user_id: userID,
         title: name,
-        script: script,
+        content: jsonP,
     })
 
     if (error) {

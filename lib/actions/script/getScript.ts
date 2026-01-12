@@ -29,6 +29,7 @@ export const getEditScript = async (id: string) => {
         .from('script')
         .select('*')
         .eq('id', id)
+        .single()
 
     if (error) {
         console.error(error)

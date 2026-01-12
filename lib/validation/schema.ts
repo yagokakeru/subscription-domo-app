@@ -5,8 +5,8 @@ import {
     passwordValidation,
     nameValidation,
     avatarValidation,
-    scriptValidation,
-    scriptIdValidation,
+    // scriptValidation,
+    contentValidation,
 } from './validation'
 
 // サインアップ用スキーマ
@@ -30,15 +30,14 @@ export const profileSchema = z.object({
 
 // script作成用のスキーマ
 export const createScriptSchema = z.object({
-    script: scriptValidation,
     name: nameValidation,
+    content: contentValidation,
 })
 
 // script編集用のスキーマ
 export const editScriptSchema = z.object({
-    id: scriptIdValidation,
-    script: scriptValidation,
     name: nameValidation,
+    content: contentValidation,
 })
 
 // スキーマから型を自動生成

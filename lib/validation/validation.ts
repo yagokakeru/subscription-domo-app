@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { LABELS } from '../consts/labels'
 import { MESSAGES } from '../consts/messages'
+import { JSONContent } from '@tiptap/react'
 
 // priceidのバリデーション
 export const priceidValidation = z.string().nullable().optional()
@@ -41,10 +42,30 @@ export const avatarValidation = z
         'JPEGまたはPNGのみアップロードできます'
     )
 
-// scriptのバリデーション
-export const scriptValidation = z
-    .string()
-    .min(1, MESSAGES.MIN_LENGTH(LABELS.SCRIPT, 1))
+// contentのバリデーション
+export const contentValidation = z.custom<JSONContent>().refine(
+    (value) => {
+        if (!value || typeof value !== 'object') return false
 
-// scriptIdのバリデーション
-export const scriptIdValidation = z.string()
+        const hasText = (node: JSONContent): boolean => {
+            if (
+                node.type === 'text' &&
+                node.text &&
+                node.text.trim().length > 0
+            ) {
+                return true
+            }
+
+            if (Array.isArray(node.content)) {
+                return node.content.some(hasText)
+            }
+
+            return false
+        }
+
+        return hasText(value)
+    },
+    {
+        message: MESSAGES.MIN_LENGTH(LABELS.CONTENT, 1),
+    }
+)
