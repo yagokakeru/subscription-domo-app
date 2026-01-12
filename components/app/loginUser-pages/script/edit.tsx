@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label'
 import { SubmitButton } from '@/components/submit-button'
 import { useEditScriptFrom } from '@/lib/validation/hooks'
 import type { getEditScript, scriptData } from '@/types/script'
-import Tiptap from '@/components/app/loginUser-pages/tiptap'
+import Tiptap from '@/components/ui/tiptap'
 
 export function EditComponent({
     message,

@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { SubmitButton } from '@/components/submit-button'
 import { useCreateScriptFrom } from '@/lib/validation/hooks'
-import Tiptap from '@/components/app/loginUser-pages/tiptap'
+import Tiptap from '@/components/ui/tiptap'
 
 export function PostComponent({ message }: { message: Message }) {
     const { form, onSubmit } = useCreateScriptFrom()

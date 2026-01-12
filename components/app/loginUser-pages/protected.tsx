@@ -67,11 +67,15 @@ export function Protected({
                 </div>
                 <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                     <InfoIcon size="16" strokeWidth={2} />
-                    削除機能
+                    表示機能
+                    <br />
+                    ・タイトル、台本
+                    <br />
+                    ・自動スクロール、速度調整、時間で流す
                 </div>
                 <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                     <InfoIcon size="16" strokeWidth={2} />
-                    WISYWIGエディタ導入
+                    決済機能見直し
                 </div>
             </div>
             <div className="flex gap-2">
