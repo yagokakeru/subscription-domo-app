@@ -75,6 +75,10 @@ export function Protected({
                 </div>
                 <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                     <InfoIcon size="16" strokeWidth={2} />
+                    行間調整機能
+                </div>
+                <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
+                    <InfoIcon size="16" strokeWidth={2} />
                     決済機能見直し
                 </div>
             </div>
@@ -114,10 +118,12 @@ export function Protected({
                         const { data, isFavorite } = item
                         return (
                             <div key={data['id']} className="w-28">
-                                <a href={`/protected/script/edit/${data.id}`}>
+                                <Link
+                                    href={`/protected/script/edit/${data.id}`}
+                                >
                                     <div className="border-2 border-solid border-gray-400 rounded flex items-center justify-center w-full h-40"></div>
                                     <p>{data.title}</p>
-                                </a>
+                                </Link>
                                 <svg
                                     className="cursor-pointer w-1/4"
                                     xmlns="http://www.w3.org/2000/svg"
