@@ -8,7 +8,8 @@ import { Button } from '@/components/ui/button'
 import { useEditScriptFrom } from '@/lib/validation/hooks'
 import type { getEditScript, scriptData } from '@/types/script'
 import Tiptap from '@/components/ui/tiptap'
-import { useRef } from 'react'
+import { useRef, useEffect, useState } from 'react'
+import { useAutoScroll } from '@/lib/hooks/autoScroll'
 
 export function EditComponent({
     message,
@@ -17,63 +18,73 @@ export function EditComponent({
     message: Message
     script: getEditScript
 }) {
+    const { scrollToWithDuration, stopScroll, enableWheelStop } =
+        useAutoScroll()
     const { form, onSubmit } = useEditScriptFrom(script.data as scriptData)
+    const [hours, setHours] = useState<number>(0)
+    const [minutes, setMinutes] = useState<number>(0)
+    const [seconds, setSeconds] = useState<number>(0)
+    const [duration, setDuration] = useState<number>(10000)
     const startRef = useRef<HTMLDivElement>(null)
     const endRef = useRef<HTMLDivElement>(null)
+
+    const scrollToStart = (startingPoint = false) => {
+        if (!endRef.current || !startRef.current) return
+
+        const startY =
+            startRef.current.getBoundingClientRect().top + window.scrollY
+        const targetY =
+            endRef.current.getBoundingClientRect().top + window.scrollY
+
+        if (startingPoint) {
+            window.scrollTo(0, startY)
+        }
+
+        // 10秒かけてスクロール
+        scrollToWithDuration(startY, targetY, duration)
+    }
+
+    const timeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+        switch (e.target.name) {
+            case 'hours':
+                setHours(Number(e.target.value))
+                setDuration(
+                    Number(e.target.value) * 3600 * 1000 +
+                        minutes * 60 * 1000 +
+                        seconds * 1000
+                )
+                break
+            case 'minutes':
+                setMinutes(Number(e.target.value))
+                setDuration(
+                    hours * 3600 * 1000 +
+                        Number(e.target.value) * 60 * 1000 +
+                        seconds * 1000
+                )
+                break
+            case 'seconds':
+                setSeconds(Number(e.target.value))
+                setDuration(
+                    hours * 3600 * 1000 +
+                        minutes * 60 * 1000 +
+                        Number(e.target.value) * 1000
+                )
+                break
+            default:
+        }
+    }
+
+    useEffect(() => {
+        enableWheelStop()
+    }, [enableWheelStop])
 
     if (!script.success) {
         return <p className="text-center">{script.error}</p>
     }
 
-    const scrollToStart = () => {
-        if (!endRef.current) return
-
-        const targetY =
-            endRef.current.getBoundingClientRect().top + window.scrollY
-
-        // 2秒かけてスクロール
-        scrollToWithDuration(targetY, 10000)
-    }
-
-    const scrollToWithDuration = (
-        targetY: number,
-        duration: number // ミリ秒
-    ) => {
-        const startY = window.scrollY
-        const diff = targetY - startY
-        const startTime = performance.now()
-
-        const animate = (currentTime: number) => {
-            const elapsed = currentTime - startTime
-            const progress = Math.min(elapsed / duration, 1)
-
-            // easeInOut（なくてもOK）
-            const ease =
-                progress < 0.5
-                    ? 2 * progress * progress
-                    : 1 - Math.pow(-2 * progress + 2, 2) / 2
-
-            window.scrollTo(0, startY + diff * ease)
-
-            if (progress < 1) {
-                requestAnimationFrame(animate)
-            }
-        }
-
-        requestAnimationFrame(animate)
-    }
-
     return (
         <>
             <h2 className="font-bold text-2xl mb-4">Post page</h2>
-            <Button
-                asChild
-                size="sm"
-                variant={'destructive'}
-                onClick={scrollToStart}
-            >
-                <p>自動スクロール</p>
-            </Button>
 
             <div ref={startRef}>START</div>
 
@@ -95,6 +106,74 @@ export function EditComponent({
             <FormMessage message={message} />
 
             <div ref={endRef}>END</div>
+
+            <div className="bg-black w-screen h-screen"></div>
+
+            <div className="flex justify-center gap-x-2.5 fixed bottom-5 left-0 w-screen">
+                <div className="flex gap-x-1 mr-4">
+                    <input
+                        type="number"
+                        name="hours"
+                        min={0}
+                        max={24}
+                        value={hours}
+                        onChange={timeHandler}
+                    />
+                    <span>時間</span>
+
+                    <input
+                        type="number"
+                        name="minutes"
+                        min={0}
+                        max={59}
+                        value={minutes}
+                        onChange={timeHandler}
+                    />
+                    <span>分</span>
+
+                    <input
+                        type="number"
+                        name="seconds"
+                        min={0}
+                        max={59}
+                        value={seconds}
+                        onChange={timeHandler}
+                    />
+                    <span>秒</span>
+                </div>
+                <Button
+                    asChild
+                    size="sm"
+                    variant={'destructive'}
+                    onClick={() => scrollToStart()}
+                >
+                    <p>自動スクロール</p>
+                </Button>
+                <Button
+                    asChild
+                    size="sm"
+                    variant={'destructive'}
+                    onClick={() => scrollToStart(true)}
+                >
+                    <p>初めから自動スクロール</p>
+                </Button>
+                <Button
+                    asChild
+                    size="sm"
+                    variant={'destructive'}
+                    onClick={stopScroll}
+                >
+                    <p>自動スクロール停止</p>
+                </Button>
+                <Button
+                    asChild
+                    size="sm"
+                    variant={'destructive'}
+                    onClick={() => scrollToStart()}
+                >
+                    <p>自動スクロール再開</p>
+                </Button>
+            </div>
         </>
     )
 }
