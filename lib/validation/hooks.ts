@@ -10,15 +10,12 @@ import {
     loginFormValues,
     profileSchema,
     profileFormValues,
-    createScriptSchema,
-    createScriptFormValues,
     editScriptSchema,
     editScriptFormValues,
 } from './schema'
 import { useAtomValue } from 'jotai'
 import { userProfileAtom } from '@/lib/atoms/authUser'
 import { updateProfile } from '@/lib/actions/auth/updateProfile'
-import { postScript } from '@/lib/actions/script/createScript'
 import { editScript } from '@/lib/actions/script/editScript'
 
 import type { scriptData } from '@/types/script'
@@ -61,23 +58,6 @@ export function useProfileFrom() {
         data: profileFormValues
     ): Promise<{ status: 'success' | 'error'; message: string }> => {
         return await updateProfile(data, userProfile!.user_id)
-    }
-
-    return { form, onSubmit }
-}
-
-export function useCreateScriptFrom() {
-    const userProfile = useAtomValue(userProfileAtom)
-
-    const form = useForm<createScriptFormValues>({
-        resolver: zodResolver(createScriptSchema), // ZodをRHFに接続
-    })
-
-    const onSubmit = (data: createScriptFormValues) => {
-        // action serverに受け渡すときにjsonのattrsが消え、fontsizeが保持されないので一度文字列にする
-        const jsonS = JSON.stringify(data.content, null, 2)
-
-        postScript(data, jsonS, userProfile!.user_id)
     }
 
     return { form, onSubmit }

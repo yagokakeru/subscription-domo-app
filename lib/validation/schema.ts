@@ -5,7 +5,6 @@ import {
     passwordValidation,
     nameValidation,
     avatarValidation,
-    // scriptValidation,
     contentValidation,
 } from './validation'
 
@@ -28,12 +27,6 @@ export const profileSchema = z.object({
     name: nameValidation,
 })
 
-// script作成用のスキーマ
-export const createScriptSchema = z.object({
-    name: nameValidation,
-    content: contentValidation,
-})
-
 // script編集用のスキーマ
 export const editScriptSchema = z.object({
     name: nameValidation,
@@ -44,5 +37,4 @@ export const editScriptSchema = z.object({
 export type signupFormValues = z.infer<typeof signupSchema>
 export type loginFormValues = z.infer<typeof loginSchema>
 export type profileFormValues = z.infer<typeof profileSchema>
-export type createScriptFormValues = z.infer<typeof createScriptSchema>
 export type editScriptFormValues = z.infer<typeof editScriptSchema>

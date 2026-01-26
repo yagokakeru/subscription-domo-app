@@ -8,6 +8,7 @@ import {
     isFavorited,
 } from '@/lib/actions/script/favorite'
 import { deleteScript } from '@/lib/actions/script/deleteScript'
+import { createScript } from '@/lib/actions/script/createScript'
 import { FormMessage, Message } from '@/components/form-message'
 import { Input } from '@/components/ui/input'
 import { InfoIcon } from 'lucide-react'
@@ -16,11 +17,8 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-
 import { userProfileAtom } from '@/lib/atoms/authUser'
-
 import { SubmitButton } from '@/components/submit-button'
-
 import type { script } from '@/types/script'
 
 export function Protected({
@@ -67,11 +65,11 @@ export function Protected({
                 </div>
                 <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                     <InfoIcon size="16" strokeWidth={2} />
-                    editで投稿も完結させる
+                    行間調整機能
                 </div>
                 <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                     <InfoIcon size="16" strokeWidth={2} />
-                    行間調整機能
+                    始まるまでのタイマー表示
                 </div>
                 <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                     <InfoIcon size="16" strokeWidth={2} />
@@ -187,13 +185,15 @@ export function Protected({
                 )}
 
                 <div>
-                    <a
+                    <button
                         className="border-2 border-solid border-gray-400 rounded flex items-center justify-center w-28 h-40"
-                        href="/protected/script/post"
+                        onClick={() => {
+                            createScript(userProfile.user_id)
+                        }}
                     >
                         +
-                    </a>
-                    <p>追加</p>
+                    </button>
+                    <p>新規追加</p>
                 </div>
             </div>
         </div>

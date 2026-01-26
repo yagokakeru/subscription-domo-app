@@ -3,6 +3,7 @@
 import { encodedRedirect } from '@/utils/utils'
 import { createClient } from '@/utils/supabase/server'
 import { editScriptFormValues } from '@/lib/validation/schema'
+import { SCRIPT_DEFAULT } from '@/lib/consts/script/script'
 
 export const editScript = async (
     formData: editScriptFormValues,
@@ -10,7 +11,7 @@ export const editScript = async (
     id: number
 ) => {
     const supabase = await createClient()
-    const name = formData.name || 'defaultName'
+    const name = formData.name || SCRIPT_DEFAULT.NAME
     // jsonが文字列で渡されるのでパースする
     const jsonP = JSON.parse(jsonS)
 
