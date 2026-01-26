@@ -6,7 +6,7 @@ import Paragraph from '@tiptap/extension-paragraph'
 import Text from '@tiptap/extension-text'
 import Heading from '@tiptap/extension-heading'
 import Bold from '@tiptap/extension-bold'
-import { FontSize, TextStyle } from '@tiptap/extension-text-style'
+import { FontSize, LineHeight, TextStyle } from '@tiptap/extension-text-style'
 import { useEffect } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import { editScriptFormValues } from '@/lib/validation/schema'
@@ -18,6 +18,7 @@ const Tiptap = (form: UseFormReturn<editScriptFormValues>) => {
         Text,
         Bold,
         TextStyle,
+        LineHeight,
         FontSize,
         Heading.configure({
             levels: [1, 2, 3],
@@ -51,6 +52,12 @@ const Tiptap = (form: UseFormReturn<editScriptFormValues>) => {
                     isH1: false,
                     isH2: false,
                     isH3: false,
+                    isBold: false,
+                    isFontSize28: false,
+                    isFontSize32: false,
+                    isLineHeight150: false,
+                    isLineHeight200: false,
+                    isLineHeight400: false,
                 }
             }
 
@@ -64,6 +71,15 @@ const Tiptap = (form: UseFormReturn<editScriptFormValues>) => {
                 }),
                 isFontSize32: editor.isActive('textStyle', {
                     fontSize: '32px',
+                }),
+                isLineHeight150: editor.isActive('textStyle', {
+                    lineHeight: '1.5',
+                }),
+                isLineHeight200: editor.isActive('textStyle', {
+                    lineHeight: '2.0',
+                }),
+                isLineHeight400: editor.isActive('textStyle', {
+                    lineHeight: '4.0',
                 }),
             }
         },
@@ -173,6 +189,75 @@ const Tiptap = (form: UseFormReturn<editScriptFormValues>) => {
                         data-test-id="unsetFontSize"
                     >
                         Unset font size
+                    </div>
+                </div>
+                <div className="button-group flex">
+                    <div
+                        onClick={() =>
+                            editor
+                                .chain()
+                                .focus()
+                                .toggleTextStyle({ lineHeight: '1.5' })
+                                .run()
+                        }
+                        className={`border-2
+                            border-black
+                            px-10
+                            ${
+                                editorState?.isLineHeight150
+                                    ? 'bg-black text-white'
+                                    : ''
+                            }`}
+                    >
+                        Line height 1.5
+                    </div>
+                    <div
+                        onClick={() =>
+                            editor
+                                .chain()
+                                .focus()
+                                .toggleTextStyle({ lineHeight: '2.0' })
+                                .run()
+                        }
+                        className={`border-2
+                            border-black
+                            px-10
+                            ${
+                                editorState?.isLineHeight200
+                                    ? 'bg-black text-white'
+                                    : ''
+                            }`}
+                    >
+                        Line height 2.0
+                    </div>
+                    <div
+                        onClick={() =>
+                            editor
+                                .chain()
+                                .focus()
+                                .toggleTextStyle({ lineHeight: '4.0' })
+                                .run()
+                        }
+                        className={`border-2
+                            border-black
+                            px-10
+                            ${
+                                editorState?.isLineHeight400
+                                    ? 'bg-black text-white'
+                                    : ''
+                            }`}
+                    >
+                        Line height 4.0
+                    </div>
+                    <div
+                        onClick={() =>
+                            editor.chain().focus().unsetLineHeight().run()
+                        }
+                        className={`border-2
+                            border-black
+                            px-10`}
+                    >
+                        Unset line height
                     </div>
                 </div>
                 <div className="button-group">
