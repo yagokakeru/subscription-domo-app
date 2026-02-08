@@ -34,7 +34,7 @@ export default function Header() {
                     ) : (
                         <div className="flex gap-2">
                             <Button asChild size="sm" variant={'destructive'}>
-                                <Link href="/pricing">Pricing</Link>
+                                <Link href="/plan">Plan</Link>
                             </Button>
                             <Button asChild size="sm" variant={'outline'}>
                                 <Link href="/sign-in">Sign in</Link>

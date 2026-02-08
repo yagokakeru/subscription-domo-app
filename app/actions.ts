@@ -7,7 +7,7 @@ import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import Stripe from 'stripe'
 
-import { getUserInfo } from '@/lib/getUserInfo'
+import { getUserInfo } from '@/lib/functions/profile/getUserInfo'
 import { getCheckoutUrl } from '@/lib/getCheckoutUrl'
 
 import { signupFormValues, loginFormValues } from '@/lib/validation/schema'
@@ -74,8 +74,8 @@ export const signUpAction = async (formData: signupFormValues) => {
             // ログインユーザー情報を取得
             const userData = await getUserInfo()
 
-            if (userData.data) {
-                const customerID = userData.data[0].stripe_uuid
+            if (userData) {
+                const customerID = userData.stripe_uuid
                 const sessionURL = await getCheckoutUrl(priceID, customerID)
 
                 if (sessionURL) {
@@ -85,7 +85,7 @@ export const signUpAction = async (formData: signupFormValues) => {
                 return encodedRedirect(
                     'error',
                     '/sign-in',
-                    userData.error.message
+                    'ユーザ情報を取得できませんでした。'
                 )
             }
         }

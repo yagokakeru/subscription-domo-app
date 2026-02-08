@@ -1,6 +1,10 @@
+/**
+ * ユーザープロフィールを返す関数
+ */
 import { createClient } from '@/utils/supabase/server'
+import type { userProfile } from '@/types/userProfile'
 
-export async function getUserInfo() {
+export async function getUserInfo(): Promise<userProfile> {
     // supabaseクライアントを作成
     const supabase = await createClient()
 
@@ -13,6 +17,7 @@ export async function getUserInfo() {
         .from('user_with_profile')
         .select()
         .eq('user_id', userID) // supabase ユーザーのprofile情報取得
+        .single()
 
-    return userData
+    return userData.data
 }

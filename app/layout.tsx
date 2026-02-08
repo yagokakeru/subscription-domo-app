@@ -3,7 +3,7 @@ import { Geist } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
 import './globals.css'
 import { AuthProvider } from '@/lib/providers/AuthProvider'
-import { getUserInfo } from '@/lib/getUserInfo'
+import { getUserInfo } from '@/lib/functions/profile/getUserInfo'
 
 const defaultUrl = process.env.VERCEL_URL
     ? `https://${process.env.VERCEL_URL}`
@@ -25,8 +25,7 @@ export default async function RootLayout({
 }: Readonly<{
     children: React.ReactNode
 }>) {
-    const { data } = await getUserInfo()
-    const userProfile = data?.[0]
+    const userProfile = await getUserInfo()
 
     return (
         <html

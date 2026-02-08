@@ -69,7 +69,8 @@ export function Protected({
                 </div>
                 <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                     <InfoIcon size="16" strokeWidth={2} />
-                    決済機能見直し
+                    決済機能見直し ーサブスクの解約機能 ーサブスク登録 DB連携
+                    ーサブスクステータスによってファイル数制御
                 </div>
             </div>
             <div className="flex gap-2">
@@ -90,7 +91,7 @@ export function Protected({
                     <FormMessage message={message} />
                 </div>
                 <Button asChild size="sm" variant={'destructive'}>
-                    <Link href="/pricing">Pleace Subscribe!!</Link>
+                    <Link href="/plan">Pleace Subscribe!!</Link>
                 </Button>
             </div>
             <div className="flex flex-col gap-2 items-start">
