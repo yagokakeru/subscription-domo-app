@@ -4,14 +4,17 @@ import { redirect } from 'next/navigation'
 import Stripe from 'stripe'
 
 import type { Result } from '@/types/result'
+import type { userProfile } from '@/types/userProfile'
 
 // Stripeクライアントを作成
 const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY as string)
 
 export const checkout = async (
     priceID: string,
-    customerID: string
+    customerID: string,
+    userID: userProfile['user_id']
 ): Promise<Result<string>> => {
+    console.log(userID)
     // 決算を作成
     const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
@@ -23,7 +26,12 @@ export const checkout = async (
         ],
         customer: customerID,
         mode: 'subscription',
-        success_url: `${process.env.NEXT_PUBLIC_APP_URL}/sucsses/?session_id={CHECKOUT_SESSION_ID}`,
+        subscription_data: {
+            metadata: {
+                user_id: userID,
+            },
+        },
+        success_url: `${process.env.NEXT_PUBLIC_APP_URL}/protected/?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/plan`,
     })
 

@@ -5,6 +5,12 @@ import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
 
+import {
+    Subscription,
+    UpgradeSubscriptionWithWebhook,
+} from '@/lib/actions/stripe/subscription'
+import { UnsubscriptionWebhook } from '@/lib/actions/stripe/unsubscription'
+
 // Stripeクライアントを作成
 const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY as string)
 
@@ -38,12 +44,15 @@ export async function POST(req: NextResponse) {
             break
         case 'customer.subscription.created':
             console.log(event.type, 'サブスク契約🤑🤑🤑🤑🤑🤑🤑🤑')
+            await Subscription(event)
             break
         case 'customer.subscription.updated':
             console.log(event.type, 'サブスクプラン変更🙇‍♂️🙇‍♂️🙇‍♂️🙇‍♂️🙇‍♂️🙇‍♂️🙇‍♂️🙇‍♂️')
+            await UpgradeSubscriptionWithWebhook(event)
             break
         case 'customer.subscription.deleted':
             console.log(event.type, 'サブスク解約😞😞😞😞😞😞😞😞')
+            await UnsubscriptionWebhook(event.data.object.id)
             break
         case 'invoice.payment_succeeded':
             console.log(event.type, '支払い成功💰💰💰💰💰💰💰💰')
@@ -52,10 +61,10 @@ export async function POST(req: NextResponse) {
             console.log(event.type, '支払い失敗😤😤😤😤😤😤😤😤')
             break
         default:
-            console.log(
-                `🚨🚨🚨🚨🚨🚨\n${event.type}\n処理対象外のイベントだ\n🚨🚨🚨🚨🚨🚨\nこれだよ`
-            )
-            console.log(event)
+        // console.log(
+        //     `🚨🚨🚨🚨🚨🚨\n${event.type}\n処理対象外のイベントだ\n🚨🚨🚨🚨🚨🚨\nこれだよ`
+        // )
+        // console.log(event)
     }
 
     return new Response('ok', { status: 200 })

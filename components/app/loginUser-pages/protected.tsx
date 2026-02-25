@@ -69,7 +69,10 @@ export function Protected({
                 </div>
                 <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                     <InfoIcon size="16" strokeWidth={2} />
-                    決済機能見直し ーサブスクの解約機能 ーサブスク登録 DB連携
+                    決済機能見直し
+                    <br />
+                    ーサブスク購読・解約時のメッセージ
+                    <br />
                     ーサブスクステータスによってファイル数制御
                 </div>
             </div>
@@ -93,14 +96,6 @@ export function Protected({
                 <Button asChild size="sm" variant={'destructive'}>
                     <Link href="/plan">Pleace Subscribe!!</Link>
                 </Button>
-            </div>
-            <div className="flex flex-col gap-2 items-start">
-                <h2 className="font-bold text-2xl mb-4">
-                    Your User Profile Infomation
-                </h2>
-                <pre className="text-xs font-mono p-3 rounded border overflow-auto break-all whitespace-pre-wrap">
-                    {JSON.stringify(userProfile, null, 2)}
-                </pre>
             </div>
 
             <div className="flex gap-2">

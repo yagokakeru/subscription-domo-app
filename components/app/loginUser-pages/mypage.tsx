@@ -4,6 +4,7 @@ import { FormMessage, Message } from '@/components/form-message'
 import { useAtomValue } from 'jotai'
 import { userProfileAtom } from '@/lib/atoms/authUser'
 import { signOutAction, deleteAccountAction } from '@/app/actions'
+import { Unsubscription } from '@/lib/actions/stripe/unsubscription'
 import { SubmitButton } from '@/components/submit-button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -12,8 +13,18 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { createAvatarUrl } from '@/lib/actions/auth/createAvatarUrl'
 import { useEffect } from 'react'
+import { Button } from '@/components/ui/button'
+import { ReactivateSubscription } from '@/lib/actions/stripe/subscription'
+import Link from 'next/link'
+import type { userPlan } from '@/types/userPlan'
 
-export function MypageComponent({ message }: { message: Message }) {
+export function MypageComponent({
+    message,
+    userPlan,
+}: {
+    message: Message
+    userPlan: userPlan | null
+}) {
     const userProfile = useAtomValue(userProfileAtom)
     const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
     const { form, onSubmit } = useProfileFrom()
@@ -76,12 +87,41 @@ export function MypageComponent({ message }: { message: Message }) {
                         </p>
                     )}
 
+                    <div className="flex">
+                        <div>プラン</div>
+                        <div>{userPlan?.name ?? '未契約'}</div>
+                    </div>
+                    {userPlan?.cancel_at_period_end ? (
+                        <>
+                            <p>
+                                プランは{userPlan?.current_period_end}
+                                に解約予定です
+                            </p>
+                            <div
+                                onClick={() =>
+                                    ReactivateSubscription(userProfile!.user_id)
+                                }
+                            >
+                                解約を解除する
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <p>
+                                次の支払いは{userPlan?.current_period_end}です
+                            </p>
+                            <Link href={'/plan?planname=' + userPlan?.name}>
+                                プランをアップグレード
+                            </Link>
+                        </>
+                    )}
+
                     <SubmitButton pendingText="editing">編集</SubmitButton>
                 </form>
 
                 <FormMessage message={message} />
 
-                <div className="flex items-center gap-4 mt-10">
+                <form className="flex items-center gap-4 mt-10">
                     <SubmitButton
                         pendingText="Signing out..."
                         variant={'outline'}
@@ -98,7 +138,15 @@ export function MypageComponent({ message }: { message: Message }) {
                     >
                         Delete Account
                     </SubmitButton>
-                </div>
+                </form>
+                <Button
+                    asChild
+                    size="default"
+                    variant={'destructive'}
+                    onClick={() => Unsubscription(userProfile!.user_id)}
+                >
+                    <div>Unsubscription</div>
+                </Button>
             </div>
         </>
     )

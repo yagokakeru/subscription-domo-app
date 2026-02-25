@@ -10,24 +10,35 @@ import { checkout } from '@/lib/actions/stripe/checkout'
 import { useSetAtom } from 'jotai'
 import { priceIdAtom } from '@/lib/atoms/handOver'
 import { useRouter } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
+import { UpgradeSubscription } from '@/lib/actions/stripe/subscription'
+import type { userPlan } from '@/types/userPlan'
 
 export function PlanComponent({
     planInfo,
     userInfo,
+    userPlan,
 }: {
     planInfo: Result<planInfo[]>
     userInfo: userProfile
+    userPlan: userPlan | null
 }) {
     const setPriceId = useSetAtom(priceIdAtom)
     const [loading, setLoading] = useState(false)
     const { push } = useRouter()
+    const searchParams = useSearchParams()
+    const planname = searchParams.get('planname')
 
     const handleCheckout = async (priceId: string) => {
         if (loading) return
 
         setLoading(true)
 
-        const result = await checkout(priceId, userInfo?.stripe_uuid)
+        const result = await checkout(
+            priceId,
+            userInfo?.stripe_uuid,
+            userInfo.user_id
+        )
 
         if (result && !result.ok) {
             console.error(result.message)
@@ -52,7 +63,24 @@ export function PlanComponent({
                                         per user / {item.interval}
                                     </span>
                                 </p>
-                                {userInfo ? ( // ログインしていなければ登録画面へ遷移させる
+                                {userInfo && planname && userPlan ? ( // サブスクアップグレード
+                                    <Button
+                                        id="checkout-and-portal-button"
+                                        onClick={() =>
+                                            UpgradeSubscription(
+                                                userPlan.stripe_subscription_id,
+                                                item.priceId
+                                            )
+                                        }
+                                        disabled={
+                                            planname == item.name
+                                                ? true
+                                                : loading
+                                        }
+                                    >
+                                        {loading ? 'Upgrading…' : 'Upgrade'}
+                                    </Button>
+                                ) : userInfo ? ( // ログイン、サブスク未加入
                                     <Button
                                         id="checkout-and-portal-button"
                                         type="submit"
@@ -64,6 +92,7 @@ export function PlanComponent({
                                         {loading ? 'Redirecting…' : 'Checkout'}
                                     </Button>
                                 ) : (
+                                    // ログインしていなければ登録画面へ遷移させる
                                     <Button
                                         id="checkout-and-portal-button"
                                         onClick={() => {
