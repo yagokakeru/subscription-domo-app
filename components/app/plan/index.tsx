@@ -52,6 +52,8 @@ export function PlanComponent({
             <div className="grid md:grid-cols-2 gap-8 max-w-xl mx-auto">
                 {planInfo.ok ? (
                     planInfo.data.map((item: planInfo, index: number) => {
+                        const priceId = item.priceId
+
                         return (
                             <div key={index}>
                                 <h2 className="text-2xl font-medium text-gray-900 mb-2">
@@ -63,13 +65,27 @@ export function PlanComponent({
                                         per user / {item.interval}
                                     </span>
                                 </p>
-                                {userInfo && planname && userPlan ? ( // サブスクアップグレード
+                                {!priceId ? (
+                                    <Button
+                                        id="checkout-and-portal-button"
+                                        onClick={() => {
+                                            push('/sign-up')
+                                        }}
+                                        disabled={
+                                            planname == item.name
+                                                ? true
+                                                : loading
+                                        }
+                                    >
+                                        {loading ? 'Moving…' : 'Signup'}
+                                    </Button>
+                                ) : userInfo && planname && userPlan ? ( // サブスクアップグレード
                                     <Button
                                         id="checkout-and-portal-button"
                                         onClick={() =>
                                             UpgradeSubscription(
                                                 userPlan.stripe_subscription_id,
-                                                item.priceId
+                                                priceId
                                             )
                                         }
                                         disabled={
@@ -84,9 +100,7 @@ export function PlanComponent({
                                     <Button
                                         id="checkout-and-portal-button"
                                         type="submit"
-                                        onClick={() =>
-                                            handleCheckout(item.priceId)
-                                        }
+                                        onClick={() => handleCheckout(priceId)}
                                         disabled={loading}
                                     >
                                         {loading ? 'Redirecting…' : 'Checkout'}
@@ -96,7 +110,7 @@ export function PlanComponent({
                                     <Button
                                         id="checkout-and-portal-button"
                                         onClick={() => {
-                                            setPriceId(item.priceId)
+                                            setPriceId(priceId)
                                             push('/sign-up')
                                         }}
                                         disabled={loading}

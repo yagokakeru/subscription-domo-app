@@ -25,17 +25,33 @@ export async function getPlan(): Promise<Result<planInfo[]>> {
     }
 
     // 2.stripeから商品情報を取得
-    // stripe_price_idを配列にまとめる
-    const planIDs = plans.map<string>((plan) => plan.stripe_price_id)
+    // Stripe price_id があるものだけ抽出
+    const paidPlans = plans.filter((p) => p.stripe_price_id)
+
     // stripeからの商品情報を配列にまとめる
     const prices = await Promise.all(
-        planIDs.map((id) => stripe.prices.retrieve(id))
+        paidPlans.map((p) => stripe.prices.retrieve(p.stripe_price_id))
     )
+
     // 商品情報をMap化する
     const priceMap = new Map(prices.map((price) => [price.id, price]))
 
     // 3. mergeして返す
     const planInfo = plans.map<planInfo>((plan) => {
+        // freeプランの場合
+        if (!plan.stripe_price_id) {
+            return {
+                id: plan.id,
+                name: plan.name,
+                description: plan.description,
+                isRecommended: plan.is_recommended,
+                priceId: null,
+                amount: 0,
+                currency: 'jpy',
+                interval: 'month',
+            }
+        }
+
         const price = priceMap.get(plan.stripe_price_id)
 
         if (!price || !price.unit_amount || !price.recurring) {

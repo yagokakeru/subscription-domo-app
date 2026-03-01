@@ -74,6 +74,10 @@ export function Protected({
                     ーサブスク購読・解約時のメッセージ
                     <br />
                     ーサブスクステータスによってファイル数制御
+                    <br />
+                    ーー新規登録時にsubscriptionテーブルにfreeプランレコード追加
+                    <br />
+                    ーーRLS書き換え（insert）
                 </div>
             </div>
             <div className="flex gap-2">

@@ -5,7 +5,7 @@ export type planInfo = {
     name: string
     description: string
     isRecommended: boolean
-    priceId: string
+    priceId: string | null
     amount: number
     currency: string
     interval: Stripe.Price.Recurring.Interval
