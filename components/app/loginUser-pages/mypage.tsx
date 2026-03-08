@@ -89,7 +89,7 @@ export function MypageComponent({
 
                     <div className="flex">
                         <div>プラン</div>
-                        <div>{userPlan?.name ?? '未契約'}</div>
+                        <div>{userPlan?.name ?? 'Free'}</div>
                     </div>
                     {userPlan?.cancel_at_period_end ? (
                         <>
@@ -107,9 +107,12 @@ export function MypageComponent({
                         </>
                     ) : (
                         <>
-                            <p>
-                                次の支払いは{userPlan?.current_period_end}です
-                            </p>
+                            {userPlan?.current_period_end && (
+                                <p>
+                                    次の支払いは{userPlan?.current_period_end}
+                                    です
+                                </p>
+                            )}
                             <Link href={'/plan?planname=' + userPlan?.name}>
                                 プランをアップグレード
                             </Link>
@@ -130,11 +133,16 @@ export function MypageComponent({
                     >
                         Sign out
                     </SubmitButton>
+                </form>
+                <form>
+                    <Input
+                        type="hidden"
+                        name="user_id"
+                        value={userProfile!.user_id}
+                    />
                     <SubmitButton
-                        pendingText="Deleting account..."
-                        variant={'destructive'}
-                        size={'sm'}
                         formAction={deleteAccountAction}
+                        pendingText="Deleting account..."
                     >
                         Delete Account
                     </SubmitButton>

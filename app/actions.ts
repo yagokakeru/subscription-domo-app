@@ -53,6 +53,25 @@ export const signUpAction = async (formData: signupFormValues) => {
             console.error(error.code + ' ' + error.message)
             return encodedRedirect('error', '/sign-up', error.message)
         }
+
+        const { data: subData, error: subError } = await supabase
+            .from('subscription')
+            .insert({
+                plan_id: 5, // よくないけどfreeプランのIDを手入力
+                user_id: data.user.id,
+                stripe_customer_id: customer.id,
+                stripe_subscription_id: null,
+                price_id: null,
+                status: 'active',
+                current_period_end: null,
+                cancel_at_period_end: false,
+            })
+            .select()
+
+        if (subError) {
+            console.error(subError.code + ' ' + subError.message)
+            return encodedRedirect('error', '/sign-up', subError.message)
+        }
     }
 
     if (error) {
@@ -221,6 +240,10 @@ export const deleteAccountAction = async (formData: FormData) => {
                     .from('profile')
                     .delete()
                     .eq('supabase_uuid', userID) // supabase profile情報削除
+                await supabase
+                    .from('subscription')
+                    .delete()
+                    .eq('user_id', userID) // supabase サブスク情報削除
             } catch (error) {
                 return encodedRedirect(
                     'error',

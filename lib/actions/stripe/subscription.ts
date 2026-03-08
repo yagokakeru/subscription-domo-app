@@ -15,9 +15,17 @@ export const Subscription = async (
 ) => {
     const supabase = await createClientRole()
 
+    const { data: planData, error: planError } = await supabase
+        .from('plan')
+        .select('id')
+        .eq('stripe_price_id', event.data.object.plan.id)
+        .single()
+
     const { data: sub, error } = await supabase
         .from('subscription')
-        .insert({
+        .update({
+            // signupした時点でレコード作成するのでupdate
+            plan_id: planData?.id,
             user_id: event.data.object.metadata.user_id,
             stripe_customer_id: event.data.object.customer,
             stripe_subscription_id: event.data.object.id,
@@ -97,9 +105,16 @@ export const UpgradeSubscriptionWithWebhook = async (
 ) => {
     const supabase = await createClientRole()
 
+    const { data: planData, error: planError } = await supabase
+        .from('plan')
+        .select('id')
+        .eq('stripe_price_id', event.data.object.plan.id)
+        .single()
+
     const { data: sub, error } = await supabase
         .from('subscription')
         .update({
+            plan_id: planData?.id,
             user_id: event.data.object.metadata.user_id,
             stripe_customer_id: event.data.object.customer,
             stripe_subscription_id: event.data.object.id,

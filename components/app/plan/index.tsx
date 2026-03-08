@@ -82,12 +82,14 @@ export function PlanComponent({
                                 ) : userInfo && planname && userPlan ? ( // サブスクアップグレード
                                     <Button
                                         id="checkout-and-portal-button"
-                                        onClick={() =>
-                                            UpgradeSubscription(
-                                                userPlan.stripe_subscription_id,
-                                                priceId
-                                            )
-                                        }
+                                        onClick={() => {
+                                            userPlan.stripe_subscription_id
+                                                ? UpgradeSubscription(
+                                                      userPlan.stripe_subscription_id,
+                                                      priceId
+                                                  )
+                                                : handleCheckout(priceId)
+                                        }}
                                         disabled={
                                             planname == item.name
                                                 ? true
