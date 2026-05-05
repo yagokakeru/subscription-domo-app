@@ -12,31 +12,12 @@
 .prose-content :where(h1, h2, h3, h4, h5, h6) {
     font-size: revert;
     font-weight: revert;
-    /* margin: revert; */
 }
-
-/* .prose-content p {
-    margin: revert;
-}
-
-.prose-content ul,
-.prose-content ol {
-    margin: revert;
-    padding-left: revert;
-}
-
-.prose-content li {
-    margin: revert;
-} */
 
 .prose-content a {
     color: #2563eb; /* tailwind blue-600 */
     text-decoration: underline;
 }
-
-/* .prose-content strong {
-    font-weight: bolder;
-} */
 
 @tailwind base;
 @tailwind components;
@@ -69,6 +50,80 @@
         --chart-3: 197 37% 24%;
         --chart-4: 43 74% 66%;
         --chart-5: 27 87% 67%;
+
+        --colorBgBase: #f9fafb;
+        --colorBgPrimary: #3b82f6;
+        --colorBgPrimaryHover: #2563eb;
+        --colorBgPrimaryActive: #1d4ed8;
+        --colorBgSurface: #ffffff;
+        --colorBgSurfaceHover: #f3f4f6;
+        --colorBgSurfaceActive: #e5e7eb;
+        --colorBgModal: rgba(17, 24, 39, 0.4);
+        --colorBgDisabled: #f3f4f6;
+        --colorBgTransparent: transparent;
+        --colorBgErrorSubtle: #fef2f2;
+        --colorBgSuccessSubtle: #f0fdf4;
+        --colorBgWarningSubtle: #fefce8;
+
+        --colorBorderDefault: #d1d5db;
+        --colorBorderStrong: #9ca3af;
+        --colorBorderFocus: #3b82f6;
+        --colorBorderError: #ef4444;
+        --colorTextSuccess: #22c55e;
+        --colorBorderWarning: #eab308;
+        --colorBorderDisabled: #f3f4f6;
+
+        --colorTextPrimary: #111827;
+        --colorTextSecondary: #6b7280;
+        --colorTextDisabled: #d1d5db;
+        --colorTextOnPrimary: #ffffff;
+        --colorTextError: #dc2626;
+        --colorTextSuccess: #16a34a;
+        --colorTextWarning: #ca8a04;
+
+        --colorStatusError: #ef4444;
+        --colorStatusSuccess: #22c55e;
+        --colorStatusWarning: #eab308;
+
+        --colorShadowDefault: #d1d5db;
+
+        --radius-sm: 4;
+        --radius-md: 8;
+        --radius-lg: 12;
+        --radius-xl: 16;
+        --radius-full: 9999;
+
+        --space-4: 4;
+        --space-8: 8;
+        --space-12: 12;
+        --space-16: 16;
+        --space-24: 24;
+        --space-32: 32;
+        --space-40: 40;
+        --space-48: 48;
+        --space-56: 56;
+        --space-64: 64;
+        --space-96: 96;
+        --space-128: 128;
+
+        --fontFamilyBase: 'noto-sans-jp', sans-serif;
+        --fontFamilyEnglish: 'Inter', sans-serif;
+
+        --fontSize-xs: 10;
+        --fontSize-sm: 12;
+        --fontSize-md: 14;
+        --fontSize-lg: 20;
+        --fontSize-xl: 24;
+        --fontSize-2xl: 32;
+
+        --lineHeight-sm: 1.2;
+        --lineHeight-md: 1.3;
+        --lineHeight-lg: 1.4;
+
+        --fontWeight-regular: 400;
+        --fontWeight-medium: 500;
+        --fontWeight-semibold: 600;
+        --fontWeight-bold: 700;
     }
 
     .dark {
@@ -96,6 +151,42 @@
         --chart-3: 30 80% 55%;
         --chart-4: 280 65% 60%;
         --chart-5: 340 75% 55%;
+
+        --colorBgBase: #111827;
+        --colorBgPrimary: #93c5fd;
+        --colorBgPrimaryHover: #3b82f6;
+        --colorBgPrimaryActive: #2563eb;
+        --colorBgSurface: #111827;
+        --colorBgSurfaceHover: #1f2937;
+        --colorBgSurfaceActive: #374151;
+        --colorBgModal: rgba(255, 255, 255, 0.4);
+        --colorBgDisabled: #374151;
+        --colorBgTransparent: transparent;
+        --colorBgErrorSubtle: #7f1d1d;
+        --colorBgSuccessSubtle: #7f1d1d;
+        --colorBgWarningSubtle: #713f12;
+
+        --colorBorderDefault: #374151;
+        --colorBorderStrong: #6b7280;
+        --colorBorderFocus: #d1d5db;
+        --colorBorderError: #ef4444;
+        --colorTextSuccess: #22c55e;
+        --colorBorderWarning: #eab308;
+        --colorBorderDisabled: #374151;
+
+        --colorTextPrimary: #ffffff;
+        --colorTextSecondary: #9ca3af;
+        --colorTextDisabled: #6b7280;
+        --colorTextOnPrimary: #000000;
+        --colorTextError: #ef4444;
+        --colorTextSuccess: #22c55e;
+        --colorTextWarning: #eab308;
+
+        --colorStatusError: #ef4444;
+        --colorStatusSuccess: #22c55e;
+        --colorStatusWarning: #eab308;
+
+        --colorShadowDefault: #374151;
     }
 }
 
