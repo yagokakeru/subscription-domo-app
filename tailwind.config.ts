@@ -1,5 +1,6 @@
 import type { Config } from 'tailwindcss'
 import tailwindAnimate from 'tailwindcss-animate'
+import { pcvwPlugin } from './lib/tailwind/pcvw'
 
 // 基準サイズ（Figmaデザインサイズ）
 const PC_BASE = 1440
@@ -286,6 +287,15 @@ const config = {
                     },
                 ],
             },
+            boxShadow: {
+                card: '0 0 16px 0 var(--colorShadowDefault)',
+            },
+            transitionDuration: {
+                button: '300ms',
+            },
+            transitionTimingFunction: {
+                button: 'ease-out',
+            },
             // keyframes: {
             //     'accordion-down': {
             //         from: { height: '0' },
@@ -303,7 +313,7 @@ const config = {
         },
     },
     // plugins: [require("tailwindcss-animate")],
-    plugins: [tailwindAnimate],
+    plugins: [tailwindAnimate, pcvwPlugin],
 } satisfies Config
 
 export default config

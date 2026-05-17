@@ -5,8 +5,9 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
 const buttonVariants = cva(
-    `inline-flex items-center justify-center rounded-lg-pc font-base text-body-strong-pc
-    disabled:pointer-events-none disabled:bg-background-disabled disabled:content-disabled`,
+    `inline-flex items-center justify-center rounded-lg-pc font-base
+    disabled:pointer-events-none disabled:bg-background-disabled disabled:content-disabled
+    transition-colors duration-button ease-button`,
     {
         variants: {
             variant: {
@@ -25,9 +26,9 @@ const buttonVariants = cva(
                 // link: 'text-primary underline-offset-4 hover:underline',
             },
             size: {
-                default: 'px-32-pc py-12-pc',
+                default: 'text-body-strong-pc px-32-pc py-12-pc',
                 sm: 'text-body-small-pc px-24-pc py-8-pc',
-                lg: 'px-48-pc py-16-pc',
+                lg: 'text-body-strong-pc px-48-pc py-16-pc',
                 // icon: 'h-10 w-10',
             },
         },
