@@ -1,17 +1,9 @@
 import type { Config } from 'tailwindcss'
 import tailwindAnimate from 'tailwindcss-animate'
-import { pcvwPlugin } from './lib/tailwind/pcvw'
-
-// 基準サイズ（Figmaデザインサイズ）
-const PC_BASE = 1440
-const SP_BASE = 750
+import { pcVw, spVw, vwPlugin } from './lib/tailwind/vw'
 
 // px変換
 const pxVar = (name: string) => `calc(var(${name}) * 1px)`
-// PC pxをvwに変換
-const pcVw = (name: string) => `calc(var(${name}) / ${PC_BASE} * 100vw)`
-// SP pxをvwに変換
-const spVw = (name: string) => `calc(var(${name}) / ${SP_BASE} * 100vw)`
 
 const config = {
     darkMode: ['class'],
@@ -313,7 +305,7 @@ const config = {
         },
     },
     // plugins: [require("tailwindcss-animate")],
-    plugins: [tailwindAnimate, pcvwPlugin],
+    plugins: [tailwindAnimate, vwPlugin],
 } satisfies Config
 
 export default config

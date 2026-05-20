@@ -33,7 +33,7 @@ export default async function RootLayout({
             className={geistSans.className}
             suppressHydrationWarning
         >
-            <body className="bg-background text-foreground">
+            <body>
                 <AuthProvider userProfile={userProfile}>
                     <ThemeProvider
                         attribute="class"
@@ -41,12 +41,9 @@ export default async function RootLayout({
                         enableSystem
                         disableTransitionOnChange
                     >
-                        <main className="min-h-screen flex flex-col items-center">
+                        <main className="min-h-screen">
                             <Header />
-
-                            <div className="flex flex-col gap-20 max-w-5xl p-5">
-                                {children}
-                            </div>
+                            {children}
                         </main>
                     </ThemeProvider>
                 </AuthProvider>

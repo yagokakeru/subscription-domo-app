@@ -225,3 +225,10 @@ types/              # 型定義
 eslint.config.js    # ESLint 設定
 prettier.config.cjs # Prettier 設定
 ```
+
+## 開発中メモ
+
+### CSS
+
+- tailwindでコーディングするときリキッドコーディングするために[`vw.ts`](./lib/tailwind/vw.ts)でプラグインを作っているがそこまでする必要はあるか。tailwindの標準でコーディングするべきか。  
+  指定は`rem`にしてhtmlタグに`vw`で可変になるようにする？そうすれば[`vw.ts`](./lib/tailwind/vw.ts)みたいなものを作らなくていい

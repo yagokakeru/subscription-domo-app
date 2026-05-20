@@ -24,58 +24,92 @@ export function SignUpForm({ message }: { message: Message }) {
 
     return (
         <>
-            <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="flex flex-col min-w-64 max-w-64 mx-auto"
-            >
-                <h1 className="text-2xl font-medium">Sign up</h1>
-                <p className="text-sm text text-foreground">
-                    Already have an account?{' '}
-                    <Link
-                        className="text-primary font-medium underline"
-                        href="/sign-in"
-                    >
-                        Sign in
-                    </Link>
-                </p>
-                <div className="flex flex-col gap-2 [&>input]:mb-3 mt-8">
-                    <Input
-                        {...form.register('priceid')}
-                        type="hidden"
-                        value={priceID}
-                    />
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                        {...form.register('email')}
-                        placeholder="you@example.com"
-                        autoComplete={'email'}
-                    />
-                    {form.formState.errors.email && (
-                        <p className="text-red-500 text-sm">
-                            {form.formState.errors.email.message}
-                        </p>
-                    )}
+            <div className="pt-pcvw-[150]">
+                <form
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    className="bg-background-surface rounded-xl-pc mx-auto p-24-pc w-pcvw-[500]"
+                >
+                    <h1 className="text-heading-h3-pc">新規登録</h1>
+                    {/* <p className="text-sm text text-foreground">
+                        Already have an account?{' '}
+                        <Link
+                            className="text-primary font-medium underline"
+                            href="/sign-in"
+                        >
+                            Sign in
+                        </Link>
+                    </p> */}
+                    <div className="mt-32-pc">
+                        <Input
+                            {...form.register('priceid')}
+                            type="hidden"
+                            value={priceID}
+                        />
+                        <div>
+                            <Label htmlFor="email">メールアドレス</Label>
+                            <Input
+                                {...form.register('email')}
+                                placeholder="example@email.com"
+                                autoComplete={'email'}
+                                variant={
+                                    form.formState.errors.email
+                                        ? 'error'
+                                        : 'default'
+                                }
+                                className="mt-8-pc"
+                            />
+                            {form.formState.errors.email && (
+                                <p className="text-status-error text-body-small-pc mt-4-pc">
+                                    {form.formState.errors.email.message}
+                                </p>
+                            )}
+                        </div>
+                        <div className="mt-24-pc">
+                            <Label htmlFor="password">パスワード</Label>
+                            <Input
+                                {...form.register('password')}
+                                type="password"
+                                placeholder="Your password"
+                                autoComplete={'current-password'}
+                                variant={
+                                    form.formState.errors.password
+                                        ? 'error'
+                                        : 'default'
+                                }
+                                className="mt-8-pc"
+                            />
+                            {form.formState.errors.password ? (
+                                <p className="text-status-error text-body-small-pc mt-4-pc">
+                                    {form.formState.errors.password.message}
+                                </p>
+                            ) : (
+                                <div className="text-text-secondary text-body-small-pc mt-4-pc">
+                                    ※半角英数字（大文字・小文字）を含む8文字以上で入力してください。
+                                </div>
+                            )}
+                        </div>
 
-                    <Label htmlFor="password">Password</Label>
-                    <Input
-                        {...form.register('password')}
-                        type="password"
-                        placeholder="Your password"
-                        autoComplete={'current-password'}
-                    />
-                    {form.formState.errors.password && (
-                        <p className="text-red-500 text-sm">
-                            {form.formState.errors.password.message}
-                        </p>
-                    )}
+                        <SubmitButton
+                            pendingText="新規登録中..."
+                            className="w-full mt-48-pc"
+                        >
+                            新規登録
+                        </SubmitButton>
 
-                    <SubmitButton pendingText="Signing up...">
-                        Sign up
-                    </SubmitButton>
-                    <FormMessage message={message} />
-                </div>
-            </form>
-            <SmtpMessage />
+                        <div className="flex flex-col items-center gap-12-pc mt-32-pc">
+                            <Link
+                                href="/sign-in"
+                                className="text-body-small-pc text-text-secondary underline"
+                            >
+                                ログインはこちら
+                            </Link>
+                        </div>
+
+                        <FormMessage message={message} />
+                    </div>
+                </form>
+            </div>
+            {/* <SmtpMessage /> */}
         </>
     )
 }
