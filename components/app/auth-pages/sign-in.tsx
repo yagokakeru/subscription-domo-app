@@ -3,6 +3,7 @@
 import { FormMessage, Message } from '@/components/form-message'
 import { SubmitButton } from '@/components/submit-button'
 import { Input } from '@/components/ui/input'
+import { InputPassword } from '@/components/ui/input-password'
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
 import { useLoginFrom } from '@/lib/validation/hooks'
@@ -48,7 +49,7 @@ export function LoginForm({ message }: { message: Message }) {
 
                     <div className="mt-24-pc">
                         <Label htmlFor="password">パスワード</Label>
-                        <Input
+                        <InputPassword
                             {...form.register('password')}
                             type="password"
                             variant={

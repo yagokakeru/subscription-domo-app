@@ -14,12 +14,12 @@ export const emailValidation = z.email(MESSAGES.INVALID_EMAIL)
 
 // パスワードのバリデーション
 export const passwordValidation = z
-    .string()
+    .string(MESSAGES.REQUIRED_FIELD(LABELS.PASSWORD))
     .min(8, MESSAGES.MIN_LENGTH(LABELS.PASSWORD, 8))
 
 // 名前のバリデーション
 export const nameValidation = z
-    .string()
+    .string(MESSAGES.REQUIRED_FIELD(LABELS.NAME))
     .max(255, MESSAGES.MAX_LENGTH(LABELS.NAME, 255))
 
 // アバター画像のバリデーション

@@ -4,9 +4,10 @@ import { useAtomValue } from 'jotai'
 import { FormMessage, Message } from '@/components/form-message'
 import { SubmitButton } from '@/components/submit-button'
 import { Input } from '@/components/ui/input'
+import { InputPassword } from '@/components/ui/input-password'
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
-import { SmtpMessage } from '@/app/(auth-pages)/smtp-message'
+// import { SmtpMessage } from '@/app/(auth-pages)/smtp-message'
 import { priceIdAtom } from '@/lib/atoms/handOver'
 import { useSignupFrom } from '@/lib/validation/hooks'
 
@@ -30,15 +31,6 @@ export function SignUpForm({ message }: { message: Message }) {
                     className="bg-background-surface rounded-xl-pc mx-auto p-24-pc w-pcvw-[500]"
                 >
                     <h1 className="text-heading-h3-pc">新規登録</h1>
-                    {/* <p className="text-sm text text-foreground">
-                        Already have an account?{' '}
-                        <Link
-                            className="text-primary font-medium underline"
-                            href="/sign-in"
-                        >
-                            Sign in
-                        </Link>
-                    </p> */}
                     <div className="mt-32-pc">
                         <Input
                             {...form.register('priceid')}
@@ -66,7 +58,7 @@ export function SignUpForm({ message }: { message: Message }) {
                         </div>
                         <div className="mt-24-pc">
                             <Label htmlFor="password">パスワード</Label>
-                            <Input
+                            <InputPassword
                                 {...form.register('password')}
                                 type="password"
                                 placeholder="Your password"

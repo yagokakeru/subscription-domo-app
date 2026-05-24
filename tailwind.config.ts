@@ -88,7 +88,7 @@ const config = {
                     strong: 'var(--colorBorderStrong)',
                     focus: 'var(--colorBorderFocus)',
                     error: 'var(--colorBorderError)',
-                    success: 'var(--colorTextSuccess)',
+                    success: 'var(--colorBorderSuccess)',
                     warning: 'var(--colorBorderWarning)',
                     disabled: 'var(--colorBorderDisabled)',
                 },

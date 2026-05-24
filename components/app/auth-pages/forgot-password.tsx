@@ -14,7 +14,9 @@ export default function ForgotPasswordForm({ message }: { message: Message }) {
             <div className="pt-pcvw-[150]">
                 <form className="bg-background-surface rounded-xl-pc mx-auto p-24-pc w-pcvw-[500]">
                     <h1 className="text-heading-h3-pc">パスワードをリセット</h1>
+
                     <FormMessage message={message} className="mt-24-pc" />
+
                     <div className="mt-32-pc">
                         <Label htmlFor="email">メールアドレス</Label>
                         <Input

@@ -3,7 +3,7 @@
 import { resetPasswordAction } from '@/app/actions'
 import { FormMessage, Message } from '@/components/form-message'
 import { SubmitButton } from '@/components/submit-button'
-import { Input } from '@/components/ui/input'
+import { InputPassword } from '@/components/ui/input-password'
 import { Label } from '@/components/ui/label'
 
 export default function ResetPasswordForm({ message }: { message: Message }) {
@@ -15,7 +15,7 @@ export default function ResetPasswordForm({ message }: { message: Message }) {
                     <FormMessage message={message} className="mt-24-pc" />
                     <div className="mt-32-pc">
                         <Label htmlFor="password">パスワード</Label>
-                        <Input
+                        <InputPassword
                             type="password"
                             name="password"
                             placeholder="パスワードを入力してください"
@@ -27,7 +27,7 @@ export default function ResetPasswordForm({ message }: { message: Message }) {
                         <Label htmlFor="confirmPassword">
                             パスワードを確認してください
                         </Label>
-                        <Input
+                        <InputPassword
                             type="password"
                             name="confirmPassword"
                             placeholder="パスワードを確認してください"
