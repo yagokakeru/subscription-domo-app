@@ -26,18 +26,20 @@ const InputPasswordVariants = cva(
 
 export interface InputPasswordProps
     extends
-        React.InputHTMLAttributes<HTMLInputElement>,
+        React.ComponentPropsWithoutRef<typeof PasswordToggleField.Input>,
         VariantProps<typeof InputPasswordVariants> {}
 
 const InputPassword = React.forwardRef<HTMLInputElement, InputPasswordProps>(
-    ({ className, type, variant, ...props }, ref) => {
+    ({ className, variant, ...props }, ref) => {
         return (
             <PasswordToggleField.Root>
                 <div className="relative">
                     <PasswordToggleField.Input
+                        ref={ref}
                         className={cn(
                             InputPasswordVariants({ variant, className })
                         )}
+                        {...props}
                     />
                     <PasswordToggleField.Toggle className="absolute right-16-pc top-[40%]">
                         <PasswordToggleField.Icon

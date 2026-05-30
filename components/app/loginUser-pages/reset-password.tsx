@@ -16,7 +16,6 @@ export default function ResetPasswordForm({ message }: { message: Message }) {
                     <div className="mt-32-pc">
                         <Label htmlFor="password">パスワード</Label>
                         <InputPassword
-                            type="password"
                             name="password"
                             placeholder="パスワードを入力してください"
                             required
@@ -28,7 +27,6 @@ export default function ResetPasswordForm({ message }: { message: Message }) {
                             パスワードを確認してください
                         </Label>
                         <InputPassword
-                            type="password"
                             name="confirmPassword"
                             placeholder="パスワードを確認してください"
                             required

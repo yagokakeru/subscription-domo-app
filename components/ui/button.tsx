@@ -5,7 +5,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
 const buttonVariants = cva(
-    `inline-flex items-center justify-center rounded-lg-pc font-base
+    `flex items-center justify-center rounded-lg-pc font-base
     disabled:pointer-events-none disabled:bg-background-disabled disabled:content-disabled
     transition-colors duration-button ease-button`,
     {
@@ -14,22 +14,16 @@ const buttonVariants = cva(
                 default: `bg-background-primary text-text-onPrimary
                     hover:bg-background-primary-hover
                     active:bg-background-primary-active`,
-                // destructive:
-                //     'bg-destructive text-destructive-foreground hover:bg-destructive/90',
-                // outline:
-                //     'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
                 secondary: `bg-background-surface border-border border-solid border
                     hover:bg-background-surface-hover
                     active:bg-background-surface-active`,
                 ghost: `hover:bg-background-surface-hover
                         active:bg-background-surface-active`,
-                // link: 'text-primary underline-offset-4 hover:underline',
             },
             size: {
                 default: 'text-body-strong-pc px-32-pc py-12-pc',
                 sm: 'text-body-small-pc px-24-pc py-8-pc',
                 lg: 'text-body-strong-pc px-48-pc py-16-pc',
-                // icon: 'h-10 w-10',
             },
         },
         defaultVariants: {

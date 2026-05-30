@@ -51,7 +51,6 @@ export function LoginForm({ message }: { message: Message }) {
                         <Label htmlFor="password">パスワード</Label>
                         <InputPassword
                             {...form.register('password')}
-                            type="password"
                             variant={
                                 form.formState.errors.password
                                     ? 'error'

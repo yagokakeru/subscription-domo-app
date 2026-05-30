@@ -60,8 +60,6 @@ export function SignUpForm({ message }: { message: Message }) {
                             <Label htmlFor="password">パスワード</Label>
                             <InputPassword
                                 {...form.register('password')}
-                                type="password"
-                                placeholder="Your password"
                                 autoComplete={'current-password'}
                                 variant={
                                     form.formState.errors.password

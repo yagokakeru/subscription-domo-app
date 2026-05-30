@@ -45,10 +45,11 @@ export async function getPlan(): Promise<Result<planInfo[]>> {
                 name: plan.name,
                 description: plan.description,
                 isRecommended: plan.is_recommended,
+                planFeatures: plan.features,
                 priceId: null,
                 amount: 0,
                 currency: 'jpy',
-                interval: 'month',
+                interval: '月',
             }
         }
 
@@ -63,12 +64,21 @@ export async function getPlan(): Promise<Result<planInfo[]>> {
             name: plan.name,
             description: plan.description,
             isRecommended: plan.is_recommended,
+            planFeatures: plan.features,
             priceId: price.id,
             amount: price.unit_amount,
             currency: price.currency,
-            interval: price.recurring.interval,
+            interval: intervalLabelMap[price.recurring.interval],
         }
     })
 
     return { ok: true, data: planInfo }
+}
+
+// 決済間隔のラベルマップ
+const intervalLabelMap: Record<Stripe.Price.Recurring.Interval, string> = {
+    day: '日',
+    week: '週',
+    month: '月',
+    year: '年',
 }
