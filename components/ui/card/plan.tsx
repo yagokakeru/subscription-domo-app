@@ -1,11 +1,17 @@
 import { cn } from '@/lib/utils'
 import { planInfo } from '@/types/planInfo'
+import { userPlan } from '@/types/userPlan'
+import { userProfile } from '@/types/userProfile'
 import { Button } from '@/components/ui/button'
 import { CircleCheck, CircleX } from 'lucide-react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { useSetAtom } from 'jotai'
 import { priceIdAtom } from '@/lib/atoms/handOver'
 import { useRouter } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
+import { useState } from 'react'
+import { UpgradeSubscription } from '@/lib/actions/stripe/subscription'
+import { checkout } from '@/lib/actions/stripe/checkout'
 
 const planCardVariants = cva('bg-background-surface rounded-xl-pc p-24-pc', {
     variants: {
@@ -24,10 +30,38 @@ export interface PlanCardProps
         React.HTMLAttributes<HTMLDivElement>,
         VariantProps<typeof planCardVariants> {
     planInfo: planInfo
+    userInfo?: userProfile | null
+    userPlan?: userPlan | null
 }
-export default function PlanCard({ planInfo, className }: PlanCardProps) {
+export default function PlanCard({
+    planInfo,
+    userInfo = null,
+    userPlan = null,
+    className,
+}: PlanCardProps) {
     const setPriceId = useSetAtom(priceIdAtom)
-    const router = useRouter()
+    const [loading, setLoading] = useState(false)
+    const { push } = useRouter()
+    const searchParams = useSearchParams()
+    const planname = searchParams.get('planname')
+
+    const handleCheckout = async (priceId: string) => {
+        if (loading) return
+
+        setLoading(true)
+
+        const result = await checkout(
+            priceId,
+            userInfo?.stripe_uuid || '',
+            userInfo?.user_id || ''
+        )
+
+        if (result && !result.ok) {
+            console.error(result.message)
+            setLoading(false)
+        }
+        // 成功時は redirect() されるのでここには来ない
+    }
 
     return (
         <div>
@@ -56,15 +90,53 @@ export default function PlanCard({ planInfo, className }: PlanCardProps) {
                         /{planInfo.interval}
                     </span>
                 </p>
-                <Button
-                    className="mt-40-pc w-full"
-                    onClick={() => {
-                        setPriceId(planInfo.priceId || '')
-                        router.push('/sign-up')
-                    }}
-                >
-                    {planInfo.priceId ? '今すぐ始める' : '無料で始める'}
-                </Button>
+
+                {!planInfo.priceId ? ( // freeプランの場合
+                    <Button
+                        className="mt-40-pc w-full"
+                        onClick={() => {
+                            push('/sign-up')
+                        }}
+                        disabled={planname == planInfo.name ? true : loading}
+                    >
+                        {loading ? '無料で始める' : '無料で始める'}
+                    </Button>
+                ) : userInfo && planname && userPlan ? ( // サブスクアップグレード
+                    <Button
+                        className="mt-40-pc w-full"
+                        onClick={() => {
+                            userPlan.stripe_subscription_id
+                                ? UpgradeSubscription(
+                                      userPlan.stripe_subscription_id,
+                                      planInfo.priceId || ('' as string)
+                                  )
+                                : handleCheckout(planInfo.priceId || '')
+                        }}
+                        disabled={planname == planInfo.name ? true : loading}
+                    >
+                        {loading ? 'アップグレードする' : 'アップグレードする'}
+                    </Button>
+                ) : userInfo ? ( // ログイン済み、サブスク未加入
+                    <Button
+                        className="mt-40-pc w-full"
+                        type="submit"
+                        onClick={() => handleCheckout(planInfo.priceId || '')}
+                        disabled={loading}
+                    >
+                        {loading ? '今すぐ始める' : '今すぐ始める'}
+                    </Button>
+                ) : (
+                    <Button
+                        className="mt-40-pc w-full"
+                        onClick={() => {
+                            setPriceId(planInfo.priceId || '')
+                            push('/sign-up')
+                        }}
+                    >
+                        {loading ? '今すぐ始める' : '今すぐ始める'}
+                    </Button>
+                )}
+
                 {planInfo.planFeatures.length > 0 && (
                     <div className="flex flex-col gap-y-8-pc mt-40-pc">
                         {planInfo.planFeatures.map((feature, index) => {
@@ -74,9 +146,9 @@ export default function PlanCard({ planInfo, className }: PlanCardProps) {
                                     className="flex items-center gap-x-4-pc"
                                 >
                                     {feature.enabled ? (
-                                        <CircleCheck className="square fill-text-success stroke-text-onPrimary w-pcvw-[20]" />
+                                        <CircleCheck className="square block fill-text-success stroke-text-onPrimary w-pcvw-[20] h-auto" />
                                     ) : (
-                                        <CircleX className="square fill-text-error stroke-text-onPrimary w-pcvw-[20]" />
+                                        <CircleX className="square block fill-text-error stroke-text-onPrimary w-pcvw-[20] h-auto" />
                                     )}
                                     <p className="text-body-default-pc">
                                         {feature.text}

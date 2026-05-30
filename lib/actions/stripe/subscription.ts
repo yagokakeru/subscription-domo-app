@@ -3,6 +3,7 @@
 import Stripe from 'stripe'
 import { createClient, createClientRole } from '@/utils/supabase/server'
 import type { userProfile } from '@/types/userProfile'
+import type { planInfo } from '@/types/planInfo'
 
 // Stripeクライアントを作成
 const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY as string)

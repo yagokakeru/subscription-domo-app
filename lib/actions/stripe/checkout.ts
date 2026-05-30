@@ -14,7 +14,6 @@ export const checkout = async (
     customerID: string,
     userID: userProfile['user_id']
 ): Promise<Result<string>> => {
-    console.log(userID)
     // 決算を作成
     const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],

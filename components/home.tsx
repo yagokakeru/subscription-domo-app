@@ -88,7 +88,6 @@ export default function Home({ planInfo }: { planInfo: Result<planInfo[]> }) {
             </section>
 
             <ul>
-                <li>プランページ作成</li>
                 <li>マイページ作成</li>
             </ul>
         </>
