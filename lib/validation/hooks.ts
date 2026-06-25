@@ -63,12 +63,13 @@ export function useProfileFrom() {
     return { form, onSubmit }
 }
 
-export function useEditScriptFrom(initialData: scriptData) {
+export function useEditScriptForm(initialData: scriptData) {
     const form = useForm<editScriptFormValues>({
         resolver: zodResolver(editScriptSchema), // ZodをRHFに接続
         defaultValues: {
             name: initialData.title ?? '無題の台本',
             content: initialData.content ?? null,
+            plainContent: initialData.plain_content ?? null,
         },
     })
 

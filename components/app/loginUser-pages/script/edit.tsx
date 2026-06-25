@@ -1,11 +1,12 @@
 'use client'
 
-import { FormMessage, Message } from '@/components/form-message'
+import { FormMessage } from '@/components/form-message'
+import type { Message } from '@/types/message'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { SubmitButton } from '@/components/submit-button'
 import { Button } from '@/components/ui/button'
-import { useEditScriptFrom } from '@/lib/validation/hooks'
+import { useEditScriptForm } from '@/lib/validation/hooks'
 import type { getEditScript, scriptData } from '@/types/script'
 import Tiptap from '@/components/ui/tiptap'
 import { useRef, useEffect, useState } from 'react'
@@ -20,7 +21,7 @@ export function EditComponent({
 }) {
     const { scrollToWithDuration, stopScroll, enableWheelStop } =
         useAutoScroll()
-    const { form, onSubmit } = useEditScriptFrom(script.data as scriptData)
+    const { form, onSubmit } = useEditScriptForm(script.data as scriptData)
     const [hours, setHours] = useState<number>(0)
     const [minutes, setMinutes] = useState<number>(0)
     const [seconds, setSeconds] = useState<number>(0)

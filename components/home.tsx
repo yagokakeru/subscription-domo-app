@@ -86,10 +86,6 @@ export default function Home({ planInfo }: { planInfo: Result<planInfo[]> }) {
                     </div>
                 </div>
             </section>
-
-            <ul>
-                <li>マイページ作成</li>
-            </ul>
         </>
     )
 }

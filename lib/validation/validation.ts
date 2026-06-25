@@ -69,3 +69,6 @@ export const contentValidation = z.custom<JSONContent>().refine(
         message: MESSAGES.MIN_LENGTH(LABELS.CONTENT, 1),
     }
 )
+
+// plain_contentのバリデーション
+export const plainContentValidation = z.string().nullable().optional()

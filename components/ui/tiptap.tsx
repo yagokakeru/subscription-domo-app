@@ -35,6 +35,9 @@ const Tiptap = (form: UseFormReturn<editScriptFormValues>) => {
             form.setValue('content', editor.getJSON(), {
                 shouldValidate: true,
             })
+            form.setValue('plainContent', editor.getText(), {
+                shouldValidate: true,
+            })
         },
     })
 
@@ -42,6 +45,11 @@ const Tiptap = (form: UseFormReturn<editScriptFormValues>) => {
         if (editor && form.getValues('content')) {
             editor.commands.setContent(form.getValues('content'))
         }
+    }, [editor, form])
+
+    useEffect(() => {
+        if (!editor) return
+        form.setValue('plainContent', editor.getText())
     }, [editor, form])
 
     const editorState = useEditorState({

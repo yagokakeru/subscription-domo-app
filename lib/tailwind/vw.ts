@@ -31,6 +31,7 @@ export const vwPlugin = plugin(({ matchUtilities }) => {
     matchUtilities(
         {
             'border-pcvw': createUtility('borderWidth', PC_WIDTH),
+            'border-t-pcvw': createUtility('border-top-width', PC_WIDTH),
             'text-pcvw': createUtility('fontSize', PC_WIDTH),
             'gap-pcvw': createUtility('gap', PC_WIDTH),
             'w-pcvw': createUtility('width', PC_WIDTH),
@@ -38,8 +39,10 @@ export const vwPlugin = plugin(({ matchUtilities }) => {
             'max-h-pcvw': createUtility('max-height', PC_WIDTH),
             'pt-pcvw': createUtility('padding-top', PC_WIDTH),
             'shadow-pcvw': createShadowUtility(PC_WIDTH),
+            'right-pcvw': createUtility('right', PC_WIDTH),
 
             'border-spvw': createUtility('borderWidth', SP_WIDTH),
+            'border-t-spvw': createUtility('border-top-width', SP_WIDTH),
             'text-spvw': createUtility('fontSize', SP_WIDTH),
             'gap-spvw': createUtility('gap', SP_WIDTH),
             'w-spvw': createUtility('width', SP_WIDTH),
@@ -47,6 +50,7 @@ export const vwPlugin = plugin(({ matchUtilities }) => {
             'max-h-spvw': createUtility('max-height', SP_WIDTH),
             'pt-spvw': createUtility('padding-top', SP_WIDTH),
             'shadow-spvw': createShadowUtility(SP_WIDTH),
+            'right-spvw': createUtility('right', SP_WIDTH),
         },
         {
             supportsNegativeValues: false,

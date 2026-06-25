@@ -1,40 +1,44 @@
 'use client'
 
-import { useAtomValue } from 'jotai'
-import { deleteAccountAction } from '@/app/actions'
-import {
-    insertFavorite,
-    deleteFavorite,
-    isFavorited,
-} from '@/lib/actions/script/favorite'
-import { deleteScript } from '@/lib/actions/script/deleteScript'
+import { useAtom, useAtomValue } from 'jotai'
+import { isFavorited } from '@/lib/actions/script/favorite'
 import { createScript } from '@/lib/actions/script/createScript'
-import { FormMessage, Message } from '@/components/form-message'
-import { Input } from '@/components/ui/input'
+import type { Message } from '@/types/message'
 import { InfoIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import Link from 'next/link'
-import Image from 'next/image'
+import ToastMessage from '@/components/ui/message/toast'
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { userProfileAtom } from '@/lib/atoms/authUser'
-import { SubmitButton } from '@/components/submit-button'
+import { scriptFavoriteAtom } from '@/lib/atoms/scriptFavorite'
+import ScriptCard from '@/components/ui/card/script'
+import SortButton from '@/components/ui/sort_buttom'
+import { Plus } from 'lucide-react'
 import type { script } from '@/types/script'
+import type { SortCategory, SortOrder } from '@/types/sort'
 
-export function Protected({
-    message,
-    script,
-}: {
-    message: Message
-    script: script
-}) {
+export function Protected({ script }: { script: script }) {
     const userProfile = useAtomValue(userProfileAtom)
-    type ScriptItem = NonNullable<script['data']>[number]
-    const [scriptMap, setScriptMap] = useState<Array<{
-        data: ScriptItem
-        isFavorite: boolean
-    }> | null>(null)
-    const router = useRouter()
+    const [scriptFavorite, setScriptFavorite] = useAtom(scriptFavoriteAtom)
+    const [toastMessage, setToastMessage] = useState<Message | null>(null)
+    const [sortCategory, setSortCategory] = useState<SortCategory>('作成日')
+    const [sortOrder, setSortOrder] = useState<SortOrder>('降順')
+    const sortedScripts = [...(scriptFavorite ?? [])].sort((a, b) => {
+        if (sortCategory === 'お気に入りを優先') {
+            return Number(b.isFavorite) - Number(a.isFavorite)
+        }
+
+        const aDate =
+            sortCategory === '作成日'
+                ? new Date(a.data.inserted_at).getTime()
+                : new Date(a.data.updated_at).getTime()
+
+        const bDate =
+            sortCategory === '作成日'
+                ? new Date(b.data.inserted_at).getTime()
+                : new Date(b.data.updated_at).getTime()
+
+        return sortOrder === '昇順' ? aDate - bDate : bDate - aDate
+    })
 
     useEffect(() => {
         if (!script.data) return
@@ -47,145 +51,100 @@ export function Protected({
                 })
             )
 
-            setScriptMap(results)
+            setScriptFavorite(results)
         }
 
         fetchFavorites()
-    }, [script.data])
+    }, [script.data, setScriptFavorite])
+
+    if (!script.success) {
+        return <p className="text-center">{script.error}</p>
+    }
 
     if (!userProfile) return <div>Loading...</div>
 
     return (
-        <div className="flex-1 w-full flex flex-col gap-12">
-            <div className="w-full">
-                <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
-                    <InfoIcon size="16" strokeWidth={2} />
-                    This is a protected page that you can only see as an
-                    authenticated user
+        <section className="pt-pcvw-[150]">
+            <div className="w-pcvw-[1280] mx-auto">
+                <div className="w-full">
+                    <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
+                        <InfoIcon size="16" strokeWidth={2} />
+                        台本一覧作成
+                        <br />
+                        commitエラー修正
+                        <br />
+                        台本カードプロンプター表示ボタン
+                    </div>
+                    <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
+                        <InfoIcon size="16" strokeWidth={2} />
+                        マイページ作成
+                    </div>
+                    <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
+                        <InfoIcon size="16" strokeWidth={2} />
+                        始まるまでのタイマー表示
+                    </div>
+                    <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
+                        <InfoIcon size="16" strokeWidth={2} />
+                        決済機能見直し
+                        <br />
+                        ーサブスク購読・解約時のメッセージ
+                    </div>
                 </div>
-                <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
-                    <InfoIcon size="16" strokeWidth={2} />
-                    始まるまでのタイマー表示
-                </div>
-                <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
-                    <InfoIcon size="16" strokeWidth={2} />
-                    決済機能見直し
-                    <br />
-                    ーサブスク購読・解約時のメッセージ
-                </div>
-            </div>
-            <div className="flex gap-2">
-                <div>
-                    <form>
-                        <Input
-                            type="hidden"
-                            name="user_id"
-                            value={userProfile.user_id}
-                        />
-                        <SubmitButton
-                            formAction={deleteAccountAction}
-                            pendingText="Deleting account..."
-                        >
-                            Delete Account
-                        </SubmitButton>
-                    </form>
-                    <FormMessage message={message} />
-                </div>
-                <Button asChild size="sm" variant={'destructive'}>
-                    <Link href="/plan">Pleace Subscribe!!</Link>
-                </Button>
-            </div>
 
-            <div className="flex gap-2">
-                {scriptMap ? (
-                    scriptMap.map((item) => {
-                        const { data, isFavorite } = item
-                        return (
-                            <div key={data['id']} className="w-28">
-                                <Link
-                                    href={`/protected/script/edit/${data.id}`}
-                                >
-                                    <div className="border-2 border-solid border-gray-400 rounded flex items-center justify-center w-full h-40"></div>
-                                    <p>{data.title}</p>
-                                </Link>
-                                <svg
-                                    className="cursor-pointer w-1/4"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 20 19"
-                                    onClick={() => {
-                                        if (isFavorite) {
-                                            deleteFavorite(
-                                                data.id,
-                                                userProfile.user_id
-                                            )
-                                        } else {
-                                            insertFavorite(
-                                                data.id,
-                                                userProfile.user_id
-                                            )
-                                        }
+                <h1 className="text-heading-h1-pc">
+                    {sortedScripts.length > 0
+                        ? '台本一覧'
+                        : '台本を作成してみましょう！'}
+                </h1>
 
-                                        // お気に入りステータス更新
-                                        setScriptMap((prev) =>
-                                            prev!.map((item) =>
-                                                item.data.id === data.id
-                                                    ? {
-                                                          ...item,
-                                                          isFavorite:
-                                                              !item.isFavorite,
-                                                      }
-                                                    : item
-                                            )
-                                        )
-                                    }}
-                                >
-                                    <path
-                                        className={
-                                            isFavorite
-                                                ? 'fill-yellow-500'
-                                                : 'fill-black'
-                                        }
-                                        d="M6.85,14.83l3.15-1.9,3.15,1.93-.83-3.6,2.78-2.4-3.65-.33-1.45-3.4-1.45,3.38-3.65.33,2.78,2.43-.83,3.58ZM3.83,19l1.63-7.03L0,7.25l7.2-.63L10,0l2.8,6.63,7.2.63-5.45,4.73,1.63,7.03-6.18-3.73-6.18,3.73Z"
-                                    />
-                                    <polygon
-                                        className={
-                                            isFavorite
-                                                ? 'fill-yellow-500'
-                                                : 'fill-transparent'
-                                        }
-                                        points="10 4.97 8.5 8.45 4.74 8.79 7.6 11.29 6.75 14.98 10 13.02 13.25 15 12.4 11.29 15.26 8.81 11.5 8.48 10 4.97"
-                                    />
-                                </svg>
-                                <Image
-                                    className="cursor-pointer w-1/4"
-                                    src={'/delete.svg'}
-                                    width={100}
-                                    height={100}
-                                    alt="削除"
-                                    onClick={async () => {
-                                        await deleteScript(data.id)
-                                        router.refresh()
-                                    }}
-                                />
-                            </div>
-                        )
-                    })
-                ) : (
-                    <p className="w-full">{script.error}</p>
-                )}
-
-                <div>
-                    <button
-                        className="border-2 border-solid border-gray-400 rounded flex items-center justify-center w-28 h-40"
+                <div className="flex items-center gap-x-16-pc mt-24-pc">
+                    <Button
+                        size="default"
+                        variant={'default'}
                         onClick={() => {
                             createScript(userProfile.user_id)
                         }}
                     >
-                        +
-                    </button>
-                    <p>新規追加</p>
+                        新規作成
+                    </Button>
+                    {sortedScripts.length > 0 && (
+                        <SortButton
+                            sortCategory={sortCategory}
+                            sortOrder={sortOrder}
+                            onChangeCategory={setSortCategory}
+                            onChangeOrder={setSortOrder}
+                        />
+                    )}
+                </div>
+
+                <div className="flex flex-wrap gap-y-40-pc gap-x-24-pc mt-48-pc">
+                    {sortedScripts.length > 0 ? (
+                        sortedScripts.map((item) => {
+                            return (
+                                <ScriptCard
+                                    key={item.data['id']}
+                                    scriptInfo={item}
+                                    className="w-pcvw-[302]"
+                                    setToastMessage={setToastMessage}
+                                />
+                            )
+                        })
+                    ) : (
+                        <div
+                            className="aspect-[302/322] cursor-pointer rounded-lg-pc border-border border-dashed border-[2px] p-24-pc flex items-center justify-center flex-col gap-y-12-pc w-pcvw-[302]"
+                            onClick={() => {
+                                createScript(userProfile.user_id)
+                            }}
+                        >
+                            <Plus size="48" strokeWidth={2} />
+                            <p className="text-heading-h3-pc text-center">
+                                新規作成
+                            </p>
+                        </div>
+                    )}
                 </div>
             </div>
-        </div>
+            {toastMessage && <ToastMessage message={toastMessage} />}
+        </section>
     )
 }

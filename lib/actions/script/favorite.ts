@@ -72,7 +72,7 @@ export const deleteFavorite = async (
 /**
  * お気に入り判定
  * @param scriptId
- * @returns
+ * @returns boolean
  */
 export async function isFavorited(scriptId: number) {
     const supabase = await createClient()

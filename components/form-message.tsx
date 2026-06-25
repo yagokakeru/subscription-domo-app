@@ -9,17 +9,7 @@ import {
 } from 'lucide-react'
 import { useRef } from 'react'
 import gsap from 'gsap'
-
-/**
- * Message type
- * @description The type of message to display
- * @property {string} message - The message to display
- * @property {string} messageType - The type of message to display
- */
-export type Message = {
-    messageType: 'success' | 'error' | 'warning' | 'message'
-    message: string
-}
+import { Message } from '@/types/message'
 
 /**
  * Root variants
