@@ -24,9 +24,10 @@ const toastVariants = cva(
 
 interface ToastMessageProps extends VariantProps<typeof toastVariants> {
     message: Message
+    onClose: () => void
 }
 
-export default function ToastMessage({ message }: ToastMessageProps) {
+export default function ToastMessage({ message, onClose }: ToastMessageProps) {
     const Icon = MESSAGE_ICONS[message.messageType]
 
     if (!message?.message || !message.messageType) return null
@@ -36,6 +37,11 @@ export default function ToastMessage({ message }: ToastMessageProps) {
             <Toast.Root
                 className={cn(toastVariants({ variant: message.messageType }))}
                 defaultOpen
+                onOpenChange={(open) => {
+                    if (!open) {
+                        onClose()
+                    }
+                }}
             >
                 <Icon
                     className="aspect-square w-pcvw-[24] shrink-0 block mr-8-pc h-auto"

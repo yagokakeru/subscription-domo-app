@@ -31,8 +31,24 @@ export async function getUserPlan() {
         .eq('stripe_price_id', subData.price_id)
         .single()
 
+    if (planError) {
+        return null
+    }
+
+    // 4. 台本数を取得
+    const { data: scriptData, error: scriptError } = await supabase
+        .from('script')
+        .select('*')
+        .eq('user_id', userID)
+
+    if (scriptError) {
+        return null
+    }
+
     // 4. サブスク情報とプラン情報をマージして返す
-    const result = Object.assign(subData, planData)
+    const result = Object.assign(subData, planData, {
+        script_count: scriptData.length,
+    })
 
     return result || null
 }

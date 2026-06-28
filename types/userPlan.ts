@@ -9,6 +9,7 @@ export type subData = {
     created_at: string
     updated_at: string
     user_id: string
+    max_scripts: number
 }
 
 export type planData = {
@@ -23,4 +24,4 @@ export type planData = {
     updated_at: string
 }
 
-export type userPlan = subData & planData
+export type userPlan = subData & planData & { script_count: number }

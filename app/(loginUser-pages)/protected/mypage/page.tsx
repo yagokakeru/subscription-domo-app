@@ -1,4 +1,4 @@
-import { Message } from '@/components/form-message'
+import type { Message } from '@/types/message'
 import { MypageComponent } from '@/components/app/loginUser-pages/mypage'
 import { getUserPlan } from '@/lib/functions/profile/getUserPlan'
 

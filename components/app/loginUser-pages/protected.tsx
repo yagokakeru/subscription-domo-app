@@ -71,13 +71,7 @@ export function Protected({ script }: { script: script }) {
                         <InfoIcon size="16" strokeWidth={2} />
                         台本一覧作成
                         <br />
-                        commitエラー修正
-                        <br />
                         台本カードプロンプター表示ボタン
-                    </div>
-                    <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
-                        <InfoIcon size="16" strokeWidth={2} />
-                        マイページ作成
                     </div>
                     <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                         <InfoIcon size="16" strokeWidth={2} />
@@ -144,7 +138,12 @@ export function Protected({ script }: { script: script }) {
                     )}
                 </div>
             </div>
-            {toastMessage && <ToastMessage message={toastMessage} />}
+            {toastMessage && (
+                <ToastMessage
+                    message={toastMessage}
+                    onClose={() => setToastMessage(null)}
+                />
+            )}
         </section>
     )
 }
