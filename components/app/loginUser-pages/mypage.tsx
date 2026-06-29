@@ -4,6 +4,7 @@ import type { Message } from '@/types/message'
 import { MypageProfile } from '@/components/ui/mypage/profile'
 import { MypagePlan } from '@/components/ui/mypage/plan'
 import { MypageAccount } from '@/components/ui/mypage/account'
+import ToastMessage from '@/components/ui/message/toast'
 import type { userPlan } from '@/types/userPlan'
 import { CircleUserRound, CreditCard, Settings, LogOut } from 'lucide-react'
 import { useState } from 'react'
@@ -17,6 +18,7 @@ export function MypageComponent({
 }) {
     type Tab = 'profile' | 'plan' | 'account'
     const [activeTab, setActiveTab] = useState<Tab>('profile')
+    const [toastMessage, setToastMessage] = useState<Message | null>(null)
 
     return (
         <>
@@ -65,7 +67,11 @@ export function MypageComponent({
                             </div>
                         </div>
                         <div className="bg-background-surface rounded-md-pc px-24-pc pt-24-pc pb-64-pc w-full">
-                            {activeTab === 'profile' && <MypageProfile />}
+                            {activeTab === 'profile' && (
+                                <MypageProfile
+                                    setToastMessage={setToastMessage}
+                                />
+                            )}
                             {activeTab === 'plan' && (
                                 <MypagePlan userPlan={userPlan} />
                             )}
@@ -313,6 +319,13 @@ export function MypageComponent({
                         </Button>
                     </div> */}
                 </div>
+
+                {toastMessage && (
+                    <ToastMessage
+                        message={toastMessage}
+                        onClose={() => setToastMessage(null)}
+                    />
+                )}
             </section>
         </>
     )

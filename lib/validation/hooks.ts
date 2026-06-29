@@ -19,6 +19,7 @@ import { updateProfile } from '@/lib/actions/auth/updateProfile'
 import { editScript } from '@/lib/actions/script/editScript'
 
 import type { scriptData } from '@/types/script'
+import type { Message } from '@/types/message'
 
 export function useSignupFrom() {
     const form = useForm<signupFormValues>({
@@ -54,9 +55,7 @@ export function useProfileFrom() {
         },
     })
 
-    const onSubmit = async (
-        data: profileFormValues
-    ): Promise<{ status: 'success' | 'error'; message: string }> => {
+    const onSubmit = async (data: profileFormValues): Promise<Message> => {
         return await updateProfile(data, userProfile!.user_id)
     }
 
