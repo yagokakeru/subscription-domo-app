@@ -1,6 +1,6 @@
 'use server'
 
-import { encodedRedirect } from '@/utils/utils'
+// import { encodedRedirect } from '@/utils/utils'
 import { createClient } from '@/utils/supabase/server'
 import { editScriptFormValues } from '@/lib/validation/schema'
 import { SCRIPT_DEFAULT } from '@/lib/consts/script/script'
@@ -10,7 +10,7 @@ export const editScript = async (
     formData: editScriptFormValues,
     jsonS: string,
     id: number
-) => {
+): Promise<Message> => {
     const supabase = await createClient()
     const name = formData.name || SCRIPT_DEFAULT.NAME
     const plainContent = formData.plainContent
@@ -28,18 +28,26 @@ export const editScript = async (
 
     if (error) {
         console.error(error)
-        return encodedRedirect(
-            'error',
-            `/protected/script/edit/${id}`,
-            `編集に失敗しました。`
-        )
+        // return encodedRedirect(
+        //     'error',
+        //     `/protected/script/edit/${id}`,
+        //     `編集に失敗しました。`
+        // )
+        return {
+            messageType: 'error',
+            message: '編集に失敗しました。',
+        }
     }
 
-    return encodedRedirect(
-        'success',
-        `/protected/script/edit/${id}`,
-        '編集しました。'
-    )
+    // return encodedRedirect(
+    //     'success',
+    //     `/protected/script/edit/${id}`,
+    //     '編集しました。'
+    // )
+    return {
+        messageType: 'success',
+        message: '編集に成功しました。',
+    }
 }
 
 export const editScriptName = async (
