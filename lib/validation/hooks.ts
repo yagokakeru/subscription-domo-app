@@ -72,11 +72,11 @@ export function useEditScriptForm(initialData: scriptData) {
         },
     })
 
-    const onSubmit = (data: editScriptFormValues) => {
+    const onSubmit = async (data: editScriptFormValues): Promise<Message> => {
         // action serverに受け渡すときにjsonのattrsが消え、fontsizeが保持されないので一度文字列にする
         const jsonS = JSON.stringify(data.content, null, 2)
 
-        editScript(data, jsonS, initialData.id)
+        return await editScript(data, jsonS, initialData.id)
     }
 
     return { form, onSubmit }

@@ -28,22 +28,12 @@ export const editScript = async (
 
     if (error) {
         console.error(error)
-        // return encodedRedirect(
-        //     'error',
-        //     `/protected/script/edit/${id}`,
-        //     `編集に失敗しました。`
-        // )
         return {
             messageType: 'error',
             message: '編集に失敗しました。',
         }
     }
 
-    // return encodedRedirect(
-    //     'success',
-    //     `/protected/script/edit/${id}`,
-    //     '編集しました。'
-    // )
     return {
         messageType: 'success',
         message: '編集に成功しました。',

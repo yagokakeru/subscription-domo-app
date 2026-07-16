@@ -77,9 +77,7 @@ export function Protected({ script }: { script: script }) {
                         <InfoIcon size="16" strokeWidth={2} />
                         台本編集作成
                         <br />
-                        保存ボタン押した時のトースト表示と保存状態の表示
-                        <br />
-                        プロンプター表示への遷移
+                        ヘッダー削除
                     </div>
                     <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                         <InfoIcon size="16" strokeWidth={2} />

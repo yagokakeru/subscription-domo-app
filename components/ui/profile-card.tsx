@@ -9,7 +9,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
 const profilePhotoVariants = cva(
-    `bg-background-surface rounded-xl-pc flex items-center flex-col gap-24-pc mt-16-pc p-24-pc shadow-pcvw-[16] shadow-shadow absolute top-full right-0 
+    `bg-background-surface rounded-xl-pc flex items-center flex-col gap-24-pc mt-16-pc p-24-pc shadow-pcvw-[16] shadow-shadow absolute top-full right-0
     transition-all duration-button ease-button`,
     {
         variants: {

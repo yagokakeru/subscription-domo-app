@@ -2,7 +2,7 @@
 
 import { Editor, useEditorState } from '@tiptap/react'
 
-const PrompterMenu = (editor: Editor) => {
+const PrompterMenu = ({ editor }: { editor: Editor }) => {
     const editorState = useEditorState({
         editor,
         selector: ({ editor }) => {

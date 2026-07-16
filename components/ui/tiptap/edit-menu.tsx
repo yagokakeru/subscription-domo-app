@@ -1,7 +1,11 @@
 'use client'
 
 import { useEditorState, type Editor } from '@tiptap/react'
-import { Bold as BoldIcon, Italic as ItalicIcon } from 'lucide-react'
+import {
+    Bold as BoldIcon,
+    Italic as ItalicIcon,
+    RemoveFormatting,
+} from 'lucide-react'
 import { IconButton } from '@/components/ui/icon-button'
 
 const EditMenu = ({ editor }: { editor: Editor }) => {
@@ -55,7 +59,7 @@ const EditMenu = ({ editor }: { editor: Editor }) => {
                         <ItalicIcon className="h-auto" />
                     </IconButton>
                 </div>
-                <div className="flex items-center gap-pcvw-[12] py-12-pc">
+                <div className="flex items-center gap-pcvw-[12] border-r border-border-default pr-12-pc py-12-pc">
                     <IconButton
                         active={editorState?.isBlack}
                         onClick={() =>
@@ -115,6 +119,11 @@ const EditMenu = ({ editor }: { editor: Editor }) => {
                         }
                     >
                         <div className="aspect-square bg-[#F97316] w-pcvw-[14] rounded-full"></div>
+                    </IconButton>
+                </div>
+                <div className="flex items-center gap-pcvw-[12] py-12-pc">
+                    <IconButton onClick={() => editor.commands.unsetAllMarks()}>
+                        <RemoveFormatting className="h-auto" />
                     </IconButton>
                 </div>
             </div>

@@ -34,7 +34,7 @@ export default function Header() {
     return (
         <header
             className={
-                'bg-background-surface rounded-xl-pc flex items-center py-16-pc px-48-pc fixed top-16-pc left-1/2 translate-x-[-50%] w-pcvw-[1280] max-h-pcvw-[72]'
+                'bg-background-surface rounded-xl-pc flex items-center py-16-pc px-48-pc fixed top-16-pc left-1/2 translate-x-[-50%] w-pcvw-[1280] max-h-pcvw-[72] z-100'
             }
         >
             <nav className="flex justify-between items-center w-full">

@@ -13,21 +13,17 @@ import Tiptap from '@/components/ui/tiptap/tiptap'
 import { useRef, useEffect, useState } from 'react'
 import { useAutoScroll } from '@/lib/hooks/autoScroll'
 import { CircleArrowLeft, Bold, Italic } from 'lucide-react'
-import EditMenu from '@/components/ui/tiptap/edit-menu'
+import PrompterMenu from '@/components/ui/tiptap/prompter-menu'
 import { editScriptName } from '@/lib/actions/script/editScript'
 import ToastMessage from '@/components/ui/message/toast'
+import type { saveState } from '@/types/saveState'
 
-export function EditComponent({
-    message,
-    script,
-}: {
-    message: Message
-    script: getEditScript
-}) {
+export function PrompterComponent({ script }: { script: getEditScript }) {
     const { scrollToWithDuration, stopScroll, enableWheelStop } =
         useAutoScroll()
     const { form, onSubmit } = useEditScriptForm(script.data as scriptData)
     const [toastMessage, setToastMessage] = useState<Message | null>(null)
+    const [saveState, setSaveState] = useState<saveState>('unsaved')
     const [hours, setHours] = useState<number>(0)
     const [minutes, setMinutes] = useState<number>(0)
     const [seconds, setSeconds] = useState<number>(0)
@@ -142,8 +138,11 @@ export function EditComponent({
                         <Tiptap
                             form={form}
                             renderMenu={(editor) => (
-                                <EditMenu editor={editor} />
+                                <PrompterMenu editor={editor} />
                             )}
+                            setToastMessage={setToastMessage}
+                            scriptData={script.data as scriptData}
+                            setSaveState={setSaveState}
                         />
                         {form.formState.errors.content && (
                             <p className="text-red-500 text-sm">

@@ -14,6 +14,7 @@ import EditMenu from '@/components/ui/tiptap/edit-menu'
 import { editScriptName } from '@/lib/actions/script/editScript'
 import ToastMessage from '@/components/ui/message/toast'
 import type { saveState } from '@/types/saveState'
+import { editScriptFormValues } from '@/lib/validation/schema'
 
 export function EditComponent({ script }: { script: getEditScript }) {
     const { form, onSubmit } = useEditScriptForm(script.data as scriptData)
@@ -45,6 +46,16 @@ export function EditComponent({ script }: { script: getEditScript }) {
         return () => clearTimeout(timeout)
     }, [name, id, script.data?.title, setToastMessage, setSaveState])
 
+    const handleSubmit = async (data: editScriptFormValues) => {
+        const result = await onSubmit(data)
+
+        setToastMessage(result)
+
+        if (result.messageType === 'success') {
+            setSaveState('saved')
+        }
+    }
+
     if (!script.success) {
         return <p className="text-center">{script.error}</p>
     }
@@ -58,7 +69,7 @@ export function EditComponent({ script }: { script: getEditScript }) {
                             <CircleArrowLeft className="block w-pcvw-[44] h-auto" />
                         </Link>
                         <div className="flex items-center gap-pcvw-[8]">
-                            <form onSubmit={form.handleSubmit(onSubmit)}>
+                            <form onSubmit={form.handleSubmit(handleSubmit)}>
                                 <Input
                                     className="border-none !text-heading-h3-pc max-w-pcvw-[400]"
                                     {...nameRegister}
@@ -79,7 +90,7 @@ export function EditComponent({ script }: { script: getEditScript }) {
                             >
                                 保存
                             </SubmitButton>
-                            <Link href="/protected">
+                            <Link href={`/protected/script/prompter/${id}`}>
                                 <Button variant="ghost">
                                     プロンプター表示
                                 </Button>
@@ -89,7 +100,7 @@ export function EditComponent({ script }: { script: getEditScript }) {
                     <form
                         className="mt-16-pc"
                         id="edit-script-form"
-                        onSubmit={form.handleSubmit(onSubmit)}
+                        onSubmit={form.handleSubmit(handleSubmit)}
                     >
                         <Tiptap
                             form={form}

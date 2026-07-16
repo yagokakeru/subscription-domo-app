@@ -69,12 +69,6 @@ const Tiptap = ({
         },
     })
 
-    // useEffect(() => {
-    //     if (editor && form.getValues('content')) {
-    //         editor.commands.setContent(form.getValues('content'))
-    //     }
-    // }, [editor, form])
-
     useEffect(() => {
         if (!editor) return
         form.setValue('plainContent', editor.getText())
