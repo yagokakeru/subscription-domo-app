@@ -43,6 +43,7 @@ export const vwPlugin = plugin(({ matchUtilities }) => {
             'pt-pcvw': createUtility('padding-top', PC_WIDTH),
             'shadow-pcvw': createShadowUtility(PC_WIDTH),
             'right-pcvw': createUtility('right', PC_WIDTH),
+            'top-pcvw': createUtility('top', PC_WIDTH),
 
             'border-spvw': createUtility('borderWidth', SP_WIDTH),
             'border-t-spvw': createUtility('border-top-width', SP_WIDTH),
@@ -57,6 +58,7 @@ export const vwPlugin = plugin(({ matchUtilities }) => {
             'pt-spvw': createUtility('padding-top', SP_WIDTH),
             'shadow-spvw': createShadowUtility(SP_WIDTH),
             'right-spvw': createUtility('right', SP_WIDTH),
+            'top-spvw': createUtility('top', SP_WIDTH),
         },
         {
             supportsNegativeValues: false,

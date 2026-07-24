@@ -136,8 +136,17 @@ export default function ScriptCard({
                 >
                     削除
                 </Button>
-                <Button size="default" variant={'secondary'} className="w-full">
-                    プロンプターで表示
+                <Button
+                    size="default"
+                    variant={'secondary'}
+                    className="w-full"
+                    asChild
+                >
+                    <Link
+                        href={`/protected/script/prompter/${scriptInfo.data.id}`}
+                    >
+                        プロンプターで表示
+                    </Link>
                 </Button>
             </div>
             <ConfirmDialog

@@ -1,6 +1,5 @@
 'use client'
 
-import { Editor } from '@tiptap/react'
 import {
     CircleArrowLeft,
     Play,
@@ -17,11 +16,29 @@ import Link from 'next/link'
 import { IconButton } from '@/components/ui/icon-button'
 import Slider from '@/components/ui/slider'
 
-const PrompterMenu = ({ editor }: { editor: Editor }) => {
-    if (!editor) {
-        return null
-    }
-
+const PrompterMenu = ({
+    fontSize,
+    lineHeight,
+    rotateX,
+    rotateY,
+    timer,
+    onFontSizeChange,
+    onLineHeightChange,
+    onRotateXChange,
+    onRotateYChange,
+    onTimerChange,
+}: {
+    fontSize: number
+    lineHeight: number
+    rotateX: boolean
+    rotateY: boolean
+    timer: number
+    onFontSizeChange: (value: number) => void
+    onLineHeightChange: (value: number) => void
+    onRotateXChange: (value: boolean) => void
+    onRotateYChange: (value: boolean) => void
+    onTimerChange: (value: number) => void
+}) => {
     return (
         <div className="bg-background-surface rounded-full flex justify-between items-center mt-16-pc px-32-pc py-8-pc w-full">
             <div className="flex items-center gap-pcvw-[12]">
@@ -50,6 +67,8 @@ const PrompterMenu = ({ editor }: { editor: Editor }) => {
                         max={140}
                         min={48}
                         step={1}
+                        value={fontSize}
+                        onValueChange={onFontSizeChange}
                     />
                 </div>
                 <div className="flex items-center gap-pcvw-[12] border-r border-border-default pr-12-pc py-12-pc">
@@ -62,6 +81,8 @@ const PrompterMenu = ({ editor }: { editor: Editor }) => {
                         max={5}
                         min={1}
                         step={0.1}
+                        value={lineHeight}
+                        onValueChange={onLineHeightChange}
                     />
                 </div>
                 <div className="flex items-center gap-pcvw-[12] border-r border-border-default pr-12-pc py-12-pc">
@@ -86,14 +107,16 @@ const PrompterMenu = ({ editor }: { editor: Editor }) => {
                         max={60}
                         min={0}
                         step={1}
+                        value={timer}
+                        onValueChange={onTimerChange}
                     />
                 </div>
             </div>
             <div className="flex items-center gap-pcvw-[12]">
-                <IconButton>
+                <IconButton onClick={() => onRotateYChange(!rotateY)}>
                     <FlipHorizontal2 className="h-auto" />
                 </IconButton>
-                <IconButton>
+                <IconButton onClick={() => onRotateXChange(!rotateX)}>
                     <FlipVertical2 className="h-auto" />
                 </IconButton>
                 <IconButton>

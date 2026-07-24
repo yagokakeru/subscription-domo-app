@@ -1,36 +1,64 @@
 'use client'
 
-import { FormMessage } from '@/components/form-message'
 import type { Message } from '@/types/message'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { SubmitButton } from '@/components/submit-button'
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
 import { useEditScriptForm } from '@/lib/validation/hooks'
 import type { getEditScript, scriptData } from '@/types/script'
-import Tiptap from '@/components/ui/tiptap/tiptap'
-import { useRef, useEffect, useState } from 'react'
-import { useAutoScroll } from '@/lib/hooks/autoScroll'
-import { CircleArrowLeft, Bold, Italic } from 'lucide-react'
-import PrompterMenu from '@/components/ui/tiptap/prompter-menu'
+import PrompterMenu from '@/components/ui/prompter-menu'
+import { useEffect, useState } from 'react'
+// import { useAutoScroll } from '@/lib/hooks/autoScroll'
 import { editScriptName } from '@/lib/actions/script/editScript'
 import ToastMessage from '@/components/ui/message/toast'
-import type { saveState } from '@/types/saveState'
+// import type { saveState } from '@/types/saveState'
+import { generateHTML } from '@tiptap/html'
+import Document from '@tiptap/extension-document'
+import Paragraph from '@tiptap/extension-paragraph'
+import Text from '@tiptap/extension-text'
+import Heading from '@tiptap/extension-heading'
+import BoldExtension from '@tiptap/extension-bold'
+import ItalicExtension from '@tiptap/extension-italic'
+import {
+    FontSize,
+    LineHeight,
+    Color,
+    TextStyle,
+} from '@tiptap/extension-text-style'
+
+const tiptapExtensions = [
+    Document,
+    Paragraph,
+    Text,
+    BoldExtension,
+    ItalicExtension,
+    TextStyle,
+    LineHeight,
+    FontSize,
+    Color,
+    Heading.configure({
+        levels: [1, 2, 3],
+    }),
+]
 
 export function PrompterComponent({ script }: { script: getEditScript }) {
-    const { scrollToWithDuration, stopScroll, enableWheelStop } =
-        useAutoScroll()
-    const { form, onSubmit } = useEditScriptForm(script.data as scriptData)
+    // const { scrollToWithDuration, stopScroll, enableWheelStop } = useAutoScroll()
+    // const { form, onSubmit } = useEditScriptForm(script.data as scriptData)
+    const { form } = useEditScriptForm(script.data as scriptData)
     const [toastMessage, setToastMessage] = useState<Message | null>(null)
-    const [saveState, setSaveState] = useState<saveState>('unsaved')
-    const [hours, setHours] = useState<number>(0)
-    const [minutes, setMinutes] = useState<number>(0)
-    const [seconds, setSeconds] = useState<number>(0)
-    const [duration, setDuration] = useState<number>(10000)
-    const startRef = useRef<HTMLDivElement>(null)
-    const endRef = useRef<HTMLDivElement>(null)
+    // const [saveState, setSaveState] = useState<saveState>('unsaved')
+    // const [hours, setHours] = useState<number>(0)
+    // const [minutes, setMinutes] = useState<number>(0)
+    // const [seconds, setSeconds] = useState<number>(0)
+    // const [duration, setDuration] = useState<number>(10000)
+    const [prompterFontSize, setPrompterFontSize] = useState<number>(48)
+    const [prompterLineHeight, setPrompterLineHeight] = useState<number>(1.5)
+    const [prompterRotateX, setPrompterRotateX] = useState<boolean>(false)
+    const [prompterRotateY, setPrompterRotateY] = useState<boolean>(false)
+    const [prompterTimer, setPrompterTimer] = useState<number>(0)
+    // const startRef = useRef<HTMLDivElement>(null)
+    // const endRef = useRef<HTMLDivElement>(null)
     const name = form.watch('name')
+    const prompterHtml = script.data?.content
+        ? generateHTML(script.data.content, tiptapExtensions)
+        : ''
 
     useEffect(() => {
         if (name === script.data?.title) return
@@ -102,35 +130,8 @@ export function PrompterComponent({ script }: { script: getEditScript }) {
     return (
         <>
             <section className="pt-pcvw-[150]">
-                <div className="w-pcvw-[1280] mx-auto">
-                    <div className="flex items-center gap-pcvw-[24]">
-                        <Link href="/protected">
-                            <CircleArrowLeft className="block w-pcvw-[44] h-auto" />
-                        </Link>
-                        <div className="flex items-center gap-pcvw-[8]">
-                            <form onSubmit={form.handleSubmit(onSubmit)}>
-                                <Input
-                                    className="border-none"
-                                    {...form.register('name')}
-                                />
-                            </form>
-                            <div className="aspect-square bg-status-warning w-pcvw-[20] rounded-full"></div>
-                        </div>
-                        <div className="flex items-center gap-pcvw-[16]">
-                            <SubmitButton
-                                pendingText="saving"
-                                form="edit-script-form"
-                            >
-                                保存
-                            </SubmitButton>
-                            <Link href="/protected">
-                                <Button variant="ghost">
-                                    プロンプター表示
-                                </Button>
-                            </Link>
-                        </div>
-                    </div>
-                    <form
+                <div className="w-pcvw-[1280] mx-auto relative">
+                    {/* <form
                         className="mt-16-pc"
                         id="edit-script-form"
                         onSubmit={form.handleSubmit(onSubmit)}
@@ -149,7 +150,39 @@ export function PrompterComponent({ script }: { script: getEditScript }) {
                                 {String(form.formState.errors.content.message)}
                             </p>
                         )}
-                    </form>
+                    </form> */}
+
+                    <PrompterMenu
+                        fontSize={prompterFontSize}
+                        lineHeight={prompterLineHeight}
+                        rotateX={prompterRotateX}
+                        rotateY={prompterRotateY}
+                        timer={prompterTimer}
+                        onFontSizeChange={setPrompterFontSize}
+                        onLineHeightChange={setPrompterLineHeight}
+                        onRotateXChange={setPrompterRotateX}
+                        onRotateYChange={setPrompterRotateY}
+                        onTimerChange={setPrompterTimer}
+                    />
+
+                    <div className="pt-pcvw-[304]">
+                        <div
+                            className="[&_*]:![font-size:inherit] [&_*]:![line-height:inherit]"
+                            style={{
+                                fontSize: `${prompterFontSize}px`,
+                                lineHeight: prompterLineHeight,
+                                transformOrigin: 'center top',
+                                transform: `rotateY(${prompterRotateY ? '180deg' : '0deg'}) rotateX(${prompterRotateX ? '180deg' : '0deg'})`,
+                            }}
+                            dangerouslySetInnerHTML={{ __html: prompterHtml }}
+                        />
+                    </div>
+
+                    {prompterTimer > 0 && (
+                        <div className="bg-background-primary text-text-onPrimary text-pcvw-[48] font-bold rounded-xl-pc flex align-center justify-center py-16-pc w-full absolute top-pcvw-[140] left-1/2 -translate-x-1/2">
+                            {prompterTimer}
+                        </div>
+                    )}
                 </div>
 
                 {toastMessage && (
