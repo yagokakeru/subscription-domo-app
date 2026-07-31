@@ -4,11 +4,10 @@ import type { Message } from '@/types/message'
 import { useEditScriptForm } from '@/lib/validation/hooks'
 import type { getEditScript, scriptData } from '@/types/script'
 import PrompterMenu from '@/components/ui/prompter-menu'
-import { useEffect, useState } from 'react'
-// import { useAutoScroll } from '@/lib/hooks/autoScroll'
+import { useRef, useEffect, useMemo, useState } from 'react'
+import { useAutoScroll } from '@/lib/hooks/autoScroll'
 import { editScriptName } from '@/lib/actions/script/editScript'
 import ToastMessage from '@/components/ui/message/toast'
-// import type { saveState } from '@/types/saveState'
 import { generateHTML } from '@tiptap/html'
 import Document from '@tiptap/extension-document'
 import Paragraph from '@tiptap/extension-paragraph'
@@ -39,26 +38,42 @@ const tiptapExtensions = [
 ]
 
 export function PrompterComponent({ script }: { script: getEditScript }) {
-    // const { scrollToWithDuration, stopScroll, enableWheelStop } = useAutoScroll()
-    // const { form, onSubmit } = useEditScriptForm(script.data as scriptData)
+    const {
+        handleStartScrollWithCountdown,
+        handleResetScroll,
+        enableWheelStop,
+    } = useAutoScroll()
     const { form } = useEditScriptForm(script.data as scriptData)
     const [toastMessage, setToastMessage] = useState<Message | null>(null)
-    // const [saveState, setSaveState] = useState<saveState>('unsaved')
-    // const [hours, setHours] = useState<number>(0)
-    // const [minutes, setMinutes] = useState<number>(0)
-    // const [seconds, setSeconds] = useState<number>(0)
-    // const [duration, setDuration] = useState<number>(10000)
-    const [prompterFontSize, setPrompterFontSize] = useState<number>(48)
-    const [prompterLineHeight, setPrompterLineHeight] = useState<number>(1.5)
-    const [prompterRotateX, setPrompterRotateX] = useState<boolean>(false)
-    const [prompterRotateY, setPrompterRotateY] = useState<boolean>(false)
-    const [prompterTimer, setPrompterTimer] = useState<number>(0)
-    // const startRef = useRef<HTMLDivElement>(null)
-    // const endRef = useRef<HTMLDivElement>(null)
+    const [prompterSetting, setPrompterSetting] = useState<{
+        fontSize: number
+        lineHeight: number
+        rotateX: boolean
+        rotateY: boolean
+        timer: number
+        scrollSpeed: number
+    }>({
+        fontSize: 48,
+        lineHeight: 1.5,
+        rotateX: false,
+        rotateY: false,
+        timer: 0,
+        scrollSpeed: 1,
+    })
+    const [countdown, setCountdown] = useState<number | null>(null)
+    const startRef = useRef<HTMLDivElement>(null)
+    const prompterSettingRef = useRef(prompterSetting)
     const name = form.watch('name')
-    const prompterHtml = script.data?.content
-        ? generateHTML(script.data.content, tiptapExtensions)
-        : ''
+    const scriptContent = script.data?.content
+    const prompterHtml = useMemo(() => {
+        if (!scriptContent) return ''
+
+        return generateHTML(scriptContent, tiptapExtensions)
+    }, [scriptContent])
+
+    useEffect(() => {
+        prompterSettingRef.current = prompterSetting
+    }, [prompterSetting])
 
     useEffect(() => {
         if (name === script.data?.title) return
@@ -73,55 +88,9 @@ export function PrompterComponent({ script }: { script: getEditScript }) {
         return () => clearTimeout(timeout)
     }, [name, script.data?.id, script.data?.title, setToastMessage])
 
-    // const scrollToStart = (startingPoint = false) => {
-    //     if (!endRef.current || !startRef.current) return
-
-    //     const startY =
-    //         startRef.current.getBoundingClientRect().top + window.scrollY
-    //     const targetY =
-    //         endRef.current.getBoundingClientRect().top + window.scrollY
-
-    //     if (startingPoint) {
-    //         window.scrollTo(0, startY)
-    //     }
-
-    //     // 10秒かけてスクロール
-    //     scrollToWithDuration(startY, targetY, duration)
-    // }
-
-    // const timeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //     switch (e.target.name) {
-    //         case 'hours':
-    //             setHours(Number(e.target.value))
-    //             setDuration(
-    //                 Number(e.target.value) * 3600 * 1000 +
-    //                     minutes * 60 * 1000 +
-    //                     seconds * 1000
-    //             )
-    //             break
-    //         case 'minutes':
-    //             setMinutes(Number(e.target.value))
-    //             setDuration(
-    //                 hours * 3600 * 1000 +
-    //                     Number(e.target.value) * 60 * 1000 +
-    //                     seconds * 1000
-    //             )
-    //             break
-    //         case 'seconds':
-    //             setSeconds(Number(e.target.value))
-    //             setDuration(
-    //                 hours * 3600 * 1000 +
-    //                     minutes * 60 * 1000 +
-    //                     Number(e.target.value) * 1000
-    //             )
-    //             break
-    //         default:
-    //     }
-    // }
-
-    // useEffect(() => {
-    //     enableWheelStop()
-    // }, [enableWheelStop])
+    useEffect(() => {
+        return enableWheelStop()
+    }, [enableWheelStop])
 
     if (!script.success) {
         return <p className="text-center">{script.error}</p>
@@ -129,58 +98,44 @@ export function PrompterComponent({ script }: { script: getEditScript }) {
 
     return (
         <>
-            <section className="pt-pcvw-[150]">
-                <div className="w-pcvw-[1280] mx-auto relative">
-                    {/* <form
-                        className="mt-16-pc"
-                        id="edit-script-form"
-                        onSubmit={form.handleSubmit(onSubmit)}
-                    >
-                        <Tiptap
-                            form={form}
-                            renderMenu={(editor) => (
-                                <PrompterMenu editor={editor} />
-                            )}
-                            setToastMessage={setToastMessage}
-                            scriptData={script.data as scriptData}
-                            setSaveState={setSaveState}
+            <section>
+                <div className="w-pcvw-[1280] mx-auto h-screen relative">
+                    <div className="fixed top-pcvw-[16] left-1/2 -translate-x-1/2 w-pcvw-[1280] z-10">
+                        <PrompterMenu
+                            prompterSetting={prompterSetting}
+                            onPrompterSettingChange={setPrompterSetting}
+                            onStartScroll={() =>
+                                handleStartScrollWithCountdown(
+                                    startRef as React.RefObject<HTMLDivElement>,
+                                    () =>
+                                        prompterSettingRef.current.scrollSpeed,
+                                    prompterSetting.timer,
+                                    setCountdown
+                                )
+                            }
+                            onResetScroll={() => {
+                                setCountdown(null)
+                                handleResetScroll()
+                            }}
                         />
-                        {form.formState.errors.content && (
-                            <p className="text-red-500 text-sm">
-                                {String(form.formState.errors.content.message)}
-                            </p>
-                        )}
-                    </form> */}
+                    </div>
 
-                    <PrompterMenu
-                        fontSize={prompterFontSize}
-                        lineHeight={prompterLineHeight}
-                        rotateX={prompterRotateX}
-                        rotateY={prompterRotateY}
-                        timer={prompterTimer}
-                        onFontSizeChange={setPrompterFontSize}
-                        onLineHeightChange={setPrompterLineHeight}
-                        onRotateXChange={setPrompterRotateX}
-                        onRotateYChange={setPrompterRotateY}
-                        onTimerChange={setPrompterTimer}
-                    />
-
-                    <div className="pt-pcvw-[304]">
+                    <div ref={startRef} className="pt-pcvw-[380] pb-pcvw-[380]">
                         <div
                             className="[&_*]:![font-size:inherit] [&_*]:![line-height:inherit]"
                             style={{
-                                fontSize: `${prompterFontSize}px`,
-                                lineHeight: prompterLineHeight,
+                                fontSize: `${prompterSetting.fontSize}px`,
+                                lineHeight: prompterSetting.lineHeight,
                                 transformOrigin: 'center top',
-                                transform: `rotateY(${prompterRotateY ? '180deg' : '0deg'}) rotateX(${prompterRotateX ? '180deg' : '0deg'})`,
+                                transform: `rotateY(${prompterSetting.rotateY ? '180deg' : '0deg'}) rotateX(${prompterSetting.rotateX ? '180deg' : '0deg'})`,
                             }}
                             dangerouslySetInnerHTML={{ __html: prompterHtml }}
                         />
                     </div>
 
-                    {prompterTimer > 0 && (
+                    {countdown !== null && (
                         <div className="bg-background-primary text-text-onPrimary text-pcvw-[48] font-bold rounded-xl-pc flex align-center justify-center py-16-pc w-full absolute top-pcvw-[140] left-1/2 -translate-x-1/2">
-                            {prompterTimer}
+                            {countdown}
                         </div>
                     )}
                 </div>
@@ -192,95 +147,6 @@ export function PrompterComponent({ script }: { script: getEditScript }) {
                     />
                 )}
             </section>
-
-            {/* <div ref={startRef}>START</div>
-
-            <form id="edit-script-form" onSubmit={form.handleSubmit(onSubmit)}>
-                <Label htmlFor="name">ファイル名</Label>
-                <Input {...form.register('name')} />
-
-                <Label htmlFor="content">台本</Label>
-                <Tiptap {...form} />
-                {form.formState.errors.content && (
-                    <p className="text-red-500 text-sm">
-                        {String(form.formState.errors.content.message)}
-                    </p>
-                )}
-
-                <SubmitButton pendingText="creating">編集</SubmitButton>
-            </form>
-
-            <FormMessage message={message} />
-
-            <div ref={endRef}>END</div>
-
-            <div className="bg-black w-screen h-screen"></div>
-
-            <div className="flex justify-center gap-x-2.5 fixed bottom-5 left-0 w-screen">
-                <div className="flex gap-x-1 mr-4">
-                    <input
-                        type="number"
-                        name="hours"
-                        min={0}
-                        max={24}
-                        value={hours}
-                        onChange={timeHandler}
-                    />
-                    <span>時間</span>
-
-                    <input
-                        type="number"
-                        name="minutes"
-                        min={0}
-                        max={59}
-                        value={minutes}
-                        onChange={timeHandler}
-                    />
-                    <span>分</span>
-
-                    <input
-                        type="number"
-                        name="seconds"
-                        min={0}
-                        max={59}
-                        value={seconds}
-                        onChange={timeHandler}
-                    />
-                    <span>秒</span>
-                </div>
-                <Button
-                    asChild
-                    size="sm"
-                    variant={'destructive'}
-                    onClick={() => scrollToStart()}
-                >
-                    <p>自動スクロール</p>
-                </Button>
-                <Button
-                    asChild
-                    size="sm"
-                    variant={'destructive'}
-                    onClick={() => scrollToStart(true)}
-                >
-                    <p>初めから自動スクロール</p>
-                </Button>
-                <Button
-                    asChild
-                    size="sm"
-                    variant={'destructive'}
-                    onClick={stopScroll}
-                >
-                    <p>自動スクロール停止</p>
-                </Button>
-                <Button
-                    asChild
-                    size="sm"
-                    variant={'destructive'}
-                    onClick={() => scrollToStart()}
-                >
-                    <p>自動スクロール再開</p>
-                </Button>
-            </div> */}
         </>
     )
 }

@@ -1,10 +1,8 @@
-import Header from '@/components/header'
 import { Geist } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
 import './globals.css'
 import { AuthProvider } from '@/lib/providers/AuthProvider'
 import { getUserInfo } from '@/lib/functions/profile/getUserInfo'
-import Footer from '@/components/footer'
 
 const defaultUrl = process.env.VERCEL_URL
     ? `https://${process.env.VERCEL_URL}`
@@ -42,11 +40,7 @@ export default async function RootLayout({
                         enableSystem
                         disableTransitionOnChange
                     >
-                        <main className="min-h-screen">
-                            <Header />
-                            {children}
-                            <Footer />
-                        </main>
+                        {children}
                     </ThemeProvider>
                 </AuthProvider>
             </body>

@@ -15,32 +15,47 @@ import {
 import Link from 'next/link'
 import { IconButton } from '@/components/ui/icon-button'
 import Slider from '@/components/ui/slider'
+import { useState } from 'react'
 
 const PrompterMenu = ({
-    fontSize,
-    lineHeight,
-    rotateX,
-    rotateY,
-    timer,
-    onFontSizeChange,
-    onLineHeightChange,
-    onRotateXChange,
-    onRotateYChange,
-    onTimerChange,
+    prompterSetting,
+    onPrompterSettingChange,
+    onStartScroll,
+    onResetScroll,
 }: {
-    fontSize: number
-    lineHeight: number
-    rotateX: boolean
-    rotateY: boolean
-    timer: number
-    onFontSizeChange: (value: number) => void
-    onLineHeightChange: (value: number) => void
-    onRotateXChange: (value: boolean) => void
-    onRotateYChange: (value: boolean) => void
-    onTimerChange: (value: number) => void
+    prompterSetting: {
+        fontSize: number
+        lineHeight: number
+        rotateX: boolean
+        rotateY: boolean
+        timer: number
+        scrollSpeed: number
+    }
+    onPrompterSettingChange: (value: {
+        fontSize: number
+        lineHeight: number
+        rotateX: boolean
+        rotateY: boolean
+        timer: number
+        scrollSpeed: number
+    }) => void
+    onStartScroll: () => void
+    onResetScroll: () => void
 }) => {
+    const [fullScreen, setFullScreen] = useState<boolean>(false)
+
+    const handleFullScreen = async () => {
+        if (!document.fullscreenElement) {
+            await document.documentElement.requestFullscreen()
+            setFullScreen(true)
+        } else {
+            await document.exitFullscreen()
+            setFullScreen(false)
+        }
+    }
+
     return (
-        <div className="bg-background-surface rounded-full flex justify-between items-center mt-16-pc px-32-pc py-8-pc w-full">
+        <div className="bg-background-surface rounded-full flex justify-between items-center px-32-pc py-8-pc w-full">
             <div className="flex items-center gap-pcvw-[12]">
                 <div className="flex items-center gap-pcvw-[12] border-r border-border-default pr-12-pc py-12-pc">
                     <IconButton>
@@ -50,10 +65,10 @@ const PrompterMenu = ({
                     </IconButton>
                 </div>
                 <div className="flex items-center gap-pcvw-[12] border-r border-border-default pr-12-pc py-12-pc">
-                    <IconButton>
+                    <IconButton onClick={onStartScroll}>
                         <Play className="h-auto" />
                     </IconButton>
-                    <IconButton>
+                    <IconButton onClick={onResetScroll}>
                         <RotateCcw className="h-auto" />
                     </IconButton>
                 </div>
@@ -67,8 +82,13 @@ const PrompterMenu = ({
                         max={140}
                         min={48}
                         step={1}
-                        value={fontSize}
-                        onValueChange={onFontSizeChange}
+                        value={prompterSetting.fontSize}
+                        onValueChange={(value) =>
+                            onPrompterSettingChange({
+                                ...prompterSetting,
+                                fontSize: value,
+                            })
+                        }
                     />
                 </div>
                 <div className="flex items-center gap-pcvw-[12] border-r border-border-default pr-12-pc py-12-pc">
@@ -81,8 +101,13 @@ const PrompterMenu = ({
                         max={5}
                         min={1}
                         step={0.1}
-                        value={lineHeight}
-                        onValueChange={onLineHeightChange}
+                        value={prompterSetting.lineHeight}
+                        onValueChange={(value) =>
+                            onPrompterSettingChange({
+                                ...prompterSetting,
+                                lineHeight: value,
+                            })
+                        }
                     />
                 </div>
                 <div className="flex items-center gap-pcvw-[12] border-r border-border-default pr-12-pc py-12-pc">
@@ -95,6 +120,13 @@ const PrompterMenu = ({
                         max={20}
                         min={1}
                         step={1}
+                        value={prompterSetting.scrollSpeed}
+                        onValueChange={(value) =>
+                            onPrompterSettingChange({
+                                ...prompterSetting,
+                                scrollSpeed: value,
+                            })
+                        }
                     />
                 </div>
                 <div className="flex items-center gap-pcvw-[12] border-r border-border-default pr-12-pc py-12-pc">
@@ -107,19 +139,40 @@ const PrompterMenu = ({
                         max={60}
                         min={0}
                         step={1}
-                        value={timer}
-                        onValueChange={onTimerChange}
+                        value={prompterSetting.timer}
+                        onValueChange={(value) =>
+                            onPrompterSettingChange({
+                                ...prompterSetting,
+                                timer: value,
+                            })
+                        }
                     />
                 </div>
             </div>
             <div className="flex items-center gap-pcvw-[12]">
-                <IconButton onClick={() => onRotateYChange(!rotateY)}>
+                <IconButton
+                    active={prompterSetting.rotateY}
+                    onClick={() =>
+                        onPrompterSettingChange({
+                            ...prompterSetting,
+                            rotateY: !prompterSetting.rotateY,
+                        })
+                    }
+                >
                     <FlipHorizontal2 className="h-auto" />
                 </IconButton>
-                <IconButton onClick={() => onRotateXChange(!rotateX)}>
+                <IconButton
+                    active={prompterSetting.rotateX}
+                    onClick={() =>
+                        onPrompterSettingChange({
+                            ...prompterSetting,
+                            rotateX: !prompterSetting.rotateX,
+                        })
+                    }
+                >
                     <FlipVertical2 className="h-auto" />
                 </IconButton>
-                <IconButton>
+                <IconButton active={fullScreen} onClick={handleFullScreen}>
                     <Maximize className="h-auto" />
                 </IconButton>
             </div>

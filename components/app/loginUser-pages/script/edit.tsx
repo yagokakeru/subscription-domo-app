@@ -62,7 +62,7 @@ export function EditComponent({ script }: { script: getEditScript }) {
 
     return (
         <>
-            <section className="pt-pcvw-[150]">
+            <section className="pt-pcvw-[16]">
                 <div className="w-pcvw-[1280] mx-auto">
                     <div className="flex items-center gap-pcvw-[24]">
                         <Link href="/protected">

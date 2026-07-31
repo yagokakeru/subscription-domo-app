@@ -69,13 +69,9 @@ export function Protected({ script }: { script: script }) {
                 <div className="w-full">
                     <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                         <InfoIcon size="16" strokeWidth={2} />
-                        台本編集作成
+                        プロンプターページ作成
                         <br />
-                        ヘッダー削除
-                    </div>
-                    <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
-                        <InfoIcon size="16" strokeWidth={2} />
-                        始まるまでのタイマー表示
+                        ・上下反転時の自動スクロール
                     </div>
                     <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                         <InfoIcon size="16" strokeWidth={2} />
