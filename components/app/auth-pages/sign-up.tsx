@@ -1,7 +1,8 @@
 'use client'
 
 import { useAtomValue } from 'jotai'
-import { FormMessage, Message } from '@/components/form-message'
+import { FormMessage } from '@/components/form-message'
+import type { Message } from '@/types/message'
 import { SubmitButton } from '@/components/submit-button'
 import { Input } from '@/components/ui/input'
 import { InputPassword } from '@/components/ui/input-password'

@@ -89,7 +89,9 @@ export function PrompterComponent({ script }: { script: getEditScript }) {
     }, [name, script.data?.id, script.data?.title, setToastMessage])
 
     useEffect(() => {
-        return enableWheelStop()
+        if (!startRef.current) return
+
+        return enableWheelStop(startRef.current)
     }, [enableWheelStop])
 
     if (!script.success) {
@@ -115,20 +117,24 @@ export function PrompterComponent({ script }: { script: getEditScript }) {
                             }
                             onResetScroll={() => {
                                 setCountdown(null)
-                                handleResetScroll()
+                                handleResetScroll(
+                                    startRef as React.RefObject<HTMLDivElement>
+                                )
                             }}
                         />
                     </div>
 
-                    <div ref={startRef} className="pt-pcvw-[380] pb-pcvw-[380]">
+                    <div
+                        ref={startRef}
+                        className="h-full overflow-y-auto [&_*]:![font-size:inherit] [&_*]:![line-height:inherit]"
+                        style={{
+                            fontSize: `${prompterSetting.fontSize}px`,
+                            lineHeight: prompterSetting.lineHeight,
+                            transform: `rotateY(${prompterSetting.rotateY ? '180deg' : '0deg'}) rotateX(${prompterSetting.rotateX ? '180deg' : '0deg'})`,
+                        }}
+                    >
                         <div
-                            className="[&_*]:![font-size:inherit] [&_*]:![line-height:inherit]"
-                            style={{
-                                fontSize: `${prompterSetting.fontSize}px`,
-                                lineHeight: prompterSetting.lineHeight,
-                                transformOrigin: 'center top',
-                                transform: `rotateY(${prompterSetting.rotateY ? '180deg' : '0deg'}) rotateX(${prompterSetting.rotateX ? '180deg' : '0deg'})`,
-                            }}
+                            className="pt-pcvw-[380] pb-pcvw-[380]"
                             dangerouslySetInnerHTML={{ __html: prompterHtml }}
                         />
                     </div>

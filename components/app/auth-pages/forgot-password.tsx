@@ -1,7 +1,8 @@
 'use client'
 
 import { forgotPasswordAction } from '@/app/actions'
-import { FormMessage, Message } from '@/components/form-message'
+import { FormMessage } from '@/components/form-message'
+import type { Message } from '@/types/message'
 import { SubmitButton } from '@/components/submit-button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'

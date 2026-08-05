@@ -71,7 +71,7 @@ export function Protected({ script }: { script: script }) {
                         <InfoIcon size="16" strokeWidth={2} />
                         プロンプターページ作成
                         <br />
-                        ・上下反転時の自動スクロール
+                        ・上下反転時の自動スクロール時のカウントダウン表示
                     </div>
                     <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                         <InfoIcon size="16" strokeWidth={2} />
