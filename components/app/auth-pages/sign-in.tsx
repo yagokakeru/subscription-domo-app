@@ -7,27 +7,33 @@ import { Input } from '@/components/ui/input'
 import { InputPassword } from '@/components/ui/input-password'
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
-import { useLoginFrom } from '@/lib/validation/hooks'
+import { useState } from 'react'
+import { useLoginForm } from '@/lib/validation/hooks'
+import { loginFormValues } from '@/lib/validation/schema'
 
-export function LoginForm({ message }: { message: Message }) {
-    const { form, onSubmit } = useLoginFrom()
+export function LoginForm() {
+    const { form, onSubmit } = useLoginForm()
+    const [message, setMessage] = useState<Message | null>(null)
+
+    const handleSubmit = async (data: loginFormValues) => {
+        const result = await onSubmit(data)
+        setMessage(result)
+    }
 
     return (
         <div className="pt-pcvw-[150]">
             <form
-                onSubmit={form.handleSubmit(onSubmit)}
+                onSubmit={form.handleSubmit(handleSubmit)}
                 className="bg-background-surface rounded-xl-pc mx-auto p-24-pc w-pcvw-[500]"
             >
                 <h1 className="text-heading-h3-pc">ログイン</h1>
-                {/* <p className="text-sm text-foreground">
-                    {"Don't have an account?"}{' '}
-                    <Link
-                        className="text-foreground font-medium underline"
-                        href="/sign-up"
-                    >
-                        Sign up
-                    </Link>
-                </p> */}
+
+                {message && (
+                    <div className="mt-16-pc">
+                        <FormMessage message={message} />
+                    </div>
+                )}
+
                 <div className="mt-32-pc">
                     <div>
                         <Label htmlFor="email">メールアドレス</Label>
@@ -91,8 +97,6 @@ export function LoginForm({ message }: { message: Message }) {
                             新規登録はこちら
                         </Link>
                     </div>
-
-                    <FormMessage message={message} />
                 </div>
             </form>
         </div>

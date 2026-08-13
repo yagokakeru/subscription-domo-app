@@ -1,4 +1,4 @@
-'use cliant'
+'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
@@ -33,13 +33,13 @@ export function useSignupFrom() {
     return { form, onSubmit }
 }
 
-export function useLoginFrom() {
+export function useLoginForm() {
     const form = useForm<loginFormValues>({
         resolver: zodResolver(loginSchema), // ZodをRHFに接続
     })
 
-    const onSubmit = (data: loginFormValues) => {
-        signInAction(data)
+    const onSubmit = async (data: loginFormValues): Promise<Message> => {
+        return await signInAction(data)
     }
 
     return { form, onSubmit }

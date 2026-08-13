@@ -9,13 +9,7 @@ import type { userPlan } from '@/types/userPlan'
 import { CircleUserRound, CreditCard, Settings, LogOut } from 'lucide-react'
 import { useState } from 'react'
 
-export function MypageComponent({
-    message,
-    userPlan,
-}: {
-    message: Message
-    userPlan: userPlan
-}) {
+export function MypageComponent({ userPlan }: { userPlan: userPlan }) {
     type Tab = 'profile' | 'plan' | 'account'
     const [activeTab, setActiveTab] = useState<Tab>('profile')
     const [toastMessage, setToastMessage] = useState<Message | null>(null)
