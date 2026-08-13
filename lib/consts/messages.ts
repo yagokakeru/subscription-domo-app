@@ -28,6 +28,8 @@ export const MESSAGES = {
     PASSWORD_REQUIRE_LOWER: 'パスワードには小文字を1文字以上含めてください',
     PASSWORD_REQUIRE_DIGIT: 'パスワードには数字を1文字以上含めてください',
     PASSWORD_REQUIRE_SYMBOL: 'パスワードには記号を1文字以上含めてください',
+    PASSWORD_REGEX: (max: number) =>
+        `パスワードは半角英数字（大文字・小文字）を含む${max}文字以上で入力してください。`,
     PASSWORD_CONFIRM_MISMATCH: 'パスワードが一致しません',
 
     // 数値

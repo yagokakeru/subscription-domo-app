@@ -16,6 +16,10 @@ export const emailValidation = z.email(MESSAGES.INVALID_EMAIL)
 export const passwordValidation = z
     .string(MESSAGES.REQUIRED_FIELD(LABELS.PASSWORD))
     .min(8, MESSAGES.MIN_LENGTH(LABELS.PASSWORD, 8))
+    .regex(
+        /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?\d)[a-zA-Z\d]{8,}$/,
+        MESSAGES.PASSWORD_REGEX(8)
+    )
 
 // 名前のバリデーション
 export const nameValidation = z
@@ -32,14 +36,14 @@ export const avatarValidation = z
     .refine(
         (file) =>
             !file || file.length === 0 || file[0]?.size <= 1 * 1024 * 1024,
-        '1MB以下の画像をアップロードしてください'
+        MESSAGES.FILE_SIZE_EXCEEDED(1)
     )
     .refine(
         (file) =>
             !file ||
             file.length === 0 ||
             ['image/jpeg', 'image/png'].includes(file[0]?.type),
-        'JPEGまたはPNGのみアップロードできます'
+        MESSAGES.FILE_TYPE_INVALID('JPEG, PNG')
     )
 
 // contentのバリデーション
