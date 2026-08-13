@@ -1,5 +1,6 @@
 'use server'
 
+import type { Message } from '@/types/message'
 import { encodedRedirect } from '@/utils/utils'
 import { createClient } from '@/utils/supabase/server'
 import { createClient as createClientAdmin } from '@supabase/supabase-js'
@@ -113,7 +114,9 @@ export const signUpAction = async (formData: signupFormValues) => {
     }
 }
 
-export const signInAction = async (formData: loginFormValues) => {
+export const signInAction = async (
+    formData: loginFormValues
+): Promise<Message> => {
     const email = formData.email
     const password = formData.password
 
@@ -125,7 +128,12 @@ export const signInAction = async (formData: loginFormValues) => {
     })
 
     if (error) {
-        return encodedRedirect('error', '/sign-in', error.message)
+        console.error(error)
+        return {
+            messageType: 'error',
+            message:
+                'ログインできませんでした。メールアドレスとパスワードを確認してください。',
+        }
     }
 
     return redirect('/protected')

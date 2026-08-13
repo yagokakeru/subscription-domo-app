@@ -1,12 +1,8 @@
-import type { Message } from '@/types/message'
 import { MypageComponent } from '@/components/app/loginUser-pages/mypage'
 import { getUserPlan } from '@/lib/functions/profile/getUserPlan'
 
-export default async function Mypage(props: {
-    searchParams: Promise<Message>
-}) {
-    const searchParams = await props.searchParams
+export default async function Mypage() {
     const userPlan = await getUserPlan()
 
-    return <MypageComponent message={searchParams} userPlan={userPlan} />
+    return <MypageComponent userPlan={userPlan} />
 }
