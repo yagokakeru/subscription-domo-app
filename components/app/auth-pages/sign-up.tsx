@@ -8,30 +8,36 @@ import { Input } from '@/components/ui/input'
 import { InputPassword } from '@/components/ui/input-password'
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
-// import { SmtpMessage } from '@/app/(auth-pages)/smtp-message'
 import { priceIdAtom } from '@/lib/atoms/handOver'
-import { useSignupFrom } from '@/lib/validation/hooks'
+import { useSignupForm } from '@/lib/validation/hooks'
+import { useState } from 'react'
+import { signupFormValues } from '@/lib/validation/schema'
 
-export function SignUpForm({ message }: { message: Message }) {
+export function SignUpForm() {
     const priceID = useAtomValue(priceIdAtom)
-    const { form, onSubmit } = useSignupFrom()
+    const [message, setMessage] = useState<Message | null>(null)
+    const { form, onSubmit } = useSignupForm()
 
-    if ('message' in message) {
-        return (
-            <div className="w-full flex-1 flex items-center h-screen sm:max-w-md justify-center gap-2 p-4">
-                <FormMessage message={message} />
-            </div>
-        )
+    const handleSubmit = async (data: signupFormValues) => {
+        const result = await onSubmit(data)
+        setMessage(result)
     }
 
     return (
         <>
             <div className="pt-pcvw-[150]">
                 <form
-                    onSubmit={form.handleSubmit(onSubmit)}
+                    onSubmit={form.handleSubmit(handleSubmit)}
                     className="bg-background-surface rounded-xl-pc mx-auto p-24-pc w-pcvw-[500]"
                 >
                     <h1 className="text-heading-h3-pc">新規登録</h1>
+
+                    {message && (
+                        <div className="mt-16-pc">
+                            <FormMessage message={message} />
+                        </div>
+                    )}
+
                     <div className="mt-32-pc">
                         <Input
                             {...form.register('priceid')}
@@ -95,12 +101,9 @@ export function SignUpForm({ message }: { message: Message }) {
                                 ログインはこちら
                             </Link>
                         </div>
-
-                        <FormMessage message={message} />
                     </div>
                 </form>
             </div>
-            {/* <SmtpMessage /> */}
         </>
     )
 }

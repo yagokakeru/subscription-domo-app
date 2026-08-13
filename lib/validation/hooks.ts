@@ -21,13 +21,13 @@ import { editScript } from '@/lib/actions/script/editScript'
 import type { scriptData } from '@/types/script'
 import type { Message } from '@/types/message'
 
-export function useSignupFrom() {
+export function useSignupForm() {
     const form = useForm<signupFormValues>({
         resolver: zodResolver(signupSchema), // ZodをRHFに接続
     })
 
-    const onSubmit = (data: signupFormValues) => {
-        signUpAction(data)
+    const onSubmit = async (data: signupFormValues): Promise<Message> => {
+        return await signUpAction(data)
     }
 
     return { form, onSubmit }

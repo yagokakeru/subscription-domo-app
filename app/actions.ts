@@ -13,7 +13,9 @@ import { getCheckoutUrl } from '@/lib/getCheckoutUrl'
 
 import { signupFormValues, loginFormValues } from '@/lib/validation/schema'
 
-export const signUpAction = async (formData: signupFormValues) => {
+export const signUpAction = async (
+    formData: signupFormValues
+): Promise<Message> => {
     const priceID = formData.priceid
     const email = formData.email
     const password = formData.password
@@ -25,11 +27,10 @@ export const signUpAction = async (formData: signupFormValues) => {
 
     // emailかpasswordの入力がなければサインアップページにリダイレクト
     if (!email || !password) {
-        return encodedRedirect(
-            'error',
-            '/sign-up',
-            'Email and password are required'
-        )
+        return {
+            messageType: 'error',
+            message: 'メールアドレスとパスワードを入力してください。',
+        }
     }
 
     // ユーザーを作成
@@ -51,8 +52,12 @@ export const signUpAction = async (formData: signupFormValues) => {
             email: email,
         })
         if (error) {
-            console.error(error.code + ' ' + error.message)
-            return encodedRedirect('error', '/sign-up', error.message)
+            console.error(error)
+            return {
+                messageType: 'error',
+                message:
+                    'ユーザーの作成に失敗しました。しばらくしてからもう一度お試しください。',
+            }
         }
 
         const { data: subData, error: subError } = await supabase
@@ -70,14 +75,24 @@ export const signUpAction = async (formData: signupFormValues) => {
             .select()
 
         if (subError) {
-            console.error(subError.code + ' ' + subError.message)
-            return encodedRedirect('error', '/sign-up', subError.message)
+            console.error(subError)
+            return {
+                messageType: 'error',
+                message:
+                    'ユーザーの作成に失敗しました。しばらくしてからもう一度お試しください。',
+            }
         }
     }
 
     if (error) {
-        console.error(error.code + ' ' + error.message)
-        return encodedRedirect('error', '/sign-up', error.message)
+        console.error(error)
+        return {
+            messageType: 'error',
+            message:
+                error.code == 'user_already_exists'
+                    ? 'ユーザーはすでに存在しています。'
+                    : 'ユーザーの作成に失敗しました。しばらくしてからもう一度お試しください。',
+        }
     } else {
         // 登録したユーザーをログインさせる
         const { error } = await supabase.auth.signInWithPassword({
@@ -86,7 +101,12 @@ export const signUpAction = async (formData: signupFormValues) => {
         })
 
         if (error) {
-            return encodedRedirect('error', '/sign-in', error.message)
+            console.error(error)
+            return {
+                messageType: 'error',
+                message:
+                    'ユーザー登録に失敗しました。しばらくしてからもう一度お試しください。',
+            }
         }
 
         // priceIDがあったらプランを購入する新規ユーザー
@@ -102,11 +122,11 @@ export const signUpAction = async (formData: signupFormValues) => {
                     return redirect(sessionURL)
                 }
             } else {
-                return encodedRedirect(
-                    'error',
-                    '/sign-in',
-                    'ユーザ情報を取得できませんでした。'
-                )
+                return {
+                    messageType: 'error',
+                    message:
+                        'ユーザー情報を取得できませんでした。しばらくしてからもう一度お試しください。',
+                }
             }
         }
 
