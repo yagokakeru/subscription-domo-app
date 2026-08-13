@@ -133,17 +133,16 @@ export function PrompterComponent({ script }: { script: getEditScript }) {
                             transform: `rotateY(${prompterSetting.rotateY ? '180deg' : '0deg'}) rotateX(${prompterSetting.rotateX ? '180deg' : '0deg'})`,
                         }}
                     >
+                        {countdown !== null && (
+                            <div className="bg-background-primary text-text-onPrimary text-pcvw-[48] font-bold rounded-xl-pc flex align-center justify-center py-16-pc w-full absolute top-pcvw-[140] left-1/2 -translate-x-1/2">
+                                {countdown}
+                            </div>
+                        )}
                         <div
                             className="pt-pcvw-[380] pb-pcvw-[380]"
                             dangerouslySetInnerHTML={{ __html: prompterHtml }}
                         />
                     </div>
-
-                    {countdown !== null && (
-                        <div className="bg-background-primary text-text-onPrimary text-pcvw-[48] font-bold rounded-xl-pc flex align-center justify-center py-16-pc w-full absolute top-pcvw-[140] left-1/2 -translate-x-1/2">
-                            {countdown}
-                        </div>
-                    )}
                 </div>
 
                 {toastMessage && (

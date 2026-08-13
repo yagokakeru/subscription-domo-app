@@ -62,7 +62,7 @@ export default function Home({ planInfo }: { planInfo: Result<planInfo[]> }) {
                 </div>
             </section>
 
-            <section className="pt-128-pc pb-128-pc">
+            <section className="pt-128-pc">
                 <div className="w-pcvw-[1280] mx-auto">
                     <h2 className="text-heading-h2-pc mb-48-pc">プラン比較</h2>
                     <div className="flex items-end justify-center gap-x-48-pc">
