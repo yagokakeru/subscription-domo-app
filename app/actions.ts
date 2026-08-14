@@ -11,7 +11,11 @@ import Stripe from 'stripe'
 import { getUserInfo } from '@/lib/functions/profile/getUserInfo'
 import { getCheckoutUrl } from '@/lib/getCheckoutUrl'
 
-import { signupFormValues, loginFormValues } from '@/lib/validation/schema'
+import {
+    signupFormValues,
+    loginFormValues,
+    forgotPasswordFormValues,
+} from '@/lib/validation/schema'
 
 export const signUpAction = async (
     formData: signupFormValues
@@ -159,14 +163,18 @@ export const signInAction = async (
     return redirect('/protected')
 }
 
-export const forgotPasswordAction = async (formData: FormData) => {
-    const email = formData.get('email')?.toString()
+export const forgotPasswordAction = async (
+    formData: forgotPasswordFormValues
+): Promise<Message> => {
+    const email = formData.email
     const supabase = await createClient()
     const origin = (await headers()).get('origin')
-    const callbackUrl = formData.get('callbackUrl')?.toString()
 
     if (!email) {
-        return encodedRedirect('error', '/forgot-password', 'Email is required')
+        return {
+            messageType: 'error',
+            message: 'メールアドレスを入力してください。',
+        }
     }
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -174,23 +182,19 @@ export const forgotPasswordAction = async (formData: FormData) => {
     })
 
     if (error) {
-        console.error(error.message)
-        return encodedRedirect(
-            'error',
-            '/forgot-password',
-            'Could not reset password'
-        )
+        console.error(error)
+        return {
+            messageType: 'error',
+            message:
+                'パスワードのリセットリンクの送信に失敗しました。しばらくしてからもう一度お試しください。',
+        }
     }
 
-    if (callbackUrl) {
-        return redirect(callbackUrl)
+    return {
+        messageType: 'success',
+        message:
+            'パスワードのリセットリンクを送信しました。メールをご確認ください。',
     }
-
-    return encodedRedirect(
-        'success',
-        '/forgot-password',
-        'Check your email for a link to reset your password.'
-    )
 }
 
 export const resetPasswordAction = async (formData: FormData) => {

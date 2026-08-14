@@ -22,6 +22,11 @@ export const loginSchema = z.object({
     password: passwordValidation,
 })
 
+// パスワード忘れ用スキーマ
+export const forgotPasswordSchema = z.object({
+    email: emailValidation,
+})
+
 // プロフィール用スキーマ
 export const profileSchema = z.object({
     avatar: avatarValidation,
@@ -38,5 +43,6 @@ export const editScriptSchema = z.object({
 // スキーマから型を自動生成
 export type signupFormValues = z.infer<typeof signupSchema>
 export type loginFormValues = z.infer<typeof loginSchema>
+export type forgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>
 export type profileFormValues = z.infer<typeof profileSchema>
 export type editScriptFormValues = z.infer<typeof editScriptSchema>

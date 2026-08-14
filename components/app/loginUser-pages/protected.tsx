@@ -69,8 +69,11 @@ export function Protected({ script }: { script: script }) {
                 <div className="w-full">
                     <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                         <InfoIcon size="16" strokeWidth={2} />
-                        パスワードリセット送信のエラーメッセージ <br />
+                        パスワードリセット送信のメール内容 <br />
                         パスワードリセットのエラーメッセージ <br />
+                        パスワードリセットのメール内容 <br />
+                        パスワードリセットリンクの押下後のうまくいかなかった時の処理/protectedに飛ばされるのでユーザーは何が起こったかわからない{' '}
+                        <br />
                     </div>
                     <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                         <InfoIcon size="16" strokeWidth={2} />

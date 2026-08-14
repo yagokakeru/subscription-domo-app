@@ -2,12 +2,14 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { signUpAction, signInAction } from '@/app/actions'
+import { signUpAction, signInAction, forgotPasswordAction } from '@/app/actions'
 import {
     signupSchema,
     signupFormValues,
     loginSchema,
     loginFormValues,
+    forgotPasswordSchema,
+    forgotPasswordFormValues,
     profileSchema,
     profileFormValues,
     editScriptSchema,
@@ -40,6 +42,20 @@ export function useLoginForm() {
 
     const onSubmit = async (data: loginFormValues): Promise<Message> => {
         return await signInAction(data)
+    }
+
+    return { form, onSubmit }
+}
+
+export function useForgetPasswordForm() {
+    const form = useForm<forgotPasswordFormValues>({
+        resolver: zodResolver(forgotPasswordSchema), // ZodをRHFに接続
+    })
+
+    const onSubmit = async (
+        data: forgotPasswordFormValues
+    ): Promise<Message> => {
+        return await forgotPasswordAction(data)
     }
 
     return { form, onSubmit }
