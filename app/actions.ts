@@ -15,6 +15,8 @@ import {
     signupFormValues,
     loginFormValues,
     forgotPasswordFormValues,
+    passwordResetFormValues,
+    passwordResetSchema,
 } from '@/lib/validation/schema'
 
 export const signUpAction = async (
@@ -197,41 +199,35 @@ export const forgotPasswordAction = async (
     }
 }
 
-export const resetPasswordAction = async (formData: FormData) => {
+export const resetPasswordAction = async (
+    formData: passwordResetFormValues
+): Promise<Message> => {
     const supabase = await createClient()
 
-    const password = formData.get('password') as string
-    const confirmPassword = formData.get('confirmPassword') as string
+    const parsed = passwordResetSchema.safeParse(formData)
 
-    if (!password || !confirmPassword) {
-        encodedRedirect(
-            'error',
-            '/protected/reset-password',
-            'Password and confirm password are required'
-        )
-    }
-
-    if (password !== confirmPassword) {
-        encodedRedirect(
-            'error',
-            '/protected/reset-password',
-            'Passwords do not match'
-        )
+    if (!parsed.success) {
+        return {
+            messageType: 'error',
+            message: parsed.error.issues[0].message,
+        }
     }
 
     const { error } = await supabase.auth.updateUser({
-        password: password,
+        password: parsed.data.newPassword,
     })
 
     if (error) {
-        encodedRedirect(
-            'error',
-            '/protected/reset-password',
-            'Password update failed'
-        )
+        return {
+            messageType: 'error',
+            message: 'パスワードの更新に失敗しました。',
+        }
     }
 
-    encodedRedirect('success', '/protected/reset-password', 'Password updated')
+    return {
+        messageType: 'success',
+        message: 'パスワードの更新に成功しました。',
+    }
 }
 
 export const signOutAction = async () => {

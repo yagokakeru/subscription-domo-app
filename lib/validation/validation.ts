@@ -1,6 +1,7 @@
 import { z } from 'zod'
-import { LABELS } from '../consts/labels'
-import { MESSAGES } from '../consts/messages'
+import { LABELS } from '@/lib/consts/labels'
+import { MESSAGES } from '@/lib/consts/messages'
+import { REGEX } from '@/lib/consts/regex'
 import { JSONContent } from '@tiptap/react'
 
 // priceidのバリデーション
@@ -16,10 +17,14 @@ export const emailValidation = z.email(MESSAGES.INVALID_EMAIL)
 export const passwordValidation = z
     .string(MESSAGES.REQUIRED_FIELD(LABELS.PASSWORD))
     .min(8, MESSAGES.MIN_LENGTH(LABELS.PASSWORD, 8))
-    .regex(
-        /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?\d)[a-zA-Z\d]{8,}$/,
-        MESSAGES.PASSWORD_REGEX(8)
-    )
+    .regex(REGEX.STRONG_PASSWORD.UPPER, MESSAGES.PASSWORD_REGEX(8))
+    .regex(REGEX.STRONG_PASSWORD.LOWER, MESSAGES.PASSWORD_REGEX(8))
+    .regex(REGEX.STRONG_PASSWORD.DIGIT, MESSAGES.PASSWORD_REGEX(8))
+
+// パスワード確認のバリデーション
+export const passwordConfirmdValidation = z.string(
+    MESSAGES.REQUIRED_FIELD(LABELS.PASSWORD)
+)
 
 // 名前のバリデーション
 export const nameValidation = z
