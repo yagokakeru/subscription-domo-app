@@ -1,6 +1,7 @@
 'use client'
 
 import { FormMessage } from '@/components/form-message'
+import ToastMessage from '@/components/ui/message/toast'
 import type { Message } from '@/types/message'
 import { SubmitButton } from '@/components/submit-button'
 import { Input } from '@/components/ui/input'
@@ -11,9 +12,15 @@ import { useState } from 'react'
 import { useLoginForm } from '@/lib/validation/hooks'
 import { loginFormValues } from '@/lib/validation/schema'
 
-export function LoginForm() {
+export function LoginForm({
+    initialMessage,
+}: {
+    initialMessage: Message | null
+}) {
     const { form, onSubmit } = useLoginForm()
     const [message, setMessage] = useState<Message | null>(null)
+    const [initialMessageState, setInitialMessageState] =
+        useState<Message | null>(initialMessage)
 
     const handleSubmit = async (data: loginFormValues) => {
         const result = await onSubmit(data)
@@ -99,6 +106,13 @@ export function LoginForm() {
                     </div>
                 </div>
             </form>
+
+            {initialMessageState && (
+                <ToastMessage
+                    message={initialMessageState}
+                    onClose={() => setInitialMessageState(null)}
+                />
+            )}
         </div>
     )
 }

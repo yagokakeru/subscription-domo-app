@@ -1,4 +1,5 @@
 import { createClient } from '@/utils/supabase/server'
+import { encodedRedirect } from '@/utils/utils'
 import { NextResponse } from 'next/server'
 
 export async function GET(request: Request) {
@@ -10,9 +11,23 @@ export async function GET(request: Request) {
     const origin = requestUrl.origin
     const redirectTo = requestUrl.searchParams.get('redirect_to')
 
-    if (code) {
-        const supabase = await createClient()
-        await supabase.auth.exchangeCodeForSession(code)
+    if (!code) {
+        return encodedRedirect(
+            'error',
+            '/sign-in',
+            '認証コードが見つかりませんでした。もう一度お試しください。'
+        )
+    }
+
+    const supabase = await createClient()
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+
+    if (error) {
+        return encodedRedirect(
+            'error',
+            '/sign-in',
+            'ログインに失敗しました。リンクの有効期限が切れている可能性があります。'
+        )
     }
 
     if (redirectTo) {
