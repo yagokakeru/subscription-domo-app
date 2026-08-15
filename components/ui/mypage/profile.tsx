@@ -2,12 +2,9 @@ import { useProfileFrom } from '@/lib/validation/hooks'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { userProfileAtom } from '@/lib/atoms/authUser'
 import { Label } from '@/components/ui/label'
-import { ProfilePhoto } from '@/components/ui/profile-photo'
+import ProfilePhoto from '@/components/ui/profile-photo'
 import { Input } from '@/components/ui/input'
 import { SubmitButton } from '@/components/submit-button'
-import Image from 'next/image'
-import { useState, useEffect } from 'react'
-import { createAvatarUrl } from '@/lib/actions/auth/createAvatarUrl'
 import { profileFormValues } from '@/lib/validation/schema'
 import type { Message } from '@/types/message'
 
@@ -16,25 +13,8 @@ export const MypageProfile = (props: {
 }) => {
     const { setToastMessage } = props
     const userProfile = useAtomValue(userProfileAtom)
-    const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
     const setUserProfile = useSetAtom(userProfileAtom)
     const { form, onSubmit } = useProfileFrom()
-
-    useEffect(() => {
-        // アバターURLを取得
-        if (!userProfile?.avatar_url) return
-
-        const fetchAvatarUrl = async () => {
-            try {
-                const signedUrl = await createAvatarUrl(userProfile?.avatar_url)
-                setAvatarUrl(signedUrl)
-            } catch (err) {
-                console.error(err)
-            }
-        }
-
-        fetchAvatarUrl()
-    }, [userProfile?.avatar_url])
 
     const handleSubmit = async (data: profileFormValues) => {
         const result = await onSubmit(data)
@@ -61,16 +41,7 @@ export const MypageProfile = (props: {
                 className="mt-48-pc"
             >
                 <Label>
-                    <ProfilePhoto>
-                        <Image
-                            src={avatarUrl || '/default-avatar.jpg'}
-                            alt="Avatar"
-                            width={100}
-                            height={100}
-                            className="rounded-full"
-                            unoptimized
-                        />
-                    </ProfilePhoto>
+                    <ProfilePhoto className="w-pcvw-[200]" />
                     <Input
                         type="file"
                         {...form.register('avatar')}

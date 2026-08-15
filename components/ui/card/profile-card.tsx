@@ -1,8 +1,8 @@
-import { ProfilePhoto } from './profile-photo'
-import { Button } from './button'
+import ProfilePhoto from '@/components/ui/profile-photo'
+import { Button } from '@/components/ui/button'
 import { SubmitButton } from '@/components/submit-button'
 import { signOutAction } from '@/app/actions'
-import { PlanBadge } from './plan-badge'
+import { PlanBadge } from '@/components/ui/plan-badge'
 import Link from 'next/link'
 import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
@@ -41,9 +41,7 @@ const ProfileCard = React.forwardRef<HTMLDivElement, ProfileCardProps>(
                 {...props}
             >
                 <div className="flex items-center flex-col gap-4-pc">
-                    <ProfilePhoto className="pointer-events-none">
-                        Y
-                    </ProfilePhoto>
+                    <ProfilePhoto className="pointer-events-none" />
                     <div className="text-body-default-pc">山田 太郎</div>
                     <div className="text-body-notice-pc">
                         yamada@exsample.com

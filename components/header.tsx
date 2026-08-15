@@ -6,8 +6,8 @@ import Image from 'next/image'
 import { Button } from './ui/button'
 import { useAtomValue } from 'jotai'
 import { userProfileAtom } from '@/lib/atoms/authUser'
-import { ProfilePhoto } from './ui/profile-photo'
-import { ProfileCard } from './ui/profile-card'
+import ProfilePhoto from '@/components/ui/profile-photo'
+import { ProfileCard } from '@/components/ui/card/profile-card'
 import { useEffect, useRef, useState } from 'react'
 
 export default function Header() {
@@ -74,27 +74,13 @@ export default function Header() {
                 <div className="flex items-center gap-8-pc">
                     {userProfile ? (
                         <div ref={profileMenuRef}>
-                            <ProfilePhoto
-                                role="button"
-                                tabIndex={0}
-                                aria-expanded={isProfileCardOpen}
+                            <div
                                 onClick={() =>
                                     setIsProfileCardOpen((current) => !current)
                                 }
-                                onKeyDown={(event) => {
-                                    if (
-                                        event.key === 'Enter' ||
-                                        event.key === ' '
-                                    ) {
-                                        event.preventDefault()
-                                        setIsProfileCardOpen(
-                                            (current) => !current
-                                        )
-                                    }
-                                }}
                             >
-                                Y
-                            </ProfilePhoto>
+                                <ProfilePhoto className="pointer-events-auto" />
+                            </div>
                             <ProfileCard
                                 open={isProfileCardOpen}
                                 onClose={() => setIsProfileCardOpen(false)}
