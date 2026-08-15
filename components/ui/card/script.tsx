@@ -3,6 +3,7 @@ import { userProfileAtom } from '@/lib/atoms/authUser'
 import { scriptFavoriteAtom } from '@/lib/atoms/scriptFavorite'
 import { useSetAtom, useAtomValue } from 'jotai'
 import { deleteFavorite, insertFavorite } from '@/lib/actions/script/favorite'
+import { deleteScript } from '@/lib/actions/script/deleteScript'
 import { useEditScriptForm } from '@/lib/validation/hooks'
 import { useEffect } from 'react'
 import { Input } from '@/components/ui/input'
@@ -11,6 +12,7 @@ import ConfirmDialog from '@/components/ui/comfirm/dialog'
 import { cn } from '@/lib/utils'
 import { dateFormat } from '@/lib/functions/dateFormat'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { editScriptName } from '@/lib/actions/script/editScript'
 import type { Message } from '@/types/message'
@@ -29,6 +31,12 @@ export default function ScriptCard({
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
     const { form, onSubmit } = useEditScriptForm(scriptInfo.data as scriptData)
     const name = form.watch('name')
+    const router = useRouter()
+
+    const handleDelete = async () => {
+        await deleteScript(scriptInfo.data.id)
+        router.refresh()
+    }
 
     useEffect(() => {
         if (name === scriptInfo.data.title) return
@@ -152,9 +160,9 @@ export default function ScriptCard({
             <ConfirmDialog
                 open={confirmDialogOpen}
                 onOpenChange={setConfirmDialogOpen}
-                scriptInfo={scriptInfo}
+                onConfirm={handleDelete}
                 title={`台本を削除しますか？`}
-                description={`${scriptInfo.data.title}を削除しますか？\nこの操作は元に戻せません`}
+                description={`${scriptInfo.data.title} を削除しますか？\nこの操作は元に戻せません`}
             />
         </div>
     )

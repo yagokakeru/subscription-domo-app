@@ -70,7 +70,6 @@ export function Protected({ script }: { script: script }) {
                     <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                         <InfoIcon size="16" strokeWidth={2} />
                         マイページ <br />
-                        ユーザー削除の確認ポップアップ <br />
                         ユーザーアイコンの初期設定 <br />
                     </div>
                     <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">

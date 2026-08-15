@@ -2,30 +2,22 @@ import { Button } from '@/components/ui/button'
 import { Dialog } from 'radix-ui'
 import { CircleX } from 'lucide-react'
 import { MESSAGE_ICONS } from '@/lib/consts/massageIcon'
-import { deleteScript } from '@/lib/actions/script/deleteScript'
-import { useRouter } from 'next/navigation'
-import type { scriptFavoriteInfo } from '@/types/script'
 
 const ConfirmDialog = ({
     open,
     onOpenChange,
-    scriptInfo,
+    onConfirm,
     title = 'アカウントを削除しますか？',
     description = 'この操作は元に戻せません',
+    confirmText = '削除',
 }: {
     open: boolean
     onOpenChange: (open: boolean) => void
-    scriptInfo: scriptFavoriteInfo
+    onConfirm: () => void | Promise<void>
     title?: string
     description?: string
+    confirmText?: string
 }) => {
-    const router = useRouter()
-
-    const handleDelete = async () => {
-        await deleteScript(scriptInfo.data.id)
-        router.refresh()
-    }
-
     return (
         <Dialog.Root open={open} onOpenChange={onOpenChange}>
             <Dialog.Portal>
@@ -63,9 +55,9 @@ const ConfirmDialog = ({
                             variant={'secondary'}
                             size={'lg'}
                             className="w-full"
-                            onClick={handleDelete}
+                            onClick={onConfirm}
                         >
-                            削除
+                            {confirmText}
                         </Button>
                     </div>
                 </Dialog.Content>
