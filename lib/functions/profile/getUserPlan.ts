@@ -2,6 +2,7 @@
  * ユーザーの契約中のプラン情報を返す関数
  */
 import { createClient } from '@/utils/supabase/server'
+import type { userPlan } from '@/types/userPlan'
 
 export async function getUserPlan() {
     // supabaseクライアントを作成
