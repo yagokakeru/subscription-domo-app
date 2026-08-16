@@ -4,6 +4,7 @@ import { userProfileAtom } from '@/lib/atoms/authUser'
 import { Label } from '@/components/ui/label'
 import ProfilePhoto from '@/components/ui/profile-photo'
 import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 import { SubmitButton } from '@/components/submit-button'
 import { profileFormValues } from '@/lib/validation/schema'
 import type { Message } from '@/types/message'
@@ -33,6 +34,24 @@ export const MypageProfile = (props: {
         }
     }
 
+    const handleDeleteImage = async () => {
+        const { deleteImage } = await import('@/lib/actions/auth/deleteImage')
+        const result = await deleteImage(userProfile?.user_id || '')
+
+        setToastMessage(result)
+
+        if (result.messageType === 'success') {
+            setUserProfile((current) =>
+                current
+                    ? {
+                          ...current,
+                          avatar_url: '',
+                      }
+                    : current
+            )
+        }
+    }
+
     return (
         <div>
             <h2 className="text-heading-h2-pc">プロフィール</h2>
@@ -41,13 +60,25 @@ export const MypageProfile = (props: {
                 className="mt-48-pc"
             >
                 <Label>
-                    <ProfilePhoto className="w-pcvw-[200]" />
+                    <ProfilePhoto />
                     <Input
                         type="file"
                         {...form.register('avatar')}
                         accept="image/png, image/jpeg"
-                        className="hidden"
+                        className="hidden cursor-pointer"
                     />
+                    {userProfile?.avatar_url && (
+                        <Button
+                            variant="secondary"
+                            className="mt-16-pc"
+                            type="button"
+                            onClick={() => {
+                                handleDeleteImage()
+                            }}
+                        >
+                            アバター画像を削除
+                        </Button>
+                    )}
                 </Label>
                 {form.formState.errors.avatar &&
                     typeof form.formState.errors.avatar.message ===

@@ -69,15 +69,13 @@ export function Protected({ script }: { script: script }) {
                 <div className="w-full">
                     <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                         <InfoIcon size="16" strokeWidth={2} />
-                        ヘッダー <br />
-                        ユーザ情報適用 <br />
+                        マイページ <br />
+                        プロフィール情報を更新したら即時反映させる <br />
+                        アバターを更新したら自動更新させる <br />
                     </div>
                     <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                         <InfoIcon size="16" strokeWidth={2} />
-                        マイページ <br />
-                        ユーザーアイコンのデフォルト文字の大きさ <br />
-                        ユーザーアイコンのダイアログを追加して追加と削除削除ボタン追加{' '}
-                        <br />
+                        フォームとかをテストする
                     </div>
                     <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                         <InfoIcon size="16" strokeWidth={2} />

@@ -19,9 +19,9 @@ export const uploadImage = async (file: File, id: userProfile['user_id']) => {
     const oldPath = profile?.avatar_url || null
 
     // 2. 新しい画像をアップロード
-    const arrayBuffer = await file.arrayBuffer()
-    const buffer = Buffer.from(arrayBuffer)
-    const filePath = `${id}/${Date.now()}-${file.name}`
+    const arrayBuffer = await file.arrayBuffer() // FileオブジェクトをArrayBufferに変換
+    const buffer = Buffer.from(arrayBuffer) // ArrayBufferをNode.jsのBufferに変換
+    const filePath = `${id}/${Date.now()}-${file.name}` // ユニークなファイル名を生成
 
     const { error: uploadError } = await supabase.storage
         .from('avatars')
