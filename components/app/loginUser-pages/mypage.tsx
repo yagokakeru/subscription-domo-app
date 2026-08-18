@@ -23,8 +23,8 @@ export function MypageComponent({ userPlan }: { userPlan: userPlan }) {
                         <div className="bg-background-surface rounded-md-pc p-8-pc w-pcvw-[320] min-h-pcvw-[370]">
                             <div className="flex flex-col gap-y-8-pc">
                                 <div
-                                    className="cursor-pointer rounded-sm-pc py-16-pc px-24-pc flex items-center gap-8-pc hover:bg-background-surface-hover active:bg-background-surface-active
-                                    bg-background-surface-active border-l-pcvw-[4] border-l-border-strong border-solid"
+                                    className={`cursor-pointer rounded-sm-pc py-16-pc px-24-pc flex items-center gap-8-pc hover:bg-background-surface-hover active:bg-background-surface-active
+                                    ${activeTab === 'profile' ? 'bg-background-surface-active border-l-pcvw-[4] border-l-border-strong border-solid' : ''}`}
                                     onClick={() => setActiveTab('profile')}
                                 >
                                     <CircleUserRound className="block w-pcvw-[20] h-auto" />
@@ -33,7 +33,8 @@ export function MypageComponent({ userPlan }: { userPlan: userPlan }) {
                                     </div>
                                 </div>
                                 <div
-                                    className="cursor-pointer rounded-sm-pc py-16-pc px-24-pc flex items-center gap-8-pc hover:bg-background-surface-hover active:bg-background-surface-active"
+                                    className={`cursor-pointer rounded-sm-pc py-16-pc px-24-pc flex items-center gap-8-pc hover:bg-background-surface-hover active:bg-background-surface-active
+                                    ${activeTab === 'plan' ? 'bg-background-surface-active border-l-pcvw-[4] border-l-border-strong border-solid' : ''}`}
                                     onClick={() => setActiveTab('plan')}
                                 >
                                     <CreditCard className="block w-pcvw-[20] h-auto" />
@@ -42,7 +43,8 @@ export function MypageComponent({ userPlan }: { userPlan: userPlan }) {
                                     </div>
                                 </div>
                                 <div
-                                    className="cursor-pointer rounded-sm-pc py-16-pc px-24-pc flex items-center gap-8-pc hover:bg-background-surface-hover active:bg-background-surface-active"
+                                    className={`cursor-pointer rounded-sm-pc py-16-pc px-24-pc flex items-center gap-8-pc hover:bg-background-surface-hover active:bg-background-surface-active
+                                    ${activeTab === 'account' ? 'bg-background-surface-active border-l-pcvw-[4] border-l-border-strong border-solid' : ''}`}
                                     onClick={() => setActiveTab('account')}
                                 >
                                     <Settings className="block w-pcvw-[20] h-auto" />

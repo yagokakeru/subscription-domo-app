@@ -1,12 +1,15 @@
-import { ProfilePhoto } from './profile-photo'
-import { Button } from './button'
+import ProfilePhoto from '@/components/ui/profile-photo'
+import { Button } from '@/components/ui/button'
 import { SubmitButton } from '@/components/submit-button'
 import { signOutAction } from '@/app/actions'
-import { PlanBadge } from './plan-badge'
+import { PlanBadge } from '@/components/ui/plan-badge'
 import Link from 'next/link'
 import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
+import { useAtomValue } from 'jotai'
+import { userProfileAtom } from '@/lib/atoms/authUser'
+import type { userPlan } from '@/types/userPlan'
 
 const profilePhotoVariants = cva(
     `bg-background-surface rounded-xl-pc flex items-center flex-col gap-24-pc mt-16-pc p-24-pc shadow-pcvw-[16] shadow-shadow absolute top-full right-0
@@ -30,10 +33,13 @@ export interface ProfileCardProps
         VariantProps<typeof profilePhotoVariants> {
     open: boolean
     onClose?: () => void
+    userPlan: userPlan
 }
 
 const ProfileCard = React.forwardRef<HTMLDivElement, ProfileCardProps>(
-    ({ className, open, onClose, ...props }, ref) => {
+    ({ className, open, onClose, userPlan, ...props }, ref) => {
+        const userProfile = useAtomValue(userProfileAtom)
+
         return (
             <div
                 className={cn(profilePhotoVariants({ open, className }))}
@@ -41,22 +47,30 @@ const ProfileCard = React.forwardRef<HTMLDivElement, ProfileCardProps>(
                 {...props}
             >
                 <div className="flex items-center flex-col gap-4-pc">
-                    <ProfilePhoto className="pointer-events-none">
-                        Y
-                    </ProfilePhoto>
-                    <div className="text-body-default-pc">山田 太郎</div>
-                    <div className="text-body-notice-pc">
-                        yamada@exsample.com
+                    <ProfilePhoto className="pointer-events-none" />
+                    <div className="text-body-default-pc">
+                        {userProfile?.name || userProfile?.email}
                     </div>
+                    {userProfile?.name && (
+                        <div className="text-body-notice-pc">
+                            {userProfile?.email}
+                        </div>
+                    )}
                 </div>
                 <div className="flex items-center flex-col gap-8-pc">
                     <div className="flex items-center gap-4-pc">
                         <div className="text-body-small-pc">現在のプラン：</div>
-                        <PlanBadge variant={'paid'}>プレミアム</PlanBadge>
+                        <PlanBadge
+                            variant={userPlan?.name ? 'paid' : 'default'}
+                        >
+                            {userPlan?.name ?? 'フリー'}
+                        </PlanBadge>
                     </div>
                     <div className="text-body-notice-pc">
                         残り{' '}
-                        <span className="text-body-strong-pc">12 / 50</span>{' '}
+                        <span className="text-body-strong-pc">
+                            {userPlan?.script_count} / {userPlan?.max_scripts}
+                        </span>{' '}
                         台本作成可能
                     </div>
                     <Button size={'sm'} asChild>

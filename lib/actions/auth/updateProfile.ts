@@ -2,7 +2,6 @@
 
 import { createClient } from '@/utils/supabase/server'
 import { profileFormValues } from '@/lib/validation/schema'
-import { uploadImage } from '@/lib/actions/auth/uploadImage'
 import type { userProfile } from '@/types/userProfile'
 import type { Message } from '@/types/message'
 
@@ -11,10 +10,7 @@ export const updateProfile = async (
     id: userProfile['user_id']
 ): Promise<Message> => {
     const supabase = await createClient()
-    const { name, avatar } = formData
-
-    // アバターを更新
-    await uploadImage(avatar[0], id)
+    const { name } = formData
 
     // プロフィール情報を更新
     const { error } = await supabase
