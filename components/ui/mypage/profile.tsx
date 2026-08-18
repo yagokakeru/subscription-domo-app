@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button'
 import { SubmitButton } from '@/components/submit-button'
 import { profileFormValues } from '@/lib/validation/schema'
 import type { Message } from '@/types/message'
+import { uploadImage } from '@/lib/actions/auth/uploadImage'
+import { deleteImage } from '@/lib/actions/auth/deleteImage'
 
 export const MypageProfile = (props: {
     setToastMessage: (message: Message) => void
@@ -34,8 +36,25 @@ export const MypageProfile = (props: {
         }
     }
 
+    const handleUploadImage = async (file: File) => {
+        const result = await uploadImage(file, userProfile?.user_id || '')
+
+        setToastMessage(result)
+
+        if (result.messageType === 'success' && result.avatarUrl) {
+            const avatarUrl = result.avatarUrl
+            setUserProfile((current) =>
+                current
+                    ? {
+                          ...current,
+                          avatar_url: avatarUrl,
+                      }
+                    : current
+            )
+        }
+    }
+
     const handleDeleteImage = async () => {
-        const { deleteImage } = await import('@/lib/actions/auth/deleteImage')
         const result = await deleteImage(userProfile?.user_id || '')
 
         setToastMessage(result)
@@ -55,39 +74,41 @@ export const MypageProfile = (props: {
     return (
         <div>
             <h2 className="text-heading-h2-pc">プロフィール</h2>
-            <form
-                onSubmit={form.handleSubmit(handleSubmit)}
-                className="mt-48-pc"
-            >
-                <Label>
-                    <ProfilePhoto />
-                    <Input
-                        type="file"
-                        {...form.register('avatar')}
-                        accept="image/png, image/jpeg"
-                        className="hidden cursor-pointer"
-                    />
-                    {userProfile?.avatar_url && (
-                        <Button
-                            variant="secondary"
-                            className="mt-16-pc"
-                            type="button"
-                            onClick={() => {
-                                handleDeleteImage()
-                            }}
-                        >
-                            アバター画像を削除
-                        </Button>
-                    )}
-                </Label>
-                {form.formState.errors.avatar &&
-                    typeof form.formState.errors.avatar.message ===
-                        'string' && (
-                        <p className="text-red-500 text-sm">
-                            {form.formState.errors.avatar.message}
-                        </p>
-                    )}
 
+            <Label className="block mt-48-pc">
+                <ProfilePhoto />
+                <Input
+                    type="file"
+                    {...form.register('avatar')}
+                    accept="image/png, image/jpeg"
+                    className="hidden cursor-pointer"
+                    onChange={(e) => {
+                        const file = e.target.files?.[0]
+                        if (file) {
+                            handleUploadImage(file)
+                        }
+                    }}
+                />
+                {userProfile?.avatar_url && (
+                    <Button
+                        variant="secondary"
+                        className="mt-16-pc"
+                        type="button"
+                        onClick={() => {
+                            handleDeleteImage()
+                        }}
+                    >
+                        アバター画像を削除
+                    </Button>
+                )}
+            </Label>
+            {form.formState.errors.avatar &&
+                typeof form.formState.errors.avatar.message === 'string' && (
+                    <p className="text-red-500 text-sm">
+                        {form.formState.errors.avatar.message}
+                    </p>
+                )}
+            <form onSubmit={form.handleSubmit(handleSubmit)}>
                 <div className="mt-32-pc max-w-pcvw-[452]">
                     <div>
                         <Label htmlFor="name">名前</Label>

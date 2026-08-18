@@ -69,12 +69,6 @@ export function Protected({ script }: { script: script }) {
                 <div className="w-full">
                     <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                         <InfoIcon size="16" strokeWidth={2} />
-                        マイページ <br />
-                        プロフィール情報を更新したら即時反映させる <br />
-                        アバターを更新したら自動更新させる <br />
-                    </div>
-                    <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
-                        <InfoIcon size="16" strokeWidth={2} />
                         フォームとかをテストする
                     </div>
                     <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">

@@ -5,7 +5,10 @@ import { useState, useEffect } from 'react'
 import { createAvatarUrl } from '@/lib/actions/auth/createAvatarUrl'
 
 const ProfilePhoto = ({ className }: { className?: string }) => {
-    const [avatarUrl, setAvatarUrl] = useState<string | undefined>(undefined)
+    const [signedAvatar, setSignedAvatar] = useState<{
+        path?: string
+        url?: string
+    }>({})
     const userProfile = useAtomValue(userProfileAtom)
     const initial = userProfile
         ? userProfile.email.charAt(0).toUpperCase()
@@ -13,19 +16,31 @@ const ProfilePhoto = ({ className }: { className?: string }) => {
 
     useEffect(() => {
         // アバターURLを取得
-        if (!userProfile?.avatar_url) return
+        const avatarPath = userProfile?.avatar_url
+        if (!avatarPath) return
 
+        let cancelled = false
         const fetchAvatarUrl = async () => {
             try {
-                const signedUrl = await createAvatarUrl(userProfile?.avatar_url)
-                setAvatarUrl(signedUrl)
+                const signedUrl = await createAvatarUrl(avatarPath)
+                if (!cancelled)
+                    setSignedAvatar({ path: avatarPath, url: signedUrl })
             } catch (err) {
                 console.error(err)
             }
         }
 
         fetchAvatarUrl()
+        return () => {
+            cancelled = true
+        }
     }, [userProfile?.avatar_url])
+
+    // avatar_url が変わった瞬間（削除も含む）に古い署名URLを無効化し、即座に反映する
+    const avatarUrl =
+        signedAvatar.path === userProfile?.avatar_url
+            ? signedAvatar.url
+            : undefined
 
     return (
         <Avatar.Root
