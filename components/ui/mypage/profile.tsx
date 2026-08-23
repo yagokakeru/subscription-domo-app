@@ -81,6 +81,7 @@ export const MypageProfile = (props: {
                     type="file"
                     {...form.register('avatar')}
                     accept="image/png, image/jpeg"
+                    aria-label="プロフィール画像を変更"
                     className="hidden cursor-pointer"
                     onChange={(e) => {
                         const file = e.target.files?.[0]
@@ -115,6 +116,7 @@ export const MypageProfile = (props: {
                         <Input
                             {...form.register('name')}
                             placeholder="山田 太郎"
+                            id="name"
                         />
                     </div>
                     {form.formState.errors.name && (
