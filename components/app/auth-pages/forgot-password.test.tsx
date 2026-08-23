@@ -11,17 +11,6 @@ vi.mock('@/app/actions', () => ({
 
 describe('ForgotPasswordForm', () => {
     it('不正なメールアドレスで送信するとエラーメッセージが表示される', async () => {
-        // ここに Arrange → Act → Assert を書いてみてください
-        //
-        // ヒント:
-        // 1. const user = userEvent.setup()
-        // 2. render(<ForgotPasswordForm />)
-        // 3. screen.getByLabelText('メールアドレス') で入力欄を取得し、
-        //    user.type(...) で不正な値(例: 'invalid') を入力する
-        // 4. screen.getByRole('button', { name: '続ける' }) を user.click(...) する
-        // 5. await screen.findByText(...) でエラーメッセージ
-        //    (MESSAGES.INVALID_EMAIL の中身)が表示されることを確認する
-
         const user = userEvent.setup()
         render(<ForgotPasswordForm />)
         const input = screen.getByLabelText('メールアドレス')

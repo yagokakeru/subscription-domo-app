@@ -53,6 +53,7 @@ export function LoginForm({
                                     : 'default'
                             }
                             className="mt-8-pc"
+                            id="email"
                         />
                         {form.formState.errors.email && (
                             <p className="text-status-error text-body-small-pc mt-4-pc">
@@ -71,6 +72,7 @@ export function LoginForm({
                                     : 'default'
                             }
                             className="mt-8-pc"
+                            id="password"
                         />
                         {form.formState.errors.password ? (
                             <p className="text-status-error text-body-small-pc mt-4-pc">
