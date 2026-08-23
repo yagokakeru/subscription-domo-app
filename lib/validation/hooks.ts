@@ -99,13 +99,13 @@ export function useProfileFrom() {
     return { form, onSubmit }
 }
 
-export function useEditScriptForm(initialData: scriptData) {
+export function useEditScriptForm(initialData: scriptData | undefined) {
     const form = useForm<editScriptFormValues>({
         resolver: zodResolver(editScriptSchema), // ZodをRHFに接続
         defaultValues: {
-            name: initialData.title ?? '無題の台本',
-            content: initialData.content ?? null,
-            plainContent: initialData.plain_content ?? null,
+            name: initialData?.title ?? '無題の台本',
+            content: initialData?.content,
+            plainContent: initialData?.plain_content ?? null,
         },
     })
 
@@ -113,7 +113,7 @@ export function useEditScriptForm(initialData: scriptData) {
         // action serverに受け渡すときにjsonのattrsが消え、fontsizeが保持されないので一度文字列にする
         const jsonS = JSON.stringify(data.content, null, 2)
 
-        return await editScript(data, jsonS, initialData.id)
+        return await editScript(data, jsonS, initialData?.id ?? 0)
     }
 
     return { form, onSubmit }

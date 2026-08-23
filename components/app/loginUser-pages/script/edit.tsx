@@ -17,7 +17,7 @@ import type { saveState } from '@/types/saveState'
 import { editScriptFormValues } from '@/lib/validation/schema'
 
 export function EditComponent({ script }: { script: getEditScript }) {
-    const { form, onSubmit } = useEditScriptForm(script.data as scriptData)
+    const { form, onSubmit } = useEditScriptForm(script.data)
     const [toastMessage, setToastMessage] = useState<Message | null>(null)
     const [saveState, setSaveState] = useState<saveState>('unsaved')
     const id = script.data?.id as number
