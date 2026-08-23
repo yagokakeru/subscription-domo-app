@@ -45,6 +45,7 @@ export default function ForgotPasswordForm() {
                                     : 'default'
                             }
                             className="mt-8-pc"
+                            id="email"
                         />
                         {form.formState.errors.email && (
                             <p className="text-status-error text-body-small-pc mt-4-pc">
