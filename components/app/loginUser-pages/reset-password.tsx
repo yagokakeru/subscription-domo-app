@@ -45,6 +45,7 @@ export default function ResetPasswordForm() {
                                 }
                                 placeholder="パスワードを入力してください"
                                 className="mt-8-pc"
+                                id="newPassword"
                             />
                             {form.formState.errors.newPassword && (
                                 <p className="text-status-error text-body-small-pc mt-4-pc">
@@ -66,6 +67,7 @@ export default function ResetPasswordForm() {
                                         : 'default'
                                 }
                                 className="mt-8-pc"
+                                id="newPasswordConfirm"
                             />
                             {form.formState.errors.newPasswordConfirm && (
                                 <p className="text-status-error text-body-small-pc mt-4-pc">

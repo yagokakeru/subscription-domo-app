@@ -44,7 +44,7 @@ describe('ForgotPasswordForm', () => {
         ).toBeInTheDocument()
     })
 
-    it('正しいメールアドレスを入力して送信するとforgotPasswordActionアクションが呼ばれて、supabaceからエラーが返ってきてエラーメッセージを表示する', async () => {
+    it('正しいメールアドレスを入力して送信するとforgotPasswordActionアクションが呼ばれて、supabaseからエラーが返ってきてエラーメッセージを表示する', async () => {
         vi.mocked(forgotPasswordAction).mockResolvedValue({
             messageType: 'error',
             message:
