@@ -73,6 +73,10 @@ export function Protected({ script }: { script: script }) {
                     </div>
                     <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                         <InfoIcon size="16" strokeWidth={2} />
+                        action.tsのエラーハンドリング見直し
+                    </div>
+                    <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
+                        <InfoIcon size="16" strokeWidth={2} />
                         決済機能見直し
                         <br />
                         ーサブスク購読・解約時のメッセージ
