@@ -70,6 +70,13 @@ export function Protected({ script }: { script: script }) {
                     <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                         <InfoIcon size="16" strokeWidth={2} />
                         フォームとかをテストする
+                        <br />
+                        lib/actions/auth/updateProfile.ts(updateProfile)
+                        lib/actions/auth/uploadImage.ts / deleteImage.ts /
+                        createAvatarUrl.ts
+                        <br />
+                        lib/actions/script/editScript.ts(editScript /
+                        editScriptName) の② 結合テスト層 実施
                     </div>
                     <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                         <InfoIcon size="16" strokeWidth={2} />
