@@ -1,7 +1,7 @@
 import Stripe from 'stripe'
 
 // Stripeクライアントを作成
-const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY as string)
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
 
 export async function getCheckoutUrl(priceID: string, customerID: string) {
     // 決算を作成

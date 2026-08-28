@@ -27,9 +27,7 @@ export const signUpAction = async (
     const password = formData.password
     const supabase = await createClient()
     // Stripeクライアントを作成
-    const stripe = new Stripe(
-        process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY as string
-    )
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
 
     // emailかpasswordの入力がなければサインアップページにリダイレクト
     if (!email || !password) {
@@ -241,7 +239,7 @@ export const deleteAccountAction = async (formData: FormData) => {
     const supabase = await createClient()
     const supabaseAdmin = createClientAdmin(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
         {
             auth: {
                 autoRefreshToken: false,
@@ -250,9 +248,7 @@ export const deleteAccountAction = async (formData: FormData) => {
         }
     )
     // Stripeクライアントを作成
-    const stripe = new Stripe(
-        process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY as string
-    )
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
 
     if (userID) {
         const { data, error } = await supabase

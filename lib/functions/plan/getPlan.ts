@@ -9,7 +9,7 @@ import type { planInfo } from '@/types/planInfo'
 
 export async function getPlan(): Promise<Result<planInfo[]>> {
     const supabase = await createClient()
-    const stripe = await new Stripe(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY!)
+    const stripe = await new Stripe(process.env.STRIPE_SECRET_KEY!)
 
     // 1.supabeseからプラン取得
     const { data: plans, error } = await supabase

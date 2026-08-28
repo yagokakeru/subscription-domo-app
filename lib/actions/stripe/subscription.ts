@@ -6,7 +6,7 @@ import type { userProfile } from '@/types/userProfile'
 import type { planInfo } from '@/types/planInfo'
 
 // Stripeクライアントを作成
-const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY as string)
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
 
 /**
  * サブスク契約時にDBにサブスク情報を保存するアクション

@@ -7,7 +7,7 @@ import type { Result } from '@/types/result'
 import type { userProfile } from '@/types/userProfile'
 
 // Stripeクライアントを作成
-const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY as string)
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
 
 export const checkout = async (
     priceID: string,

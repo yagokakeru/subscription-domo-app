@@ -12,7 +12,7 @@ import {
 import { UnsubscriptionWebhook } from '@/lib/actions/stripe/unsubscription'
 
 // Stripeクライアントを作成
-const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY as string)
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
 
 export async function POST(req: NextResponse) {
     const body = await req.text()
@@ -29,7 +29,7 @@ export async function POST(req: NextResponse) {
         event = stripe.webhooks.constructEvent(
             body,
             sig,
-            process.env.NEXT_PUBLIC_STRIPE_WEBHOOK_SECRET!
+            process.env.STRIPE_WEBHOOK_SECRET!
         )
     } catch (err) {
         console.error('Webhook signature verification failed.', err)
