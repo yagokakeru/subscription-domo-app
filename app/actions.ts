@@ -26,8 +26,31 @@ export const signUpAction = async (
     const email = formData.email
     const password = formData.password
     const supabase = await createClient()
+    const supabaseAdmin = createClientAdmin(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        {
+            auth: {
+                autoRefreshToken: false,
+                persistSession: false,
+            },
+        }
+    )
     // Stripeクライアントを作成
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
+
+    // ユーザー作成をロールバックする関数
+    const rollbackSignUp = async (userId: string, stripe_uuid?: string) => {
+        try {
+            await supabase.auth.signOut() // supabase.auth.signUpで発行されたsessionを削除するためにサインアウト
+            await supabaseAdmin.auth.admin.deleteUser(userId) // supabase authユーザー情報削除
+            if (stripe_uuid) {
+                await stripe.customers.del(stripe_uuid) // stripe顧客情報削除
+            }
+        } catch (rollbackError) {
+            console.error('ロールバック失敗:', rollbackError)
+        }
+    }
 
     // emailかpasswordの入力がなければサインアップページにリダイレクト
     if (!email || !password) {
@@ -38,25 +61,33 @@ export const signUpAction = async (
     }
 
     // ユーザーを作成
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error: signUpError } = await supabase.auth.signUp({
         email: email,
         password: password,
     })
 
+    if (signUpError) {
+        console.error(signUpError)
+        return {
+            messageType: 'error',
+            message:
+                signUpError.code == 'user_already_exists'
+                    ? 'ユーザーはすでに存在しています。'
+                    : 'ユーザーの作成に失敗しました。しばらくしてからもう一度お試しください。',
+        }
+    }
+
     // Stripeの顧客情報を作成
     if (data.user) {
-        const customer = await stripe.customers.create({
-            email: data.user.email,
-        })
-
-        // SupabeseとStripeのユーザIDをDBに挿入
-        const { error } = await supabase.from('profile').insert({
-            stripe_uuid: customer.id,
-            supabase_uuid: data.user.id,
-            email: email,
-        })
-        if (error) {
-            console.error(error)
+        let customer
+        try {
+            customer = await stripe.customers.create({
+                email: data.user.email,
+            })
+        } catch (stripeError) {
+            console.error(stripeError)
+            // ユーザー作成をロールバック
+            await rollbackSignUp(data.user.id)
             return {
                 messageType: 'error',
                 message:
@@ -64,7 +95,23 @@ export const signUpAction = async (
             }
         }
 
-        const { data: subData, error: subError } = await supabase
+        // SupabeseとStripeのユーザIDをDBに挿入
+        const { error: profileError } = await supabase.from('profile').insert({
+            stripe_uuid: customer.id,
+            supabase_uuid: data.user.id,
+            email: data.user.email,
+        })
+        if (profileError) {
+            await rollbackSignUp(data.user.id, customer.id) // ユーザー作成をロールバック
+            console.error(profileError)
+            return {
+                messageType: 'error',
+                message:
+                    'ユーザーの作成に失敗しました。しばらくしてからもう一度お試しください。',
+            }
+        }
+
+        const { error: subError } = await supabase
             .from('subscription')
             .insert({
                 plan_id: 5, // よくないけどfreeプランのIDを手入力
@@ -79,6 +126,12 @@ export const signUpAction = async (
             .select()
 
         if (subError) {
+            await supabase
+                .from('profile')
+                .delete()
+                .eq('supabase_uuid', data.user.id) // supabase profile情報削除
+            await rollbackSignUp(data.user.id, customer.id) // ユーザー作成をロールバック
+
             console.error(subError)
             return {
                 messageType: 'error',
@@ -88,54 +141,28 @@ export const signUpAction = async (
         }
     }
 
-    if (error) {
-        console.error(error)
-        return {
-            messageType: 'error',
-            message:
-                error.code == 'user_already_exists'
-                    ? 'ユーザーはすでに存在しています。'
-                    : 'ユーザーの作成に失敗しました。しばらくしてからもう一度お試しください。',
-        }
-    } else {
-        // 登録したユーザーをログインさせる
-        const { error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-        })
+    // priceIDがあったらプランを購入する新規ユーザー
+    if (priceID) {
+        // ログインユーザー情報を取得
+        const userData = await getUserInfo()
 
-        if (error) {
-            console.error(error)
+        if (userData) {
+            const customerID = userData.stripe_uuid
+            const sessionURL = await getCheckoutUrl(priceID, customerID)
+
+            if (sessionURL) {
+                return redirect(sessionURL)
+            }
+        } else {
             return {
                 messageType: 'error',
                 message:
-                    'ユーザー登録に失敗しました。しばらくしてからもう一度お試しください。',
+                    'ユーザー情報を取得できませんでした。しばらくしてからもう一度お試しください。',
             }
         }
-
-        // priceIDがあったらプランを購入する新規ユーザー
-        if (priceID) {
-            // ログインユーザー情報を取得
-            const userData = await getUserInfo()
-
-            if (userData) {
-                const customerID = userData.stripe_uuid
-                const sessionURL = await getCheckoutUrl(priceID, customerID)
-
-                if (sessionURL) {
-                    return redirect(sessionURL)
-                }
-            } else {
-                return {
-                    messageType: 'error',
-                    message:
-                        'ユーザー情報を取得できませんでした。しばらくしてからもう一度お試しください。',
-                }
-            }
-        }
-
-        return redirect('/protected')
     }
+
+    return redirect('/protected')
 }
 
 export const signInAction = async (

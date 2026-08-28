@@ -246,14 +246,14 @@ const mockFrom = vi.fn((table: string) => {
 
 const mockSignUpSupabase = ({
     signUp = vi.fn().mockResolvedValue({ data: { user: null }, error: null }),
-    signInWithPassword = vi.fn().mockResolvedValue({ error: null }),
+    signOut = vi.fn().mockResolvedValue({ error: null }),
     from = mockFrom,
 } = {}) => {
     vi.mocked(createClient).mockResolvedValue({
-        auth: { signUp, signInWithPassword },
+        auth: { signUp, signOut },
         from,
     } as unknown as Awaited<ReturnType<typeof createClient>>)
-    return { signUp, signInWithPassword }
+    return { signUp, signOut, from }
 }
 
 describe('signUpAction', () => {
@@ -298,9 +298,38 @@ describe('signUpAction', () => {
         })
     })
 
-    it('profileテーブルへの挿入でエラーが発生した場合、エラーメッセージを返す', async () => {
+    it('Stripe顧客の作成に失敗した場合、authユーザーをロールバックしてエラーメッセージを返す', async () => {
         const mockUser = { id: 'user-1', email: 'new@example.com' }
-        mockSignUpSupabase({
+        const { signOut } = mockSignUpSupabase({
+            signUp: vi.fn().mockResolvedValue({
+                data: { user: mockUser },
+                error: null,
+            }),
+        })
+        mockAdminSupabase()
+        mockCustomersCreate.mockRejectedValue(new Error('stripe down'))
+
+        const result = await signUpAction({
+            priceid: null,
+            email: 'new@example.com',
+            password: 'Password1',
+        })
+
+        // Stripe顧客はまだ存在しないので削除は呼ばれない
+        expect(mockCustomersDel).not.toHaveBeenCalled()
+        // authユーザーの削除とセッションのサインアウトは行われる
+        expect(mockAdminDeleteUser).toHaveBeenCalledWith('user-1')
+        expect(signOut).toHaveBeenCalled()
+        expect(result).toEqual({
+            messageType: 'error',
+            message:
+                'ユーザーの作成に失敗しました。しばらくしてからもう一度お試しください。',
+        })
+    })
+
+    it('profileテーブルへの挿入でエラーが発生した場合、Stripe顧客とauthユーザーをロールバックしてエラーメッセージを返す', async () => {
+        const mockUser = { id: 'user-1', email: 'new@example.com' }
+        const { signOut } = mockSignUpSupabase({
             signUp: vi.fn().mockResolvedValue({
                 data: { user: mockUser },
                 error: null,
@@ -317,6 +346,7 @@ describe('signUpAction', () => {
                 throw new Error(`想定外のテーブル: ${table}`)
             }),
         })
+        mockAdminSupabase()
         mockCustomersCreate.mockResolvedValue({ id: 'cus_123' })
 
         const result = await signUpAction({
@@ -325,6 +355,9 @@ describe('signUpAction', () => {
             password: 'Password1',
         })
 
+        expect(mockCustomersDel).toHaveBeenCalledWith('cus_123')
+        expect(mockAdminDeleteUser).toHaveBeenCalledWith('user-1')
+        expect(signOut).toHaveBeenCalled()
         expect(result).toEqual({
             messageType: 'error',
             message:
@@ -332,9 +365,11 @@ describe('signUpAction', () => {
         })
     })
 
-    it('subscriptionテーブルへの挿入でエラーが発生した場合、エラーメッセージを返す', async () => {
+    it('subscriptionテーブルへの挿入でエラーが発生した場合、profile・Stripe顧客・authユーザーをロールバックしてエラーメッセージを返す', async () => {
         const mockUser = { id: 'user-1', email: 'new@example.com' }
-        mockSignUpSupabase({
+        const profileDeleteEq = vi.fn().mockResolvedValue({ error: null })
+        const profileDelete = vi.fn().mockReturnValue({ eq: profileDeleteEq })
+        const { signOut } = mockSignUpSupabase({
             signUp: vi.fn().mockResolvedValue({
                 data: { user: mockUser },
                 error: null,
@@ -343,6 +378,7 @@ describe('signUpAction', () => {
                 if (table === 'profile') {
                     return {
                         insert: vi.fn().mockResolvedValue({ error: null }),
+                        delete: profileDelete,
                     }
                 }
                 if (table === 'subscription') {
@@ -358,6 +394,7 @@ describe('signUpAction', () => {
                 throw new Error(`想定外のテーブル: ${table}`)
             }),
         })
+        mockAdminSupabase()
         mockCustomersCreate.mockResolvedValue({ id: 'cus_123' })
 
         const result = await signUpAction({
@@ -366,6 +403,12 @@ describe('signUpAction', () => {
             password: 'Password1',
         })
 
+        // profile行が削除されたか
+        expect(profileDelete).toHaveBeenCalled()
+        expect(profileDeleteEq).toHaveBeenCalledWith('supabase_uuid', 'user-1')
+        expect(mockCustomersDel).toHaveBeenCalledWith('cus_123')
+        expect(mockAdminDeleteUser).toHaveBeenCalledWith('user-1')
+        expect(signOut).toHaveBeenCalled()
         expect(result).toEqual({
             messageType: 'error',
             message:
@@ -411,32 +454,6 @@ describe('signUpAction', () => {
             messageType: 'error',
             message:
                 'ユーザーの作成に失敗しました。しばらくしてからもう一度お試しください。',
-        })
-    })
-
-    it('登録後のログインに失敗した場合、エラーメッセージを返す', async () => {
-        const mockUser = { id: 'user-1', email: 'new@example.com' }
-        mockSignUpSupabase({
-            signUp: vi.fn().mockResolvedValue({
-                data: { user: mockUser },
-                error: null,
-            }),
-            signInWithPassword: vi
-                .fn()
-                .mockResolvedValue({ error: { message: 'login failed' } }),
-        })
-        mockCustomersCreate.mockResolvedValue({ id: 'cus_123' })
-
-        const result = await signUpAction({
-            priceid: null,
-            email: 'new@example.com',
-            password: 'Password1',
-        })
-
-        expect(result).toEqual({
-            messageType: 'error',
-            message:
-                'ユーザー登録に失敗しました。しばらくしてからもう一度お試しください。',
         })
     })
 
