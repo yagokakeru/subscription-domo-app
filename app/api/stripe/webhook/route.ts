@@ -3,6 +3,7 @@
  */
 import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
+import { stripeClient } from '@/utils/stripe/server'
 import Stripe from 'stripe'
 
 import {
@@ -12,7 +13,7 @@ import {
 import { UnsubscriptionWebhook } from '@/lib/actions/stripe/unsubscription'
 
 // Stripeクライアントを作成
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
+const stripe = stripeClient()
 
 export async function POST(req: NextResponse) {
     const body = await req.text()

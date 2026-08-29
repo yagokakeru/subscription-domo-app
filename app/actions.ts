@@ -5,7 +5,7 @@ import { createClient } from '@/utils/supabase/server'
 import { createClient as createClientAdmin } from '@supabase/supabase-js'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-import Stripe from 'stripe'
+import { stripeClient } from '@/utils/stripe/server'
 
 import { getUserInfo } from '@/lib/functions/profile/getUserInfo'
 import { getCheckoutUrl } from '@/lib/getCheckoutUrl'
@@ -36,7 +36,7 @@ export const signUpAction = async (
         }
     )
     // Stripeクライアントを作成
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
+    const stripe = stripeClient()
 
     // ユーザー作成をロールバックする関数
     const rollbackSignUp = async (userId: string, stripe_uuid?: string) => {
@@ -110,10 +110,31 @@ export const signUpAction = async (
             }
         }
 
+        const { data: planData, error: planError } = await supabase
+            .from('plan')
+            .select('id')
+            .is('stripe_price_id', null) // priceIDがnullのプランを取得
+            .single()
+
+        if (planError) {
+            await supabase
+                .from('profile')
+                .delete()
+                .eq('supabase_uuid', data.user.id) // supabase profile情報削除
+            await rollbackSignUp(data.user.id, customer.id) // ユーザー作成をロールバック
+
+            console.error(planError)
+            return {
+                messageType: 'error',
+                message:
+                    'ユーザーの作成に失敗しました。しばらくしてからもう一度お試しください。',
+            }
+        }
+
         const { error: subError } = await supabase
             .from('subscription')
             .insert({
-                plan_id: 5, // よくないけどfreeプランのIDを手入力
+                plan_id: planData.id,
                 user_id: data.user.id,
                 stripe_customer_id: customer.id,
                 stripe_subscription_id: null,
@@ -305,10 +326,10 @@ export const deleteAccountAction = async (
         }
     )
     // Stripeクライアントを作成
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
+    const stripe = stripeClient()
 
     if (userID) {
-        const { data: profileData, error: selectErrror } = await supabase
+        const { data: profileData, error: selectError } = await supabase
             .from('profile')
             .select('stripe_uuid')
             .eq('supabase_uuid', userID)
@@ -335,8 +356,8 @@ export const deleteAccountAction = async (
             }
         }
 
-        if (selectErrror) {
-            console.error('error', selectErrror)
+        if (selectError) {
+            console.error('error', selectError)
             return {
                 messageType: 'error',
                 message:

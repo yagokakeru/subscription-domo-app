@@ -1,11 +1,11 @@
 'use server'
 
-import Stripe from 'stripe'
+import { stripeClient } from '@/utils/stripe/server'
 import { createClient, createClientRole } from '@/utils/supabase/server'
 import type { userProfile } from '@/types/userProfile'
 
 // Stripeクライアントを作成
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
+const stripe = stripeClient()
 
 /**
  * サブスク解約処理

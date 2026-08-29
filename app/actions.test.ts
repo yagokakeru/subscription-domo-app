@@ -263,6 +263,18 @@ const mockFrom = vi.fn((table: string) => {
     if (table === 'profile') {
         return { insert: vi.fn().mockResolvedValue({ error: null }) }
     }
+    if (table === 'plan') {
+        return {
+            select: vi.fn().mockReturnValue({
+                is: vi.fn().mockReturnValue({
+                    single: vi.fn().mockResolvedValue({
+                        data: { id: 5 },
+                        error: null,
+                    }),
+                }),
+            }),
+        }
+    }
     if (table === 'subscription') {
         return {
             insert: vi.fn().mockReturnValue({
@@ -394,6 +406,59 @@ describe('signUpAction', () => {
         })
     })
 
+    it('freeプランの取得に失敗した場合、profile・Stripe顧客・authユーザーをロールバックしてエラーメッセージを返す', async () => {
+        const mockUser = { id: 'user-1', email: 'new@example.com' }
+        const profileDeleteEq = vi.fn().mockResolvedValue({ error: null })
+        const profileDelete = vi.fn().mockReturnValue({ eq: profileDeleteEq })
+        const { signOut } = mockSignUpSupabase({
+            signUp: vi.fn().mockResolvedValue({
+                data: { user: mockUser },
+                error: null,
+            }),
+            from: vi.fn((table: string) => {
+                if (table === 'profile') {
+                    return {
+                        insert: vi.fn().mockResolvedValue({ error: null }),
+                        delete: profileDelete,
+                    }
+                }
+                if (table === 'plan') {
+                    return {
+                        select: vi.fn().mockReturnValue({
+                            is: vi.fn().mockReturnValue({
+                                single: vi.fn().mockResolvedValue({
+                                    data: null,
+                                    error: { message: 'plan not found' },
+                                }),
+                            }),
+                        }),
+                    }
+                }
+                throw new Error(`想定外のテーブル: ${table}`)
+            }),
+        })
+        mockAdminSupabase()
+        mockCustomersCreate.mockResolvedValue({ id: 'cus_123' })
+
+        const result = await signUpAction({
+            priceid: null,
+            email: 'new@example.com',
+            password: 'Password1',
+        })
+
+        // profile行が削除されたか
+        expect(profileDelete).toHaveBeenCalled()
+        expect(profileDeleteEq).toHaveBeenCalledWith('supabase_uuid', 'user-1')
+        expect(mockCustomersDel).toHaveBeenCalledWith('cus_123')
+        expect(mockAdminDeleteUser).toHaveBeenCalledWith('user-1')
+        expect(signOut).toHaveBeenCalled()
+        expect(result).toEqual({
+            messageType: 'error',
+            message:
+                'ユーザーの作成に失敗しました。しばらくしてからもう一度お試しください。',
+        })
+    })
+
     it('subscriptionテーブルへの挿入でエラーが発生した場合、profile・Stripe顧客・authユーザーをロールバックしてエラーメッセージを返す', async () => {
         const mockUser = { id: 'user-1', email: 'new@example.com' }
         const profileDeleteEq = vi.fn().mockResolvedValue({ error: null })
@@ -408,6 +473,18 @@ describe('signUpAction', () => {
                     return {
                         insert: vi.fn().mockResolvedValue({ error: null }),
                         delete: profileDelete,
+                    }
+                }
+                if (table === 'plan') {
+                    return {
+                        select: vi.fn().mockReturnValue({
+                            is: vi.fn().mockReturnValue({
+                                single: vi.fn().mockResolvedValue({
+                                    data: { id: 5 },
+                                    error: null,
+                                }),
+                            }),
+                        }),
                     }
                 }
                 if (table === 'subscription') {

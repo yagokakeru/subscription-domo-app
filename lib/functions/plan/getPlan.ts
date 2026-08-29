@@ -2,14 +2,14 @@
  * 商品情報を返す関数
  */
 import { createClient } from '@/utils/supabase/server'
-import Stripe from 'stripe'
-
+import { stripeClient } from '@/utils/stripe/server'
 import type { Result } from '@/types/result'
 import type { planInfo } from '@/types/planInfo'
+import Stripe from 'stripe'
 
 export async function getPlan(): Promise<Result<planInfo[]>> {
     const supabase = await createClient()
-    const stripe = await new Stripe(process.env.STRIPE_SECRET_KEY!)
+    const stripe = stripeClient()
 
     // 1.supabeseからプラン取得
     const { data: plans, error } = await supabase

@@ -1,13 +1,13 @@
 'use server'
 
 import { redirect } from 'next/navigation'
-import Stripe from 'stripe'
+import { stripeClient } from '@/utils/stripe/server'
 
 import type { Result } from '@/types/result'
 import type { userProfile } from '@/types/userProfile'
 
 // Stripeクライアントを作成
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
+const stripe = stripeClient()
 
 export const checkout = async (
     priceID: string,
