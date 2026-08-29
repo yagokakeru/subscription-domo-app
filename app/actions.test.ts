@@ -46,7 +46,7 @@ vi.mock('stripe', () => ({
     }),
 }))
 
-const mockHeaders = (origin = 'https://example.com') => {
+const mockHeaders = (origin: string | null = 'https://example.com') => {
     vi.mocked(headers).mockResolvedValue({
         get: vi.fn().mockReturnValue(origin),
     } as unknown as Awaited<ReturnType<typeof headers>>)
@@ -71,6 +71,20 @@ describe('forgotPasswordAction', () => {
         expect(result).toEqual({
             messageType: 'error',
             message: 'メールアドレスを入力してください。',
+        })
+        expect(resetPasswordForEmail).not.toHaveBeenCalled()
+    })
+
+    it('originが取得できない場合はエラーを返す', async () => {
+        mockHeaders(null)
+        const resetPasswordForEmail = mockSupabase()
+
+        const result = await forgotPasswordAction({ email: 'user@example.com' })
+
+        expect(result).toEqual({
+            messageType: 'error',
+            message:
+                '不正なアクセスです。しばらくしてからもう一度お試しください。',
         })
         expect(resetPasswordForEmail).not.toHaveBeenCalled()
     })
@@ -493,6 +507,40 @@ describe('signUpAction', () => {
             messageType: 'error',
             message:
                 'ユーザー情報を取得できませんでした。しばらくしてからもう一度お試しください。',
+        })
+    })
+
+    it('決済セッションの取得に失敗した場合、エラーメッセージを返す', async () => {
+        const mockUser = { id: 'user-1', email: 'new@example.com' }
+        mockSignUpSupabase({
+            signUp: vi.fn().mockResolvedValue({
+                data: { user: mockUser },
+                error: null,
+            }),
+        })
+        mockCustomersCreate.mockResolvedValue({ id: 'cus_123' })
+        vi.mocked(getUserInfo).mockResolvedValue({
+            user_id: 'user-1',
+            email: 'new@example.com',
+            created_at: '2024-01-01T00:00:00.000Z',
+            profile_id: 1,
+            stripe_uuid: 'cus_123',
+            name: '',
+            avatar_url: '',
+        })
+        vi.mocked(getCheckoutUrl).mockRejectedValue(new Error('Checkout error'))
+
+        const result = await signUpAction({
+            priceid: 'price_123',
+            email: 'new@example.com',
+            password: 'Password1',
+        })
+
+        expect(getCheckoutUrl).toHaveBeenCalledWith('price_123', 'cus_123')
+        expect(result).toEqual({
+            messageType: 'error',
+            message:
+                '決済セッションの作成に失敗しました。しばらくしてからもう一度お試しください。',
         })
     })
 

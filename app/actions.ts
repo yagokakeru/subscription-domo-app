@@ -147,7 +147,18 @@ export const signUpAction = async (
 
         if (userData) {
             const customerID = userData.stripe_uuid
-            const sessionURL = await getCheckoutUrl(priceID, customerID)
+            let sessionURL: string | null = null
+
+            try {
+                sessionURL = await getCheckoutUrl(priceID, customerID)
+            } catch (checkoutError) {
+                console.error(checkoutError)
+                return {
+                    messageType: 'error',
+                    message:
+                        '決済セッションの作成に失敗しました。しばらくしてからもう一度お試しください。',
+                }
+            }
 
             if (sessionURL) {
                 return redirect(sessionURL)
@@ -195,6 +206,14 @@ export const forgotPasswordAction = async (
     const email = formData.email
     const supabase = await createClient()
     const origin = (await headers()).get('origin')
+
+    if (!origin) {
+        return {
+            messageType: 'error',
+            message:
+                '不正なアクセスです。しばらくしてからもう一度お試しください。',
+        }
+    }
 
     if (!email) {
         return {
