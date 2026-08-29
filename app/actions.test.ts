@@ -573,12 +573,15 @@ const makeFormData = (userID?: string) => {
 }
 
 describe('deleteAccountAction', () => {
-    it('user_idが無い場合、エラーとして/protectedへredirectする', async () => {
-        await deleteAccountAction(makeFormData())
+    it('user_idが無い場合、エラーメッセージを返す', async () => {
+        const result = await deleteAccountAction(makeFormData())
 
-        expect(redirect).toHaveBeenCalledWith(
-            '/protected?messageType=error&message=Delete%20account%20failed'
-        )
+        expect(result).toEqual({
+            messageType: 'error',
+            message:
+                'ユーザー削除に失敗しました。しばらくしてからもう一度お試しください。',
+        })
+        expect(redirect).not.toHaveBeenCalled()
     })
 
     it('正常に削除できた場合、サインアウトして/へredirectする', async () => {
@@ -594,26 +597,49 @@ describe('deleteAccountAction', () => {
         expect(redirect).toHaveBeenCalledWith('/')
     })
 
-    it('プロフィール取得でエラーが返ってきた場合、/protectedへredirectする', async () => {
+    it('プロフィール取得でエラーが返ってきた場合、エラーメッセージを返す', async () => {
         mockAdminSupabase()
         mockDeleteAccountSupabase({
             selectResult: { data: null, error: { message: 'select error' } },
         })
 
-        await deleteAccountAction(makeFormData('user-1'))
+        const result = await deleteAccountAction(makeFormData('user-1'))
 
-        expect(redirect).toHaveBeenCalledWith('/protected')
+        expect(result).toEqual({
+            messageType: 'error',
+            message:
+                'ユーザー削除に失敗しました。しばらくしてからもう一度お試しください。',
+        })
+        expect(redirect).not.toHaveBeenCalled()
     })
 
-    it('削除処理中に例外が発生した場合、エラーメッセージ付きで/protectedへredirectする', async () => {
+    it('削除処理中に例外が発生した場合、エラーメッセージを返す', async () => {
         mockAdminSupabase()
         mockDeleteAccountSupabase()
         mockCustomersDel.mockRejectedValue(new Error('stripe error'))
 
+        const result = await deleteAccountAction(makeFormData('user-1'))
+
+        expect(result).toEqual({
+            messageType: 'error',
+            message:
+                'ユーザー削除に失敗しました。しばらくしてからもう一度お試しください。',
+        })
+        expect(redirect).not.toHaveBeenCalled()
+    })
+
+    it('profileが見つからない(空配列)場合、クラッシュせずサインアウトして/へredirectする', async () => {
+        mockAdminSupabase()
+        const { signOut } = mockDeleteAccountSupabase({
+            selectResult: { data: [], error: null },
+        })
+
         await deleteAccountAction(makeFormData('user-1'))
 
-        expect(redirect).toHaveBeenCalledWith(
-            expect.stringContaining('/protected?messageType=error&message=')
-        )
+        // 該当プロフィールが無いので削除系の呼び出しは発生しない
+        expect(mockCustomersDel).not.toHaveBeenCalled()
+        expect(mockAdminDeleteUser).not.toHaveBeenCalled()
+        expect(signOut).toHaveBeenCalled()
+        expect(redirect).toHaveBeenCalledWith('/')
     })
 })

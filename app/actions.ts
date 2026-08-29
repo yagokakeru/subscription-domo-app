@@ -1,7 +1,6 @@
 'use server'
 
 import type { Message } from '@/types/message'
-import { encodedRedirect } from '@/utils/utils'
 import { createClient } from '@/utils/supabase/server'
 import { createClient as createClientAdmin } from '@supabase/supabase-js'
 import { headers } from 'next/headers'
@@ -261,7 +260,9 @@ export const signOutAction = async () => {
     return redirect('/sign-in')
 }
 
-export const deleteAccountAction = async (formData: FormData) => {
+export const deleteAccountAction = async (
+    formData: FormData
+): Promise<Message> => {
     const userID = formData.get('user_id')?.toString()
     const supabase = await createClient()
     const supabaseAdmin = createClientAdmin(
@@ -278,14 +279,14 @@ export const deleteAccountAction = async (formData: FormData) => {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
 
     if (userID) {
-        const { data, error } = await supabase
+        const { data: profileData, error: selectErrror } = await supabase
             .from('profile')
             .select('stripe_uuid')
             .eq('supabase_uuid', userID)
 
-        if (data) {
+        if (profileData && profileData.length > 0) {
             try {
-                await stripe.customers.del(data[0].stripe_uuid) // stripe顧客情報削除
+                await stripe.customers.del(profileData[0].stripe_uuid) // stripe顧客情報削除
                 await supabaseAdmin.auth.admin.deleteUser(userID) // supabase authユーザー情報削除
                 await supabase
                     .from('profile')
@@ -296,22 +297,31 @@ export const deleteAccountAction = async (formData: FormData) => {
                     .delete()
                     .eq('user_id', userID) // supabase サブスク情報削除
             } catch (error) {
-                return encodedRedirect(
-                    'error',
-                    '/protected',
-                    `ユーザー削除処理でエラー: ${error}`
-                )
+                console.error('ユーザー削除処理でエラー:', error)
+                return {
+                    messageType: 'error',
+                    message:
+                        'ユーザー削除に失敗しました。しばらくしてからもう一度お試しください。',
+                }
             }
         }
 
-        if (error) {
-            console.error('error', error)
-            return redirect('/protected')
+        if (selectErrror) {
+            console.error('error', selectErrror)
+            return {
+                messageType: 'error',
+                message:
+                    'ユーザー削除に失敗しました。しばらくしてからもう一度お試しください。',
+            }
         }
 
         await supabase.auth.signOut()
         return redirect('/')
     } else {
-        return encodedRedirect('error', '/protected', 'Delete account failed')
+        return {
+            messageType: 'error',
+            message:
+                'ユーザー削除に失敗しました。しばらくしてからもう一度お試しください。',
+        }
     }
 }
