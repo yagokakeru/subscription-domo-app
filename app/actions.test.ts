@@ -227,6 +227,21 @@ describe('signOutAction', () => {
         expect(signOut).toHaveBeenCalled()
         expect(redirect).toHaveBeenCalledWith('/sign-in')
     })
+
+    it('supabaseがエラーを返した場合、エラーメッセージを返す', async () => {
+        const signOut = mockSignOut(
+            vi.fn().mockResolvedValue({ error: { message: 'boom' } })
+        )
+
+        const result = await signOutAction()
+
+        expect(signOut).toHaveBeenCalled()
+        expect(result).toEqual({
+            messageType: 'error',
+            message:
+                'ログアウトに失敗しました。しばらくしてからもう一度お試しください。',
+        })
+    })
 })
 
 // テーブル名によって返す偽物を出し分ける

@@ -256,7 +256,17 @@ export const resetPasswordAction = async (
 
 export const signOutAction = async () => {
     const supabase = await createClient()
-    await supabase.auth.signOut()
+    const { error } = await supabase.auth.signOut()
+
+    if (error) {
+        console.error(error)
+        return {
+            messageType: 'error',
+            message:
+                'ログアウトに失敗しました。しばらくしてからもう一度お試しください。',
+        }
+    }
+
     return redirect('/sign-in')
 }
 
