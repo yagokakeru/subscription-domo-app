@@ -12,6 +12,8 @@ import { useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import { UpgradeSubscription } from '@/lib/actions/stripe/subscription'
 import { checkout } from '@/lib/actions/stripe/checkout'
+import ToastMessage from '@/components/ui/message/toast'
+import type { Message } from '@/types/message'
 
 const planCardVariants = cva('bg-background-surface rounded-xl-pc p-24-pc', {
     variants: {
@@ -40,6 +42,7 @@ export default function PlanCard({
     className,
 }: PlanCardProps) {
     const setPriceId = useSetAtom(priceIdAtom)
+    const [toastMessage, setToastMessage] = useState<Message | null>(null)
     const [loading, setLoading] = useState(false)
     const { push } = useRouter()
     const searchParams = useSearchParams()
@@ -56,9 +59,10 @@ export default function PlanCard({
             userInfo?.user_id || ''
         )
 
-        if (result && !result.ok) {
+        if (result) {
             console.error(result.message)
             setLoading(false)
+            setToastMessage(result)
         }
         // 成功時は redirect() されるのでここには来ない
     }
@@ -159,6 +163,13 @@ export default function PlanCard({
                     </div>
                 )}
             </div>
+
+            {toastMessage && (
+                <ToastMessage
+                    message={toastMessage}
+                    onClose={() => setToastMessage(null)}
+                />
+            )}
         </div>
     )
 }

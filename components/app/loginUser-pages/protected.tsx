@@ -80,11 +80,25 @@ export function Protected({ script }: { script: script }) {
                     </div>
                     <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                         <InfoIcon size="16" strokeWidth={2} />
-                        action.tsのエラーハンドリング見直し
-                    </div>
-                    <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
-                        <InfoIcon size="16" strokeWidth={2} />
                         決済機能見直し
+                        <br />
+                        購入、解約後はwebhookで通知を受け取って処理を実行する
+                        <br />
+                        lib/actions/stripe/checkout.ts のエラーメッセージ
+                        <br />
+                        ー普通のサブスク加入
+                        <br />
+                        ー未登録からのサブスク加入
+                        <br />
+                        ーアップグレード
+                        <br />
+                        lib/actions/stripe/subscription.ts
+                        <br />
+                        ーサブスク関連処理
+                        <br />
+                        lib/actions/stripe/unsubscription.ts
+                        <br />
+                        ーサブスク解約処理
                         <br />
                         ーサブスク購読・解約時のメッセージ
                     </div>

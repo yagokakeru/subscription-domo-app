@@ -12,7 +12,7 @@ import { createClient as createClientAdmin } from '@supabase/supabase-js'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { getUserInfo } from '@/lib/functions/profile/getUserInfo'
-import { getCheckoutUrl } from '@/lib/getCheckoutUrl'
+import { checkout } from '@/lib/actions/stripe/checkout'
 
 vi.mock('@/utils/supabase/server', () => ({
     createClient: vi.fn(),
@@ -26,8 +26,8 @@ vi.mock('next/headers', () => ({
 vi.mock('next/navigation', () => ({
     redirect: vi.fn(),
 }))
-vi.mock('@/lib/getCheckoutUrl', () => ({
-    getCheckoutUrl: vi.fn(),
+vi.mock('@/lib/actions/stripe/checkout', () => ({
+    checkout: vi.fn(),
 }))
 vi.mock('@/lib/functions/profile/getUserInfo', () => ({
     getUserInfo: vi.fn(),
@@ -605,7 +605,11 @@ describe('signUpAction', () => {
             name: '',
             avatar_url: '',
         })
-        vi.mocked(getCheckoutUrl).mockRejectedValue(new Error('Checkout error'))
+        vi.mocked(checkout).mockResolvedValue({
+            messageType: 'error',
+            message:
+                '決済を開始できませんでした。時間をおいて再度お試しください。',
+        })
 
         const result = await signUpAction({
             priceid: 'price_123',
@@ -613,46 +617,12 @@ describe('signUpAction', () => {
             password: 'Password1',
         })
 
-        expect(getCheckoutUrl).toHaveBeenCalledWith('price_123', 'cus_123')
+        expect(checkout).toHaveBeenCalledWith('price_123', 'cus_123', 'user-1')
         expect(result).toEqual({
             messageType: 'error',
             message:
-                '決済セッションの作成に失敗しました。しばらくしてからもう一度お試しください。',
+                '決済を開始できませんでした。時間をおいて再度お試しください。',
         })
-    })
-
-    it('priceIDがあり、決済セッションを取得できた場合、そのURLへredirectする', async () => {
-        const mockUser = { id: 'user-1', email: 'new@example.com' }
-        mockSignUpSupabase({
-            signUp: vi.fn().mockResolvedValue({
-                data: { user: mockUser },
-                error: null,
-            }),
-        })
-        mockCustomersCreate.mockResolvedValue({ id: 'cus_123' })
-        vi.mocked(getUserInfo).mockResolvedValue({
-            user_id: 'user-1',
-            email: 'new@example.com',
-            created_at: '2024-01-01T00:00:00.000Z',
-            profile_id: 1,
-            stripe_uuid: 'cus_123',
-            name: '',
-            avatar_url: '',
-        })
-        vi.mocked(getCheckoutUrl).mockResolvedValue(
-            'https://checkout.stripe.com/session_123'
-        )
-
-        await signUpAction({
-            priceid: 'price_123',
-            email: 'new@example.com',
-            password: 'Password1',
-        })
-
-        expect(getCheckoutUrl).toHaveBeenCalledWith('price_123', 'cus_123')
-        expect(redirect).toHaveBeenCalledWith(
-            'https://checkout.stripe.com/session_123'
-        )
     })
 })
 

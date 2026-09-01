@@ -11,7 +11,7 @@ vi.mock('@/lib/actions/script/editScript', () => ({
 
 // useEditScriptForm は lib/validation/hooks.ts の一部で、
 // そのファイルは app/actions.ts(Stripeクライアントを初期化する
-// getCheckoutUrl を間接的にimportしている)を丸ごと読み込むため、
+// checkout.ts を間接的にimportしている)を丸ごと読み込むため、
 // 実際には使わなくてもここでモックしておく必要がある
 vi.mock('@/app/actions', () => ({}))
 

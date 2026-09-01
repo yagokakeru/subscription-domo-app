@@ -8,7 +8,7 @@ import { redirect } from 'next/navigation'
 import { stripeClient } from '@/utils/stripe/server'
 
 import { getUserInfo } from '@/lib/functions/profile/getUserInfo'
-import { getCheckoutUrl } from '@/lib/getCheckoutUrl'
+import { checkout } from '@/lib/actions/stripe/checkout'
 
 import {
     signupFormValues,
@@ -167,23 +167,7 @@ export const signUpAction = async (
         const userData = await getUserInfo()
 
         if (userData) {
-            const customerID = userData.stripe_uuid
-            let sessionURL: string | null = null
-
-            try {
-                sessionURL = await getCheckoutUrl(priceID, customerID)
-            } catch (checkoutError) {
-                console.error(checkoutError)
-                return {
-                    messageType: 'error',
-                    message:
-                        '決済セッションの作成に失敗しました。しばらくしてからもう一度お試しください。',
-                }
-            }
-
-            if (sessionURL) {
-                return redirect(sessionURL)
-            }
+            return checkout(priceID, userData.stripe_uuid, userData.user_id)
         } else {
             return {
                 messageType: 'error',
