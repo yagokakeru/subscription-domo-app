@@ -43,10 +43,21 @@ export const Unsubscription = async (userID: userProfile['user_id']) => {
 export const UnsubscriptionWebhook = async (subscriptionID: string) => {
     const supabase = await createClientRole()
 
-    const { data, error } = await supabase
+    const { data: subData, error: subError } = await supabase
         .from('subscription')
         .delete()
         .eq('stripe_subscription_id', subscriptionID)
         .select()
-        .single()
+
+    if (subError) {
+        console.error('Error deleting subscription:', subError)
+        throw new Error('Error deleting subscription')
+    }
+
+    if (!subData || subData.length === 0) {
+        console.warn(
+            `Subscription not found (already deleted?): ${subscriptionID}`
+        )
+        return
+    }
 }

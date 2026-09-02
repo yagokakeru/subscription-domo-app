@@ -22,7 +22,12 @@ export const Subscription = async (
         .eq('stripe_price_id', event.data.object.plan.id)
         .single()
 
-    const { data: sub, error } = await supabase
+    if (planError) {
+        console.error('Error fetching plan data:', planError)
+        throw new Error('Error fetching plan data')
+    }
+
+    const { data: subData, error: subError } = await supabase
         .from('subscription')
         .update({
             // signupした時点でレコード作成するのでupdate
@@ -43,7 +48,13 @@ export const Subscription = async (
             }),
             cancel_at_period_end: event.data.object.cancel_at_period_end,
         })
+        .eq('user_id', event.data.object.metadata.user_id)
         .select()
+
+    if (subError) {
+        console.error('Error updating subscription:', subError)
+        throw new Error('Error updating subscription')
+    }
 }
 
 /**
@@ -69,10 +80,15 @@ export const ReactivateSubscription = async (
             { cancel_at_period_end: false }
         )
 
-        const { error: updataError } = await supabase
+        const { error: updateError } = await supabase
             .from('subscription')
             .update({ cancel_at_period_end: subscription.cancel_at_period_end })
             .eq('user_id', userID)
+
+        if (updateError) {
+            console.error('Error updating subscription:', updateError)
+            throw new Error('Error updating subscription')
+        }
     }
 }
 
@@ -112,7 +128,12 @@ export const UpgradeSubscriptionWithWebhook = async (
         .eq('stripe_price_id', event.data.object.plan.id)
         .single()
 
-    const { data: sub, error } = await supabase
+    if (planError) {
+        console.error('Error fetching plan data:', planError)
+        throw new Error('Error fetching plan data')
+    }
+
+    const { data: subData, error: subError } = await supabase
         .from('subscription')
         .update({
             plan_id: planData?.id,
@@ -134,4 +155,9 @@ export const UpgradeSubscriptionWithWebhook = async (
         })
         .eq('user_id', event.data.object.metadata.user_id)
         .select()
+
+    if (subError) {
+        console.error('Error updating subscription:', subError)
+        throw new Error('Error updating subscription')
+    }
 }

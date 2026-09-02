@@ -207,6 +207,12 @@ prettier --write
 
 https://docs.stripe.com/stripe-cli/install
 
+#### 2. Stripeにログインする
+
+```bash
+stripe login
+```
+
 #### 2. ローカルの Webhook エンドポイントにイベントを転送する
 
 ```bash
