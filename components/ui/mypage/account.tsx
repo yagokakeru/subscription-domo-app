@@ -25,7 +25,9 @@ export const MypageAccount = () => {
             <form className="mt-40-pc">
                 <SubmitButton
                     pendingText="Signing out..."
-                    formAction={signOutAction}
+                    formAction={async () => {
+                        await signOutAction()
+                    }}
                 >
                     ログアウト
                 </SubmitButton>

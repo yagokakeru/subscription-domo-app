@@ -6,9 +6,29 @@ import { Button } from '@/components/ui/button'
 import { ReactivateSubscription } from '@/lib/actions/stripe/subscription'
 import { userPlan } from '@/types/userPlan'
 import { Unsubscription } from '@/lib/actions/stripe/unsubscription'
+import { useState } from 'react'
+import ConfirmDialog from '@/components/ui/comfirm/dialog'
+import { Message } from '@/types/message'
 
-export const MypagePlan = ({ userPlan }: { userPlan: userPlan }) => {
+export const MypagePlan = ({
+    userPlan,
+    setToastMessage,
+}: {
+    userPlan: userPlan
+    setToastMessage: (message: Message) => void
+}) => {
     const userProfile = useAtomValue(userProfileAtom)
+    const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
+
+    const handleUnsubscription = async () => {
+        const message = await Unsubscription(userProfile!.user_id)
+        setToastMessage(message)
+    }
+
+    const handleReactivateSubscription = async () => {
+        const message = await ReactivateSubscription(userProfile!.user_id)
+        setToastMessage(message)
+    }
 
     return (
         <div>
@@ -23,20 +43,14 @@ export const MypagePlan = ({ userPlan }: { userPlan: userPlan }) => {
                         <div>解約予定日：</div>
                         <div>{userPlan?.current_period_end}</div>
                     </div>
-                    <div
-                        onClick={() =>
-                            ReactivateSubscription(userProfile!.user_id)
-                        }
-                    >
+                    <div onClick={handleReactivateSubscription}>
                         解約を解除する
                     </div>
                     <Button
                         asChild
                         variant={'secondary'}
                         className="mt-8-pc w-pcvw-[180]"
-                        onClick={() =>
-                            ReactivateSubscription(userProfile!.user_id)
-                        }
+                        onClick={handleReactivateSubscription}
                     >
                         <div>解約を解除する</div>
                     </Button>
@@ -65,11 +79,20 @@ export const MypagePlan = ({ userPlan }: { userPlan: userPlan }) => {
             <Button
                 asChild
                 variant={'secondary'}
-                className="mt-16-pc w-pcvw-[180]"
-                onClick={() => Unsubscription(userProfile!.user_id)}
+                className="mt-16-pc w-pcvw-[180] cursor-pointer"
+                onClick={() => setConfirmDialogOpen(true)}
             >
                 <div>プランを解約する</div>
             </Button>
+
+            <ConfirmDialog
+                open={confirmDialogOpen}
+                onOpenChange={setConfirmDialogOpen}
+                onConfirm={handleUnsubscription}
+                title="プランを解約しますか？"
+                description="この操作は元に戻せません"
+                confirmText="解約"
+            />
         </div>
     )
 }

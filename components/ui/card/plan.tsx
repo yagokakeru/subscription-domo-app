@@ -67,6 +67,23 @@ export default function PlanCard({
         // 成功時は redirect() されるのでここには来ない
     }
 
+    const handleUpgradeSubscription = async (
+        subscriptionId: string,
+        priceId: string
+    ) => {
+        if (loading) return
+
+        setLoading(true)
+
+        const result = await UpgradeSubscription(subscriptionId, priceId)
+
+        if (result) {
+            console.error(result.message)
+            setLoading(false)
+            setToastMessage(result)
+        }
+    }
+
     return (
         <div>
             {planInfo.isRecommended && (
@@ -110,7 +127,7 @@ export default function PlanCard({
                         className="mt-40-pc w-full"
                         onClick={() => {
                             userPlan.stripe_subscription_id
-                                ? UpgradeSubscription(
+                                ? handleUpgradeSubscription(
                                       userPlan.stripe_subscription_id,
                                       planInfo.priceId || ('' as string)
                                   )

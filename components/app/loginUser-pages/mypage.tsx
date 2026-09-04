@@ -69,7 +69,10 @@ export function MypageComponent({ userPlan }: { userPlan: userPlan }) {
                                 />
                             )}
                             {activeTab === 'plan' && (
-                                <MypagePlan userPlan={userPlan} />
+                                <MypagePlan
+                                    userPlan={userPlan}
+                                    setToastMessage={setToastMessage}
+                                />
                             )}
                             {activeTab === 'account' && <MypageAccount />}
                         </div>

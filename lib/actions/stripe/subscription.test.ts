@@ -213,7 +213,9 @@ const mockReactivateFrom = ({
 
 describe('ReactivateSubscription', () => {
     beforeEach(() => {
-        mockSubscriptionsUpdate.mockClear()
+        // mockClearは呼び出し履歴しか消さないため、前のテストのmockRejectedValueが
+        // 残らないようmockResetで実装ごとリセットする
+        mockSubscriptionsUpdate.mockReset()
     })
 
     it('正常時、Stripeを再アクティブ化しDBを更新する', async () => {
@@ -225,15 +227,19 @@ describe('ReactivateSubscription', () => {
             cancel_at_period_end: false,
         })
 
-        await ReactivateSubscription('user-uuid-1')
+        const result = await ReactivateSubscription('user-uuid-1')
 
         expect(mockSubscriptionsUpdate).toHaveBeenCalledWith('sub_test123', {
             cancel_at_period_end: false,
         })
         expect(from).toHaveBeenCalledWith('subscription')
+        expect(result).toEqual({
+            messageType: 'success',
+            message: 'サブスクリプションの再開に成功しました',
+        })
     })
 
-    it('該当するsubscriptionが見つからない場合、何もしない', async () => {
+    it('該当するsubscriptionが見つからない場合、Stripeを呼ばずエラーメッセージを返す', async () => {
         const from = mockReactivateFrom({
             selectResult: { data: null, error: { message: 'not found' } },
         })
@@ -241,13 +247,16 @@ describe('ReactivateSubscription', () => {
             from,
         } as unknown as Awaited<ReturnType<typeof createClientRole>>)
 
-        await expect(
-            ReactivateSubscription('user-uuid-1')
-        ).resolves.not.toThrow()
+        const result = await ReactivateSubscription('user-uuid-1')
+
         expect(mockSubscriptionsUpdate).not.toHaveBeenCalled()
+        expect(result).toEqual({
+            messageType: 'error',
+            message: 'サブスクリプションの再開に失敗しました',
+        })
     })
 
-    it('DB更新でエラーの場合、throwする', async () => {
+    it('DB更新でエラーの場合、エラーメッセージを返す', async () => {
         const from = mockReactivateFrom({
             updateResult: { error: { message: 'db error' } },
         })
@@ -258,16 +267,34 @@ describe('ReactivateSubscription', () => {
             cancel_at_period_end: false,
         })
 
-        await expect(ReactivateSubscription('user-uuid-1')).rejects.toThrow(
-            'Error updating subscription'
-        )
+        const result = await ReactivateSubscription('user-uuid-1')
+
+        expect(result).toEqual({
+            messageType: 'error',
+            message: 'サブスクリプションの再開に失敗しました',
+        })
+    })
+
+    it('Stripe呼び出しが失敗した場合、エラーメッセージを返す', async () => {
+        const from = mockReactivateFrom()
+        vi.mocked(createClientRole).mockResolvedValue({
+            from,
+        } as unknown as Awaited<ReturnType<typeof createClientRole>>)
+        mockSubscriptionsUpdate.mockRejectedValue(new Error('stripe down'))
+
+        const result = await ReactivateSubscription('user-uuid-1')
+
+        expect(result).toEqual({
+            messageType: 'error',
+            message: 'サブスクリプションの再開に失敗しました',
+        })
     })
 })
 
 describe('UpgradeSubscription', () => {
     beforeEach(() => {
-        mockSubscriptionsRetrieve.mockClear()
-        mockSubscriptionsUpdate.mockClear()
+        mockSubscriptionsRetrieve.mockReset()
+        mockSubscriptionsUpdate.mockReset()
     })
 
     it('現在のsubscription itemを取得し、新しいpriceでupdateする', async () => {
@@ -276,12 +303,28 @@ describe('UpgradeSubscription', () => {
         })
         mockSubscriptionsUpdate.mockResolvedValue({})
 
-        await UpgradeSubscription('sub_test123', 'price_new123')
+        const result = await UpgradeSubscription('sub_test123', 'price_new123')
 
         expect(mockSubscriptionsRetrieve).toHaveBeenCalledWith('sub_test123')
         expect(mockSubscriptionsUpdate).toHaveBeenCalledWith('sub_test123', {
             items: [{ id: 'si_test123', price: 'price_new123' }],
             proration_behavior: 'create_prorations',
+        })
+        expect(result).toEqual({
+            messageType: 'success',
+            message: 'サブスクリプションのアップグレードに成功しました',
+        })
+    })
+
+    it('Stripe呼び出しが失敗した場合、エラーメッセージを返す', async () => {
+        mockSubscriptionsRetrieve.mockRejectedValue(new Error('stripe down'))
+
+        const result = await UpgradeSubscription('sub_test123', 'price_new123')
+
+        expect(mockSubscriptionsUpdate).not.toHaveBeenCalled()
+        expect(result).toEqual({
+            messageType: 'error',
+            message: 'サブスクリプションのアップグレードに失敗しました',
         })
     })
 })
