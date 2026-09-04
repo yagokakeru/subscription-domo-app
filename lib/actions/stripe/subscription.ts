@@ -14,12 +14,25 @@ const stripe = stripeClient()
 export const Subscription = async (
     event: Stripe.CustomerSubscriptionCreatedEvent
 ) => {
+    const userId = event.data.object.metadata.user_id
+
+    if (!userId) {
+        // 再送されても直らない恒久的な失敗なので、throwせずログだけ残して正常終了する
+        console.error(
+            '[stripe webhook] metadata.user_id がありません:',
+            `subscription=${event.data.object.id}`,
+            `customer=${event.data.object.customer}`
+        )
+        return
+    }
+
+    // Supabaseクライアントを作成
     const supabase = await createClientRole()
 
     const { data: planData, error: planError } = await supabase
         .from('plan')
         .select('id')
-        .eq('stripe_price_id', event.data.object.plan.id)
+        .eq('stripe_price_id', event.data.object.items.data[0].price.id)
         .single()
 
     if (planError) {
@@ -32,11 +45,11 @@ export const Subscription = async (
         .update({
             // signupした時点でレコード作成するのでupdate
             plan_id: planData?.id,
-            user_id: event.data.object.metadata.user_id,
+            user_id: userId,
             stripe_customer_id: event.data.object.customer,
             stripe_subscription_id: event.data.object.id,
-            price_id: event.data.object.plan.id,
-            status: 'active',
+            price_id: event.data.object.items.data[0].price.id,
+            status: event.data.object.status,
             current_period_end: new Date(
                 event.data.object.current_period_end * 1000
             ).toLocaleString('ja-JP', {
@@ -48,7 +61,7 @@ export const Subscription = async (
             }),
             cancel_at_period_end: event.data.object.cancel_at_period_end,
         })
-        .eq('user_id', event.data.object.metadata.user_id)
+        .eq('user_id', userId)
         .select()
 
     if (subError) {
@@ -120,12 +133,24 @@ export const UpgradeSubscription = async (
 export const UpgradeSubscriptionWithWebhook = async (
     event: Stripe.CustomerSubscriptionUpdatedEvent
 ) => {
+    const userId = event.data.object.metadata.user_id
+
+    if (!userId) {
+        // 再送されても直らない恒久的な失敗なので、throwせずログだけ残して正常終了する
+        console.error(
+            '[stripe webhook] metadata.user_id がありません:',
+            `subscription=${event.data.object.id}`,
+            `customer=${event.data.object.customer}`
+        )
+        return
+    }
+
     const supabase = await createClientRole()
 
     const { data: planData, error: planError } = await supabase
         .from('plan')
         .select('id')
-        .eq('stripe_price_id', event.data.object.plan.id)
+        .eq('stripe_price_id', event.data.object.items.data[0].price.id)
         .single()
 
     if (planError) {
@@ -137,11 +162,11 @@ export const UpgradeSubscriptionWithWebhook = async (
         .from('subscription')
         .update({
             plan_id: planData?.id,
-            user_id: event.data.object.metadata.user_id,
+            user_id: userId,
             stripe_customer_id: event.data.object.customer,
             stripe_subscription_id: event.data.object.id,
-            price_id: event.data.object.plan.id,
-            status: 'active',
+            price_id: event.data.object.items.data[0].price.id,
+            status: event.data.object.status,
             current_period_end: new Date(
                 event.data.object.current_period_end * 1000
             ).toLocaleString('ja-JP', {
@@ -153,7 +178,7 @@ export const UpgradeSubscriptionWithWebhook = async (
             }),
             cancel_at_period_end: event.data.object.cancel_at_period_end,
         })
-        .eq('user_id', event.data.object.metadata.user_id)
+        .eq('user_id', userId)
         .select()
 
     if (subError) {

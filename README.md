@@ -213,7 +213,7 @@ https://docs.stripe.com/stripe-cli/install
 stripe login
 ```
 
-#### 2. ローカルの Webhook エンドポイントにイベントを転送する
+#### 3. ローカルの Webhook エンドポイントにイベントを転送する
 
 ```bash
 stripe listen --forward-to localhost:3000/api/stripe/webhook

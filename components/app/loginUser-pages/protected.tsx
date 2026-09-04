@@ -102,6 +102,10 @@ export function Protected({ script }: { script: script }) {
                         <br />
                         ーサブスク購読・解約時のメッセージ
                     </div>
+                    <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
+                        <InfoIcon size="16" strokeWidth={2} />
+                        actions.tsをリファクタリング
+                    </div>
                 </div>
 
                 <h1 className="text-heading-h1-pc">

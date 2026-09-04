@@ -32,8 +32,15 @@ const mockEvent = {
         object: {
             id: 'sub_test123',
             customer: 'cus_test123',
-            plan: { id: 'price_test123' },
+            items: {
+                data: [
+                    {
+                        price: { id: 'price_test123' },
+                    },
+                ],
+            },
             metadata: { user_id: 'user-uuid-1' },
+            status: 'active',
             current_period_end: 1700000000,
             cancel_at_period_end: false,
         },
@@ -45,8 +52,15 @@ const mockUpdatedEvent = {
         object: {
             id: 'sub_test123',
             customer: 'cus_test123',
-            plan: { id: 'price_test123' },
+            items: {
+                data: [
+                    {
+                        price: { id: 'price_test123' },
+                    },
+                ],
+            },
             metadata: { user_id: 'user-uuid-1' },
+            status: 'active',
             current_period_end: 1700000000,
             cancel_at_period_end: false,
         },
@@ -62,8 +76,15 @@ const mockFrom = ({
         error: { message: string } | null
     }
     updateResult?: { data: object | null; error: { message: string } | null }
-} = {}) =>
-    vi.fn((table: string) => {
+} = {}) => {
+    // updateに渡された中身を検証したいので、モック関数の参照を外に出しておく
+    const update = vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+            select: vi.fn().mockResolvedValue(updateResult),
+        }),
+    })
+
+    const from = vi.fn((table: string) => {
         if (table === 'plan') {
             return {
                 select: vi.fn().mockReturnValue({
@@ -74,20 +95,17 @@ const mockFrom = ({
             }
         }
         if (table === 'subscription') {
-            return {
-                update: vi.fn().mockReturnValue({
-                    eq: vi.fn().mockReturnValue({
-                        select: vi.fn().mockResolvedValue(updateResult),
-                    }),
-                }),
-            }
+            return { update }
         }
         throw new Error(`想定外のテーブル: ${table}`)
     })
 
+    return { from, update }
+}
+
 describe('Subscription', () => {
     it('正常時、planを紐付けてSubscriptionをuser_idでupdateする', async () => {
-        const from = mockFrom()
+        const { from, update } = mockFrom()
         vi.mocked(createClientRole).mockResolvedValue({
             from,
         } as unknown as Awaited<ReturnType<typeof createClientRole>>)
@@ -95,10 +113,22 @@ describe('Subscription', () => {
         await Subscription(mockEvent)
 
         expect(from).toHaveBeenCalledWith('subscription')
+        // current_period_endは実行環境のタイムゾーンで文字列が変わるため検証対象から外す
+        expect(update).toHaveBeenCalledWith(
+            expect.objectContaining({
+                plan_id: 1,
+                user_id: 'user-uuid-1',
+                stripe_customer_id: 'cus_test123',
+                stripe_subscription_id: 'sub_test123',
+                price_id: 'price_test123',
+                status: 'active',
+                cancel_at_period_end: false,
+            })
+        )
     })
 
     it('plan取得でエラーの場合、throwする', async () => {
-        const from = mockFrom({
+        const { from } = mockFrom({
             planResult: { data: null, error: { message: 'not found' } },
         })
 
@@ -112,7 +142,7 @@ describe('Subscription', () => {
     })
 
     it('subscription更新でエラーの場合、throwする', async () => {
-        const from = mockFrom({
+        const { from } = mockFrom({
             updateResult: { data: null, error: { message: 'db error' } },
         })
 
@@ -123,6 +153,32 @@ describe('Subscription', () => {
         await expect(Subscription(mockEvent)).rejects.toThrow(
             'Error updating subscription'
         )
+    })
+
+    it('metadata.user_idが無い場合、DBに触らず正常終了する', async () => {
+        // console.errorを差し替えて、テスト出力を汚さずに呼び出しを検証する
+        const consoleError = vi
+            .spyOn(console, 'error')
+            .mockImplementation(() => {})
+        const { from } = mockFrom()
+        vi.mocked(createClientRole).mockResolvedValue({
+            from,
+        } as unknown as Awaited<ReturnType<typeof createClientRole>>)
+
+        const eventWithoutUserId = {
+            data: {
+                object: { ...mockEvent.data.object, metadata: {} },
+            },
+        } as unknown as Stripe.CustomerSubscriptionCreatedEvent
+
+        // throwしない（＝Stripeに200を返しリトライさせない）
+        await expect(Subscription(eventWithoutUserId)).resolves.not.toThrow()
+        // DBアクセス自体が発生していない
+        expect(from).not.toHaveBeenCalled()
+        // 人間が気づけるログが出ている
+        expect(consoleError).toHaveBeenCalled()
+
+        consoleError.mockRestore()
     })
 })
 
@@ -232,7 +288,7 @@ describe('UpgradeSubscription', () => {
 
 describe('UpgradeSubscriptionWithWebhook', () => {
     it('正常時、planを紐付けてSubscriptionをuser_idでupdateする', async () => {
-        const from = mockFrom()
+        const { from, update } = mockFrom()
         vi.mocked(createClientRole).mockResolvedValue({
             from,
         } as unknown as Awaited<ReturnType<typeof createClientRole>>)
@@ -240,10 +296,18 @@ describe('UpgradeSubscriptionWithWebhook', () => {
         await UpgradeSubscriptionWithWebhook(mockUpdatedEvent)
 
         expect(from).toHaveBeenCalledWith('subscription')
+        expect(update).toHaveBeenCalledWith(
+            expect.objectContaining({
+                plan_id: 1,
+                user_id: 'user-uuid-1',
+                price_id: 'price_test123',
+                status: 'active',
+            })
+        )
     })
 
     it('plan取得でエラーの場合、throwする', async () => {
-        const from = mockFrom({
+        const { from } = mockFrom({
             planResult: { data: null, error: { message: 'not found' } },
         })
         vi.mocked(createClientRole).mockResolvedValue({
@@ -256,7 +320,7 @@ describe('UpgradeSubscriptionWithWebhook', () => {
     })
 
     it('subscription更新でエラーの場合、throwする', async () => {
-        const from = mockFrom({
+        const { from } = mockFrom({
             updateResult: { data: null, error: { message: 'db error' } },
         })
         vi.mocked(createClientRole).mockResolvedValue({
@@ -266,5 +330,29 @@ describe('UpgradeSubscriptionWithWebhook', () => {
         await expect(
             UpgradeSubscriptionWithWebhook(mockUpdatedEvent)
         ).rejects.toThrow('Error updating subscription')
+    })
+
+    it('metadata.user_idが無い場合、DBに触らず正常終了する', async () => {
+        const consoleError = vi
+            .spyOn(console, 'error')
+            .mockImplementation(() => {})
+        const { from } = mockFrom()
+        vi.mocked(createClientRole).mockResolvedValue({
+            from,
+        } as unknown as Awaited<ReturnType<typeof createClientRole>>)
+
+        const eventWithoutUserId = {
+            data: {
+                object: { ...mockUpdatedEvent.data.object, metadata: {} },
+            },
+        } as unknown as Stripe.CustomerSubscriptionUpdatedEvent
+
+        await expect(
+            UpgradeSubscriptionWithWebhook(eventWithoutUserId)
+        ).resolves.not.toThrow()
+        expect(from).not.toHaveBeenCalled()
+        expect(consoleError).toHaveBeenCalled()
+
+        consoleError.mockRestore()
     })
 })
