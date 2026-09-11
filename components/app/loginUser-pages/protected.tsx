@@ -82,25 +82,18 @@ export function Protected({ script }: { script: script }) {
                         <InfoIcon size="16" strokeWidth={2} />
                         決済機能見直し
                         <br />
-                        購入、解約後はwebhookで通知を受け取って処理を実行する
+                        実際にアプリを動かして決済機能を確認する
                         <br />
-                        lib/actions/stripe/checkout.ts のエラーメッセージ
+                        ー ユーザ削除
                         <br />
-                        ー普通のサブスク加入
+                        ー ユーザ作成後に決済
                         <br />
-                        ー未登録からのサブスク加入
+                        ー planページからユーザー登録&決済
                         <br />
-                        ーアップグレード
+                        ー プラン変更
                         <br />
-                        lib/actions/stripe/subscription.ts
-                        <br />
-                        ーサブスク関連処理
-                        <br />
-                        lib/actions/stripe/unsubscription.ts
-                        <br />
-                        ーサブスク解約処理
-                        <br />
-                        ーサブスク購読・解約時のメッセージ
+                        ー プラン解約
+                        <br />ー プラン再契約
                     </div>
                     <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                         <InfoIcon size="16" strokeWidth={2} />
