@@ -69,9 +69,7 @@ export const MypagePlan = ({
             </div>
 
             <Button asChild className="mt-40-pc w-pcvw-[180]">
-                <Link href={'/plan?planname=' + userPlan?.name}>
-                    プランを変更する
-                </Link>
+                <Link href={'/plan'}>プランを変更する</Link>
             </Button>
             <Button
                 asChild
