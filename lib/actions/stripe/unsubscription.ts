@@ -55,6 +55,19 @@ export const Unsubscription = async (
 
     if (updataError) {
         console.error('Error updating subscription:', updataError)
+
+        try {
+            await stripe.subscriptions.update(
+                selectData.stripe_subscription_id,
+                { cancel_at_period_end: false }
+            )
+        } catch (rollbackError) {
+            console.error(
+                'CRITICAL: rollback failed, Stripe/DB state inconsistent:',
+                rollbackError
+            )
+        }
+
         return {
             messageType: 'error',
             message: 'サブスクリプションの解約に失敗しました',

@@ -43,9 +43,6 @@ export const MypagePlan = ({
                         <div>解約予定日：</div>
                         <div>{userPlan?.current_period_end}</div>
                     </div>
-                    <div onClick={handleReactivateSubscription}>
-                        解約を解除する
-                    </div>
                     <Button
                         asChild
                         variant={'secondary'}

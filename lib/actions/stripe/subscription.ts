@@ -110,6 +110,13 @@ export const ReactivateSubscription = async (
 
         if (updateError) {
             console.error('Error updating subscription:', updateError)
+
+            // コールバックとしてサブスクを再度解約状態に戻す
+            await stripe.subscriptions.update(
+                selectData.stripe_subscription_id,
+                { cancel_at_period_end: true }
+            )
+
             return {
                 messageType: 'error',
                 message: 'サブスクリプションの再開に失敗しました',

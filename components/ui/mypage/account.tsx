@@ -5,8 +5,13 @@ import { Button } from '@/components/ui/button'
 import { SubmitButton } from '@/components/submit-button'
 import ConfirmDialog from '@/components/ui/comfirm/dialog'
 import { deleteAccountAction, signOutAction } from '@/app/actions'
+import type { Message } from '@/types/message'
 
-export const MypageAccount = () => {
+export const MypageAccount = ({
+    setToastMessage,
+}: {
+    setToastMessage: (message: Message) => void
+}) => {
     const userProfile = useAtomValue(userProfileAtom)
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
     const [isDeleting, setIsDeleting] = useState(false)
@@ -15,7 +20,9 @@ export const MypageAccount = () => {
         setIsDeleting(true)
         const formData = new FormData()
         formData.append('user_id', userProfile!.user_id)
-        await deleteAccountAction(formData)
+        const message = await deleteAccountAction(formData)
+        setToastMessage(message)
+        setIsDeleting(false)
     }
 
     return (
@@ -39,7 +46,7 @@ export const MypageAccount = () => {
                 aria-disabled={isDeleting}
                 onClick={() => setConfirmDialogOpen(true)}
             >
-                {isDeleting ? 'Deleting account...' : 'アカウント削除'}
+                {isDeleting ? 'アカウント削除中...' : 'アカウント削除'}
             </Button>
             <ConfirmDialog
                 open={confirmDialogOpen}

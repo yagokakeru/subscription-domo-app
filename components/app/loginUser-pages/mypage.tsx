@@ -74,7 +74,11 @@ export function MypageComponent({ userPlan }: { userPlan: userPlan }) {
                                     setToastMessage={setToastMessage}
                                 />
                             )}
-                            {activeTab === 'account' && <MypageAccount />}
+                            {activeTab === 'account' && (
+                                <MypageAccount
+                                    setToastMessage={setToastMessage}
+                                />
+                            )}
                         </div>
                     </div>
                 </div>

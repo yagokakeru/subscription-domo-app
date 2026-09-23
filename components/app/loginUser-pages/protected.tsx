@@ -97,6 +97,30 @@ export function Protected({ script }: { script: script }) {
                     </div>
                     <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                         <InfoIcon size="16" strokeWidth={2} />
+                        決済機能見直し
+                        <br />
+                        ーログイン中にプランページに行った時に契約中のプランは非活性にする
+                        <br />
+                        ープランの表示はサインアップに飛ばすか、アップグレードの2通りにする。通常表示はいらない
+                        <br />
+                        ープレミアムプランの時は残り台本作成数を無制限にする
+                        <br />
+                        ープラン解約後は確認ポップアップを閉じる
+                        <br />
+                        ープラン解約後はマイページとheaderを更新する
+                        <br />
+                        ーフリープランの時「プランを解約」ボタンは非活性にする
+                        <br />
+                        ープランを解約したら「プランを解約」ボタンは非活性にする
+                        <br />
+                        ー「プランを再開する」ボタンのカーソルを適切に変更する
+                        <br />
+                        ー「プランを再開する」に成功したらレンダーを更新する（マイページとheaderも更新）
+                        <br />
+                        ー新規台本作成時に何も書き込まず一覧に戻ったらその台本は削除する
+                    </div>
+                    <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
+                        <InfoIcon size="16" strokeWidth={2} />
                         actions.tsをリファクタリング
                     </div>
                 </div>

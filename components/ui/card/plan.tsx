@@ -78,7 +78,7 @@ export default function PlanCard({
         const result = await UpgradeSubscription(subscriptionId, priceId)
 
         if (result) {
-            console.error(result.message)
+            result.messageType === 'error' && console.error(result.message)
             setLoading(false)
             setToastMessage(result)
         }

@@ -331,7 +331,12 @@ export const deleteAccountAction = async (
                     .delete()
                     .eq('user_id', userID) // supabase サブスク情報削除
             } catch (error) {
-                console.error('ユーザー削除処理でエラー:', error)
+                console.error(
+                    'ユーザー削除処理でエラー:',
+                    `userID=${userID}`,
+                    `stripe_uuid=${profileData[0].stripe_uuid}`,
+                    error
+                )
                 return {
                     messageType: 'error',
                     message:
