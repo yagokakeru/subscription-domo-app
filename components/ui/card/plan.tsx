@@ -8,7 +8,6 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { useSetAtom } from 'jotai'
 import { priceIdAtom } from '@/lib/atoms/handOver'
 import { useRouter } from 'next/navigation'
-import { useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import { UpgradeSubscription } from '@/lib/actions/stripe/subscription'
 import { checkout } from '@/lib/actions/stripe/checkout'
@@ -45,8 +44,6 @@ export default function PlanCard({
     const [toastMessage, setToastMessage] = useState<Message | null>(null)
     const [loading, setLoading] = useState(false)
     const { push } = useRouter()
-    const searchParams = useSearchParams()
-    const planname = searchParams.get('planname')
 
     const handleCheckout = async (priceId: string) => {
         if (loading) return
@@ -118,11 +115,13 @@ export default function PlanCard({
                         onClick={() => {
                             push('/sign-up')
                         }}
-                        disabled={planname == planInfo.name ? true : loading}
+                        disabled={
+                            userPlan?.name == planInfo.name ? true : loading
+                        }
                     >
                         {loading ? '無料で始める' : '無料で始める'}
                     </Button>
-                ) : userInfo && planname && userPlan ? ( // サブスクアップグレード
+                ) : userInfo && userPlan ? ( // サブスクアップグレード
                     <Button
                         className="mt-40-pc w-full"
                         onClick={() => {
@@ -133,18 +132,11 @@ export default function PlanCard({
                                   )
                                 : handleCheckout(planInfo.priceId || '')
                         }}
-                        disabled={planname == planInfo.name ? true : loading}
+                        disabled={
+                            userPlan?.name == planInfo.name ? true : loading
+                        }
                     >
                         {loading ? 'アップグレードする' : 'アップグレードする'}
-                    </Button>
-                ) : userInfo ? ( // ログイン済み、サブスク未加入
-                    <Button
-                        className="mt-40-pc w-full"
-                        type="submit"
-                        onClick={() => handleCheckout(planInfo.priceId || '')}
-                        disabled={loading}
-                    >
-                        {loading ? '今すぐ始める' : '今すぐ始める'}
                     </Button>
                 ) : (
                     <Button
