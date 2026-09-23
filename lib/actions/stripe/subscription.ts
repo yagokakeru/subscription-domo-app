@@ -143,22 +143,70 @@ export const UpgradeSubscription = async (
     subscriptionId: string,
     price_id: string
 ): Promise<Message> => {
+    let updatedSubscription: Stripe.Subscription
+
     try {
         const subscription = await stripe.subscriptions.retrieve(subscriptionId)
 
         const itemId = subscription.items.data[0].id
 
-        await stripe.subscriptions.update(subscriptionId, {
-            items: [
-                {
-                    id: itemId,
-                    price: price_id,
-                },
-            ],
-            proration_behavior: 'create_prorations',
-        })
+        updatedSubscription = await stripe.subscriptions.update(
+            subscriptionId,
+            {
+                items: [
+                    {
+                        id: itemId,
+                        price: price_id,
+                    },
+                ],
+                proration_behavior: 'create_prorations',
+            }
+        )
     } catch (error) {
         console.error('Error upgrading subscription:', error)
+        return {
+            messageType: 'error',
+            message: 'サブスクリプションのアップグレードに失敗しました',
+        }
+    }
+
+    const supabase = await createClientRole()
+
+    const { data: planData, error: planError } = await supabase
+        .from('plan')
+        .select('id')
+        .eq('stripe_price_id', price_id)
+        .single()
+
+    if (planError) {
+        console.error('Error fetching plan data:', planError)
+        return {
+            messageType: 'error',
+            message: 'サブスクリプションのアップグレードに失敗しました',
+        }
+    }
+
+    const { error: subError } = await supabase
+        .from('subscription')
+        .update({
+            plan_id: planData.id,
+            price_id: price_id,
+            status: updatedSubscription.status,
+            current_period_end: new Date(
+                updatedSubscription.current_period_end * 1000
+            ).toLocaleString('ja-JP', {
+                year: 'numeric',
+                month: 'numeric',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+            }),
+            cancel_at_period_end: updatedSubscription.cancel_at_period_end,
+        })
+        .eq('stripe_subscription_id', subscriptionId)
+
+    if (subError) {
+        console.error('Error updating subscription:', subError)
         return {
             messageType: 'error',
             message: 'サブスクリプションのアップグレードに失敗しました',

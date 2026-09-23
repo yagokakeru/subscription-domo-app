@@ -99,12 +99,6 @@ export function Protected({ script }: { script: script }) {
                         <InfoIcon size="16" strokeWidth={2} />
                         決済機能見直し
                         <br />
-                        ープレミアムプランの時は残り台本作成数を無制限にする
-                        <br />
-                        ープラン解約後は確認ポップアップを閉じる
-                        <br />
-                        ープラン解約後はマイページとheaderを更新する
-                        <br />
                         ーフリープランの時「プランを解約」ボタンは非活性にする
                         <br />
                         ープランを解約したら「プランを解約」ボタンは非活性にする

@@ -67,11 +67,13 @@ const ProfileCard = React.forwardRef<HTMLDivElement, ProfileCardProps>(
                         </PlanBadge>
                     </div>
                     <div className="text-body-notice-pc">
-                        残り{' '}
                         <span className="text-body-strong-pc">
-                            {userPlan?.script_count} / {userPlan?.max_scripts}
+                            {userPlan?.script_count} /{' '}
+                            {userPlan.max_scripts
+                                ? userPlan.max_scripts
+                                : '無制限'}
                         </span>{' '}
-                        台本作成可能
+                        作成済み
                     </div>
                     <Button size={'sm'} asChild>
                         <Link href={'/plan'} onClick={onClose}>

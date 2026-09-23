@@ -7,6 +7,7 @@ import { ReactivateSubscription } from '@/lib/actions/stripe/subscription'
 import { userPlan } from '@/types/userPlan'
 import { Unsubscription } from '@/lib/actions/stripe/unsubscription'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import ConfirmDialog from '@/components/ui/comfirm/dialog'
 import { Message } from '@/types/message'
 
@@ -19,15 +20,28 @@ export const MypagePlan = ({
 }) => {
     const userProfile = useAtomValue(userProfileAtom)
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
+    const { refresh } = useRouter()
 
     const handleUnsubscription = async () => {
         const message = await Unsubscription(userProfile!.user_id)
+
         setToastMessage(message)
+        if (message.messageType !== 'error') {
+            setConfirmDialogOpen(false)
+            refresh()
+        } else {
+            console.error(message.message)
+        }
     }
 
     const handleReactivateSubscription = async () => {
         const message = await ReactivateSubscription(userProfile!.user_id)
         setToastMessage(message)
+        if (message.messageType !== 'error') {
+            refresh()
+        } else {
+            console.error(message.message)
+        }
     }
 
     return (
@@ -63,7 +77,8 @@ export const MypagePlan = ({
             <div className="text-body-default-pc mt-16-pc">
                 現在の台本数：
                 <span className="text-heading-h3-pc">
-                    {userPlan?.script_count} / {userPlan?.max_scripts}
+                    {userPlan?.script_count} /{' '}
+                    {userPlan.max_scripts ? userPlan.max_scripts : '無制限'}
                 </span>{' '}
                 作成済み
             </div>

@@ -43,7 +43,7 @@ export default function PlanCard({
     const setPriceId = useSetAtom(priceIdAtom)
     const [toastMessage, setToastMessage] = useState<Message | null>(null)
     const [loading, setLoading] = useState(false)
-    const { push } = useRouter()
+    const { push, refresh } = useRouter()
 
     const handleCheckout = async (priceId: string) => {
         if (loading) return
@@ -74,11 +74,15 @@ export default function PlanCard({
 
         const result = await UpgradeSubscription(subscriptionId, priceId)
 
-        if (result) {
-            result.messageType === 'error' && console.error(result.message)
-            setLoading(false)
-            setToastMessage(result)
+        setToastMessage(result)
+
+        if (result.messageType === 'error') {
+            console.error(result.message)
+        } else {
+            refresh() // ヘッダー・プランページ両方が再フェッチされる
         }
+
+        setLoading(false)
     }
 
     return (
