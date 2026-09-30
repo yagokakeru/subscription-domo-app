@@ -1,6 +1,6 @@
 'use server'
 
-// import { encodedRedirect } from '@/utils/utils'
+import { isScriptLocked } from '@/lib/functions/script/isScriptLocked'
 import { createClient } from '@/utils/supabase/server'
 import { editScriptFormValues } from '@/lib/validation/schema'
 import { SCRIPT_DEFAULT } from '@/lib/consts/script/script'
@@ -11,6 +11,15 @@ export const editScript = async (
     jsonS: string,
     id: number
 ): Promise<Message> => {
+    const locked = await isScriptLocked(id)
+    if (locked) {
+        return {
+            messageType: 'error',
+            message:
+                'この台本はロックされています。上位プランにアップデートしてください。',
+        }
+    }
+
     const supabase = await createClient()
     const name = formData.name || SCRIPT_DEFAULT.NAME
     const plainContent = formData.plainContent
@@ -44,6 +53,15 @@ export const editScriptName = async (
     name: string,
     id: number
 ): Promise<Message> => {
+    const locked = await isScriptLocked(id)
+    if (locked) {
+        return {
+            messageType: 'error',
+            message:
+                'この台本はロックされています。上位プランにアップデートしてください。',
+        }
+    }
+
     const supabase = await createClient()
 
     const { error } = await supabase

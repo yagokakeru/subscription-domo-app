@@ -28,13 +28,18 @@ export const Subscription = async (
         return
     }
 
+    // イベントのスナップショットではなく、今の状態を取り直す
+    const subscription = await stripe.subscriptions.retrieve(
+        event.data.object.id
+    )
+
     // Supabaseクライアントを作成
     const supabase = await createClientRole()
 
     const { data: planData, error: planError } = await supabase
         .from('plan')
         .select('id')
-        .eq('stripe_price_id', event.data.object.items.data[0].price.id)
+        .eq('stripe_price_id', subscription.items.data[0].price.id)
         .single()
 
     if (planError) {
@@ -48,12 +53,12 @@ export const Subscription = async (
             // signupした時点でレコード作成するのでupdate
             plan_id: planData?.id,
             user_id: userId,
-            stripe_customer_id: event.data.object.customer,
-            stripe_subscription_id: event.data.object.id,
-            price_id: event.data.object.items.data[0].price.id,
-            status: event.data.object.status,
+            stripe_customer_id: subscription.customer,
+            stripe_subscription_id: subscription.id,
+            price_id: subscription.items.data[0].price.id,
+            status: subscription.status,
             current_period_end: new Date(
-                event.data.object.current_period_end * 1000
+                subscription.current_period_end * 1000
             ).toLocaleString('ja-JP', {
                 year: 'numeric',
                 month: 'numeric',
@@ -61,7 +66,7 @@ export const Subscription = async (
                 hour: '2-digit',
                 minute: '2-digit',
             }),
-            cancel_at_period_end: event.data.object.cancel_at_period_end,
+            cancel_at_period_end: subscription.cancel_at_period_end,
         })
         .eq('user_id', userId)
         .select()
@@ -237,12 +242,17 @@ export const UpgradeSubscriptionWithWebhook = async (
         return
     }
 
+    // イベントのスナップショットではなく、今の状態を取り直す
+    const subscription = await stripe.subscriptions.retrieve(
+        event.data.object.id
+    )
+
     const supabase = await createClientRole()
 
     const { data: planData, error: planError } = await supabase
         .from('plan')
         .select('id')
-        .eq('stripe_price_id', event.data.object.items.data[0].price.id)
+        .eq('stripe_price_id', subscription.items.data[0].price.id)
         .single()
 
     if (planError) {
@@ -255,12 +265,12 @@ export const UpgradeSubscriptionWithWebhook = async (
         .update({
             plan_id: planData?.id,
             user_id: userId,
-            stripe_customer_id: event.data.object.customer,
-            stripe_subscription_id: event.data.object.id,
-            price_id: event.data.object.items.data[0].price.id,
-            status: event.data.object.status,
+            stripe_customer_id: subscription.customer,
+            stripe_subscription_id: subscription.id,
+            price_id: subscription.items.data[0].price.id,
+            status: subscription.status,
             current_period_end: new Date(
-                event.data.object.current_period_end * 1000
+                subscription.current_period_end * 1000
             ).toLocaleString('ja-JP', {
                 year: 'numeric',
                 month: 'numeric',
@@ -268,7 +278,7 @@ export const UpgradeSubscriptionWithWebhook = async (
                 hour: '2-digit',
                 minute: '2-digit',
             }),
-            cancel_at_period_end: event.data.object.cancel_at_period_end,
+            cancel_at_period_end: subscription.cancel_at_period_end,
         })
         .eq('user_id', userId)
         .select()

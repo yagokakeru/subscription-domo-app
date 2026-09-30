@@ -11,7 +11,7 @@ import { ProfileCard } from '@/components/ui/card/profile-card'
 import { useEffect, useRef, useState } from 'react'
 import type { userPlan } from '@/types/userPlan'
 
-export default function Header({ userPlan }: { userPlan: userPlan }) {
+export default function Header({ userPlan }: { userPlan: userPlan | null }) {
     const userProfile = useAtomValue(userProfileAtom)
     const [isProfileCardOpen, setIsProfileCardOpen] = useState(false)
     const profileMenuRef = useRef<HTMLDivElement>(null)

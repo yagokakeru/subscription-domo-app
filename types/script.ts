@@ -8,6 +8,7 @@ export type scriptData = {
     plain_content: string
     inserted_at: string
     updated_at: string
+    isLocked?: boolean
 }
 
 export type scriptFavorite = boolean

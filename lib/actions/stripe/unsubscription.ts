@@ -88,21 +88,31 @@ export const Unsubscription = async (
 export const UnsubscriptionWebhook = async (subscriptionID: string) => {
     const supabase = await createClientRole()
 
-    const { data: subData, error: subError } = await supabase
-        .from('subscription')
-        .delete()
-        .eq('stripe_subscription_id', subscriptionID)
-        .select()
+    const { data: freePlan, error: planError } = await supabase
+        .from('plan')
+        .select('id')
+        .is('stripe_price_id', null)
+        .single()
 
-    if (subError) {
-        console.error('Error deleting subscription:', subError)
-        throw new Error('Error deleting subscription')
+    if (planError) {
+        console.error('Error fetching free plan:', planError)
+        throw new Error('Error fetching free plan')
     }
 
-    if (!subData || subData.length === 0) {
-        console.warn(
-            `Subscription not found (already deleted?): ${subscriptionID}`
-        )
-        return
+    const { error: updataError } = await supabase
+        .from('subscription')
+        .update({
+            stripe_subscription_id: null,
+            price_id: null,
+            status: 'active',
+            current_period_end: null,
+            cancel_at_period_end: false,
+            plan_id: freePlan.id,
+        })
+        .eq('stripe_subscription_id', subscriptionID)
+
+    if (updataError) {
+        console.error('Error updating subscription:', updataError)
+        throw new Error('Error updating subscription')
     }
 }

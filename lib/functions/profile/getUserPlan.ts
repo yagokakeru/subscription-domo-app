@@ -4,7 +4,7 @@
 import { createClient } from '@/utils/supabase/server'
 import type { userPlan } from '@/types/userPlan'
 
-export async function getUserPlan() {
+export async function getUserPlan(): Promise<userPlan | null> {
     // supabaseクライアントを作成
     const supabase = await createClient()
 
@@ -29,7 +29,7 @@ export async function getUserPlan() {
     const { data: planData, error: planError } = await supabase
         .from('plan')
         .select()
-        .eq('stripe_price_id', subData.price_id)
+        .eq('id', subData.plan_id)
         .single()
 
     if (planError) {
@@ -37,9 +37,9 @@ export async function getUserPlan() {
     }
 
     // 4. 台本数を取得
-    const { data: scriptData, error: scriptError } = await supabase
+    const { count: scriptCount, error: scriptError } = await supabase
         .from('script')
-        .select('*')
+        .select('id', { count: 'exact', head: true })
         .eq('user_id', userID)
 
     if (scriptError) {
@@ -48,7 +48,7 @@ export async function getUserPlan() {
 
     // 4. サブスク情報とプラン情報をマージして返す
     const result = Object.assign(subData, planData, {
-        script_count: scriptData.length,
+        script_count: scriptCount ?? 0,
     })
 
     return result || null

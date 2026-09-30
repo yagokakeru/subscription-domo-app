@@ -1,6 +1,7 @@
 'use server'
 
 import type { Message } from '@/types/message'
+import Stripe from 'stripe'
 import { createClient } from '@/utils/supabase/server'
 import { createClient as createClientAdmin } from '@supabase/supabase-js'
 import { headers } from 'next/headers'
@@ -294,47 +295,38 @@ export const signOutAction = async () => {
     return redirect('/sign-in')
 }
 
-export const deleteAccountAction = async (
-    formData: FormData
-): Promise<Message> => {
-    const userID = formData.get('user_id')?.toString()
-    const supabase = await createClient()
-    const supabaseAdmin = createClientAdmin(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!,
-        {
-            auth: {
-                autoRefreshToken: false,
-                persistSession: false,
-            },
-        }
-    )
-    // Stripeクライアントを作成
-    const stripe = stripeClient()
+export const deleteAccountAction = async (): Promise<Message> => {
+    const userInfo = await getUserInfo()
 
-    if (userID) {
-        const { data: profileData, error: selectError } = await supabase
-            .from('profile')
-            .select('stripe_uuid')
-            .eq('supabase_uuid', userID)
+    if (userInfo) {
+        const userID = userInfo.user_id
+        const supabase = await createClient()
+        const supabaseAdmin = createClientAdmin(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.SUPABASE_SERVICE_ROLE_KEY!,
+            {
+                auth: {
+                    autoRefreshToken: false,
+                    persistSession: false,
+                },
+            }
+        )
+        // Stripeクライアントを作成
+        const stripe = stripeClient()
 
-        if (profileData && profileData.length > 0) {
-            try {
-                await stripe.customers.del(profileData[0].stripe_uuid) // stripe顧客情報削除
-                await supabaseAdmin.auth.admin.deleteUser(userID) // supabase authユーザー情報削除
-                await supabase
-                    .from('profile')
-                    .delete()
-                    .eq('supabase_uuid', userID) // supabase profile情報削除
-                await supabase
-                    .from('subscription')
-                    .delete()
-                    .eq('user_id', userID) // supabase サブスク情報削除
-            } catch (error) {
+        try {
+            await stripe.customers.del(userInfo.stripe_uuid) // stripe顧客情報削除
+        } catch (error) {
+            if (
+                !(
+                    error instanceof Stripe.errors.StripeError &&
+                    error.code === 'resource_missing'
+                )
+            ) {
                 console.error(
-                    'ユーザー削除処理でエラー:',
+                    'stripeユーザー削除処理でエラー:',
                     `userID=${userID}`,
-                    `stripe_uuid=${profileData[0].stripe_uuid}`,
+                    `stripe_uuid=${userInfo.stripe_uuid}`,
                     error
                 )
                 return {
@@ -345,8 +337,14 @@ export const deleteAccountAction = async (
             }
         }
 
-        if (selectError) {
-            console.error('error', selectError)
+        const { error: deleteUserError } =
+            await supabaseAdmin.auth.admin.deleteUser(userID) // supabase authユーザー情報削除
+        if (deleteUserError) {
+            console.error(
+                'supabaseユーザー削除処理でエラー:',
+                `userID=${userID}`,
+                deleteUserError
+            )
             return {
                 messageType: 'error',
                 message:
@@ -355,12 +353,14 @@ export const deleteAccountAction = async (
         }
 
         await supabase.auth.signOut()
-        return redirect('/')
     } else {
+        console.error('ユーザー情報が取得できませんでした。')
         return {
             messageType: 'error',
             message:
                 'ユーザー削除に失敗しました。しばらくしてからもう一度お試しください。',
         }
     }
+
+    return redirect('/')
 }

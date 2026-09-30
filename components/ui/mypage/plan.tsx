@@ -15,12 +15,19 @@ export const MypagePlan = ({
     userPlan,
     setToastMessage,
 }: {
-    userPlan: userPlan
+    userPlan: userPlan | null
     setToastMessage: (message: Message) => void
 }) => {
     const userProfile = useAtomValue(userProfileAtom)
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
     const { refresh } = useRouter()
+
+    if (!userPlan)
+        return (
+            <p className="text-body-default-pc">
+                プラン情報を取得できませんでした。
+            </p>
+        )
 
     const handleUnsubscription = async () => {
         const message = await Unsubscription(userProfile!.user_id)
@@ -49,7 +56,7 @@ export const MypagePlan = ({
             <h2 className="text-heading-h2-pc">プラン</h2>
             <div className="flex items-center gap-4-pc text-body-default-pc mt-40-pc">
                 <div>現在のプラン：</div>
-                <PlanBadge>{userPlan?.name ?? 'フリー'}</PlanBadge>
+                <PlanBadge>{userPlan?.name}</PlanBadge>
             </div>
             {userPlan?.cancel_at_period_end ? (
                 <>
@@ -57,20 +64,14 @@ export const MypagePlan = ({
                         <div>解約予定日：</div>
                         <div>{userPlan?.current_period_end}</div>
                     </div>
-                    <Button
-                        asChild
-                        variant={'secondary'}
-                        className="mt-8-pc w-pcvw-[180]"
-                        onClick={handleReactivateSubscription}
-                    >
-                        <div>解約を解除する</div>
-                    </Button>
                 </>
             ) : (
                 <>
                     <div className="flex items-center gap-4-pc text-body-default-pc mt-16-pc">
                         <div>次回の支払い：</div>
-                        <div>{userPlan?.current_period_end}</div>
+                        <div>
+                            {userPlan?.current_period_end ?? '支払いなし'}
+                        </div>
                     </div>
                 </>
             )}
@@ -86,14 +87,24 @@ export const MypagePlan = ({
             <Button asChild className="mt-40-pc w-pcvw-[180]">
                 <Link href={'/plan'}>プランを変更する</Link>
             </Button>
-            <Button
-                asChild
-                variant={'secondary'}
-                className="mt-16-pc w-pcvw-[180] cursor-pointer"
-                onClick={() => setConfirmDialogOpen(true)}
-            >
-                <div>プランを解約する</div>
-            </Button>
+            {userPlan.stripe_subscription_id &&
+                (userPlan.cancel_at_period_end ? (
+                    <Button
+                        variant={'secondary'}
+                        className="mt-8-pc w-pcvw-[180]"
+                        onClick={handleReactivateSubscription}
+                    >
+                        解約を解除する
+                    </Button>
+                ) : (
+                    <Button
+                        variant={'secondary'}
+                        className="mt-16-pc w-pcvw-[180]"
+                        onClick={() => setConfirmDialogOpen(true)}
+                    >
+                        プランを解約する
+                    </Button>
+                ))}
 
             <ConfirmDialog
                 open={confirmDialogOpen}

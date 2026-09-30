@@ -221,6 +221,10 @@ stripe listen --forward-to localhost:3000/api/stripe/webhook
 
 発行されたシークレットキーを`.env.local`の`NEXT_PUBLIC_STRIPE_WEBHOOK_SECRET`に設定する
 
+#### 4. CLIでテストイベントを発火させる
+
+stripe trigger customer.subscription.created
+
 ## 📂 ディレクトリ構成（抜粋）
 
 ```
@@ -238,3 +242,4 @@ prettier.config.cjs # Prettier 設定
 
 - tailwindでコーディングするときリキッドコーディングするために[`vw.ts`](./lib/tailwind/vw.ts)でプラグインを作っているがそこまでする必要はあるか。tailwindの標準でコーディングするべきか。  
   指定は`rem`にしてhtmlタグに`vw`で可変になるようにする？そうすれば[`vw.ts`](./lib/tailwind/vw.ts)みたいなものを作らなくていい
+- エラー表示の方法（関数やactionがどんな値を返すのか、該当なしの場合はnullを返すのか）、エラーメッセージの統一など最初にやるべき設計のやり方が知りたい

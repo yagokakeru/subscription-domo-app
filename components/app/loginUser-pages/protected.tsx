@@ -13,10 +13,17 @@ import { scriptFavoriteAtom } from '@/lib/atoms/scriptFavorite'
 import ScriptCard from '@/components/ui/card/script'
 import SortButton from '@/components/ui/sort_buttom'
 import { Plus } from 'lucide-react'
+import Link from 'next/link'
 import type { script } from '@/types/script'
 import type { SortCategory, SortOrder } from '@/types/sort'
 
-export function Protected({ script }: { script: script }) {
+export function Protected({
+    script,
+    isLimitReached,
+}: {
+    script: script
+    isLimitReached: boolean
+}) {
     const userProfile = useAtomValue(userProfileAtom)
     const [scriptFavorite, setScriptFavorite] = useAtom(scriptFavoriteAtom)
     const [toastMessage, setToastMessage] = useState<Message | null>(null)
@@ -63,6 +70,11 @@ export function Protected({ script }: { script: script }) {
 
     if (!userProfile) return <div>Loading...</div>
 
+    const handleCreateScript = async () => {
+        const result = await createScript(userProfile.user_id)
+        setToastMessage(result)
+    }
+
     return (
         <section className="pt-pcvw-[150]">
             <div className="w-pcvw-[1280] mx-auto">
@@ -82,36 +94,44 @@ export function Protected({ script }: { script: script }) {
                         <InfoIcon size="16" strokeWidth={2} />
                         決済機能見直し
                         <br />
-                        実際にアプリを動かして決済機能を確認する
+                        【テスト】
                         <br />
-                        ー ユーザ削除
+                        ーA6
+                        deleteAccountActionのテストを新仕様に合わせる（引数なし・getUserInfoモック・StripeモックにerrorsのStripeErrorを追加）
                         <br />
-                        ー ユーザ作成後に決済
+                        【解約予定中の有料プラン変更：解約取消＋プラン変更】
                         <br />
-                        ー planページからユーザー登録&決済
+                        ーC1 UpgradeSubscriptionでcancel_at_period_end:
+                        falseも同時に送る
                         <br />
-                        ー プラン変更
+                        ーC2
+                        解約予定中に有料プランを選んだら「解約予定は取り消されます」の確認ダイアログを出す
                         <br />
-                        ー プラン解約
-                        <br />ー プラン再契約
-                    </div>
-                    <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
-                        <InfoIcon size="16" strokeWidth={2} />
-                        決済機能見直し
+                        ーC3
+                        解約予定中は現在のプランのカードのボタンを「解約を解除する」にする
                         <br />
-                        ーフリープランの時「プランを解約」ボタンは非活性にする
+                        ーC4 subscription.test.tsを更新する
                         <br />
-                        ープランを解約したら「プランを解約」ボタンは非活性にする
+                        【その他】
                         <br />
-                        ー「プランを再開する」ボタンのカーソルを適切に変更する
+                        ーCN-04の期待結果を「subscriptionの行がフリープランに更新される」に修正する（チェックリストExcel）
                         <br />
-                        ー「プランを再開する」に成功したらレンダーを更新する（マイページとheaderも更新）
+                        ー型エラー修正：profile-card.tsx:101
+                        formのactionにMessageを返す関数を渡している
                         <br />
-                        ー新規台本作成時に何も書き込まず一覧に戻ったらその台本は削除する
+                        ー型エラー修正：sort_buttom.tsx:62,82
+                        stringをSortCategory／SortOrderに渡している
+                        <br />
+                        ー型エラー修正：webhook/route.ts:18 POST(req:
+                        NextResponse) → NextRequestにする
                     </div>
                     <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                         <InfoIcon size="16" strokeWidth={2} />
                         actions.tsをリファクタリング
+                    </div>
+                    <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
+                        <InfoIcon size="16" strokeWidth={2} />
+                        スマホデザインをClaude Designで生成
                     </div>
                 </div>
 
@@ -122,15 +142,21 @@ export function Protected({ script }: { script: script }) {
                 </h1>
 
                 <div className="flex items-center gap-x-16-pc mt-24-pc">
-                    <Button
-                        size="default"
-                        variant={'default'}
-                        onClick={() => {
-                            createScript(userProfile.user_id)
-                        }}
-                    >
-                        新規作成
-                    </Button>
+                    {isLimitReached ? (
+                        <Button size="default" variant={'default'} asChild>
+                            <Link href="/plan">プランをアップグレード</Link>
+                        </Button>
+                    ) : (
+                        <Button
+                            size="default"
+                            variant={'default'}
+                            onClick={() => {
+                                handleCreateScript()
+                            }}
+                        >
+                            新規作成
+                        </Button>
+                    )}
                     {sortedScripts.length > 0 && (
                         <SortButton
                             sortCategory={sortCategory}
@@ -140,6 +166,11 @@ export function Protected({ script }: { script: script }) {
                         />
                     )}
                 </div>
+                {isLimitReached && (
+                    <div className="text-text-secondary text-sm mt-4">
+                        台本の作成上限に達しています。プランをアップグレードしてください。
+                    </div>
+                )}
 
                 <div className="flex flex-wrap gap-y-40-pc gap-x-24-pc mt-48-pc">
                     {sortedScripts.length > 0 ? (
@@ -157,7 +188,7 @@ export function Protected({ script }: { script: script }) {
                         <div
                             className="aspect-[302/322] cursor-pointer rounded-lg-pc border-border border-dashed border-[2px] p-24-pc flex items-center justify-center flex-col gap-y-12-pc w-pcvw-[302]"
                             onClick={() => {
-                                createScript(userProfile.user_id)
+                                handleCreateScript()
                             }}
                         >
                             <Plus size="48" strokeWidth={2} />

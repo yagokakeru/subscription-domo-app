@@ -18,9 +18,7 @@ export const MypageAccount = ({
 
     const handleDeleteAccount = async () => {
         setIsDeleting(true)
-        const formData = new FormData()
-        formData.append('user_id', userProfile!.user_id)
-        const message = await deleteAccountAction(formData)
+        const message = await deleteAccountAction()
         setToastMessage(message)
         setIsDeleting(false)
     }

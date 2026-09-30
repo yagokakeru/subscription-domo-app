@@ -33,7 +33,7 @@ export interface ProfileCardProps
         VariantProps<typeof profilePhotoVariants> {
     open: boolean
     onClose?: () => void
-    userPlan: userPlan
+    userPlan: userPlan | null
 }
 
 const ProfileCard = React.forwardRef<HTMLDivElement, ProfileCardProps>(
@@ -69,8 +69,8 @@ const ProfileCard = React.forwardRef<HTMLDivElement, ProfileCardProps>(
                     <div className="text-body-notice-pc">
                         <span className="text-body-strong-pc">
                             {userPlan?.script_count} /{' '}
-                            {userPlan.max_scripts
-                                ? userPlan.max_scripts
+                            {userPlan?.max_scripts
+                                ? userPlan?.max_scripts
                                 : '無制限'}
                         </span>{' '}
                         作成済み
