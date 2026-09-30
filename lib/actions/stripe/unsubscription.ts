@@ -3,7 +3,7 @@
 import { stripeClient } from '@/utils/stripe/server'
 import { createClientRole } from '@/utils/supabase/server'
 import type Stripe from 'stripe'
-import type { userProfile } from '@/types/userProfile'
+import { getUserPlan } from '@/lib/functions/profile/getUserPlan'
 import type { Message } from '@/types/message'
 
 // Stripeクライアントを作成
@@ -14,20 +14,21 @@ const stripe = stripeClient()
  *
  * @param userID
  */
-export const Unsubscription = async (
-    userID: userProfile['user_id']
-): Promise<Message> => {
+export const Unsubscription = async (): Promise<Message> => {
     const supabase = await createClientRole()
     let subscription: Stripe.Subscription | null = null
 
-    const { data: selectData, error: selectError } = await supabase
-        .from('subscription')
-        .select()
-        .eq('user_id', userID)
-        .single()
+    const currentPlan = await getUserPlan()
+    if (!currentPlan) {
+        return {
+            messageType: 'error',
+            message: 'サブスクリプションの解約に失敗しました',
+        }
+    }
 
-    if (selectError) {
-        console.error('Error fetching subscription:', selectError)
+    const userID = currentPlan.user_id
+    const subscriptionID = currentPlan.stripe_subscription_id
+    if (!subscriptionID) {
         return {
             messageType: 'error',
             message: 'サブスクリプションの解約に失敗しました',
@@ -36,10 +37,9 @@ export const Unsubscription = async (
 
     // サブスクを解約
     try {
-        subscription = await stripe.subscriptions.update(
-            selectData.stripe_subscription_id,
-            { cancel_at_period_end: true }
-        )
+        subscription = await stripe.subscriptions.update(subscriptionID, {
+            cancel_at_period_end: true,
+        })
     } catch (error) {
         console.error('Error unsubscribing:', error)
         return {
@@ -56,11 +56,11 @@ export const Unsubscription = async (
     if (updataError) {
         console.error('Error updating subscription:', updataError)
 
+        // DBの更新に失敗した場合、Stripeのサブスクを元に戻すロールバック処理
         try {
-            await stripe.subscriptions.update(
-                selectData.stripe_subscription_id,
-                { cancel_at_period_end: false }
-            )
+            await stripe.subscriptions.update(subscriptionID, {
+                cancel_at_period_end: false,
+            })
         } catch (rollbackError) {
             console.error(
                 'CRITICAL: rollback failed, Stripe/DB state inconsistent:',

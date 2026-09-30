@@ -99,18 +99,11 @@ export function Protected({
                         ーA6
                         deleteAccountActionのテストを新仕様に合わせる（引数なし・getUserInfoモック・StripeモックにerrorsのStripeErrorを追加）
                         <br />
-                        【解約予定中の有料プラン変更：解約取消＋プラン変更】
+                        ーC4
+                        subscription.test.ts／unsubscription.test.tsを新仕様に合わせる（引数なし・getUserPlanモック、UpgradeSubscriptionはprice_idのみ）
                         <br />
-                        ーC1 UpgradeSubscriptionでcancel_at_period_end:
-                        falseも同時に送る
-                        <br />
-                        ーC2
-                        解約予定中に有料プランを選んだら「解約予定は取り消されます」の確認ダイアログを出す
-                        <br />
-                        ーC3
-                        解約予定中は現在のプランのカードのボタンを「解約を解除する」にする
-                        <br />
-                        ーC4 subscription.test.tsを更新する
+                        ーC4
+                        stripe_subscription_idがnullの時にエラーを返すテストを追加（Upgrade／Unsubscription／Reactivate）
                         <br />
                         【その他】
                         <br />

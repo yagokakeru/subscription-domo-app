@@ -30,7 +30,7 @@ export const MypagePlan = ({
         )
 
     const handleUnsubscription = async () => {
-        const message = await Unsubscription(userProfile!.user_id)
+        const message = await Unsubscription()
 
         setToastMessage(message)
         if (message.messageType !== 'error') {
@@ -42,7 +42,7 @@ export const MypagePlan = ({
     }
 
     const handleReactivateSubscription = async () => {
-        const message = await ReactivateSubscription(userProfile!.user_id)
+        const message = await ReactivateSubscription()
         setToastMessage(message)
         if (message.messageType !== 'error') {
             refresh()

@@ -3,9 +3,9 @@
 import Stripe from 'stripe'
 import { stripeClient } from '@/utils/stripe/server'
 import { createClientRole } from '@/utils/supabase/server'
+import { getUserPlan } from '@/lib/functions/profile/getUserPlan'
 import type { userProfile } from '@/types/userProfile'
 import type { Message } from '@/types/message'
-import { tr } from 'zod/v4/locales'
 
 // Stripeクライアントを作成
 const stripe = stripeClient()
@@ -82,19 +82,20 @@ export const Subscription = async (
  *
  * @param subscriptionID
  */
-export const ReactivateSubscription = async (
-    userID: userProfile['user_id']
-): Promise<Message> => {
+export const ReactivateSubscription = async (): Promise<Message> => {
     const supabase = await createClientRole()
 
-    const { data: selectData, error: selectError } = await supabase
-        .from('subscription')
-        .select()
-        .eq('user_id', userID)
-        .single()
+    const currentPlan = await getUserPlan()
+    if (!currentPlan) {
+        return {
+            messageType: 'error',
+            message: 'サブスクリプションの再開に失敗しました',
+        }
+    }
+    const userID = currentPlan.user_id
+    const subscriptionID = currentPlan.stripe_subscription_id
 
-    if (selectError) {
-        console.error('Error fetching subscription:', selectError)
+    if (!subscriptionID) {
         return {
             messageType: 'error',
             message: 'サブスクリプションの再開に失敗しました',
@@ -102,11 +103,10 @@ export const ReactivateSubscription = async (
     }
 
     try {
-        // サブスクを解約
-        const subscription = await stripe.subscriptions.update(
-            selectData.stripe_subscription_id,
-            { cancel_at_period_end: false }
-        )
+        // サブスクを再開
+        const subscription = await stripe.subscriptions.update(subscriptionID, {
+            cancel_at_period_end: false,
+        })
 
         const { error: updateError } = await supabase
             .from('subscription')
@@ -116,11 +116,17 @@ export const ReactivateSubscription = async (
         if (updateError) {
             console.error('Error updating subscription:', updateError)
 
-            // コールバックとしてサブスクを再度解約状態に戻す
-            await stripe.subscriptions.update(
-                selectData.stripe_subscription_id,
-                { cancel_at_period_end: true }
-            )
+            // ロールバックとしてサブスクを再度解約状態に戻す
+            try {
+                await stripe.subscriptions.update(subscriptionID, {
+                    cancel_at_period_end: true,
+                })
+            } catch (rollbackError) {
+                console.error(
+                    'CRITICAL: rollback failed, Stripe/DB state inconsistent:',
+                    rollbackError
+                )
+            }
 
             return {
                 messageType: 'error',
@@ -145,10 +151,42 @@ export const ReactivateSubscription = async (
  * サブスクのアップグレードアクション
  */
 export const UpgradeSubscription = async (
-    subscriptionId: string,
     price_id: string
 ): Promise<Message> => {
     let updatedSubscription: Stripe.Subscription
+
+    const supabase = await createClientRole()
+
+    const currentPlan = await getUserPlan()
+    if (!currentPlan) {
+        return {
+            messageType: 'error',
+            message: 'サブスクリプションのアップグレードに失敗しました',
+        }
+    }
+    const subscriptionId = currentPlan.stripe_subscription_id
+
+    if (!subscriptionId) {
+        return {
+            messageType: 'error',
+            message: 'サブスクリプションのアップグレードに失敗しました',
+        }
+    }
+
+    const { data: planData, error: planError } = await supabase
+        .from('plan')
+        .select('id')
+        .eq('stripe_price_id', price_id)
+        .eq('is_active', true)
+        .single()
+
+    if (planError) {
+        console.error('Error fetching plan data:', planError)
+        return {
+            messageType: 'error',
+            message: 'サブスクリプションのアップグレードに失敗しました',
+        }
+    }
 
     try {
         const subscription = await stripe.subscriptions.retrieve(subscriptionId)
@@ -165,26 +203,11 @@ export const UpgradeSubscription = async (
                     },
                 ],
                 proration_behavior: 'create_prorations',
+                cancel_at_period_end: false, // 解約予定中なら取り消す
             }
         )
     } catch (error) {
         console.error('Error upgrading subscription:', error)
-        return {
-            messageType: 'error',
-            message: 'サブスクリプションのアップグレードに失敗しました',
-        }
-    }
-
-    const supabase = await createClientRole()
-
-    const { data: planData, error: planError } = await supabase
-        .from('plan')
-        .select('id')
-        .eq('stripe_price_id', price_id)
-        .single()
-
-    if (planError) {
-        console.error('Error fetching plan data:', planError)
         return {
             messageType: 'error',
             message: 'サブスクリプションのアップグレードに失敗しました',

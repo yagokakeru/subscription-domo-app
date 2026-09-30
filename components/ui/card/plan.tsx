@@ -9,7 +9,10 @@ import { useSetAtom } from 'jotai'
 import { priceIdAtom } from '@/lib/atoms/handOver'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { UpgradeSubscription } from '@/lib/actions/stripe/subscription'
+import {
+    UpgradeSubscription,
+    ReactivateSubscription,
+} from '@/lib/actions/stripe/subscription'
 import { checkout } from '@/lib/actions/stripe/checkout'
 import ToastMessage from '@/components/ui/message/toast'
 import { Unsubscription } from '@/lib/actions/stripe/unsubscription'
@@ -46,6 +49,7 @@ export default function PlanCard({
     const [toastMessage, setToastMessage] = useState<Message | null>(null)
     const [loading, setLoading] = useState(false)
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
+    const [pendingPriceId, setPendingPriceId] = useState<string | null>(null)
     const { push, refresh } = useRouter()
 
     const handleCheckout = async (priceId: string) => {
@@ -67,15 +71,12 @@ export default function PlanCard({
         // 成功時は redirect() されるのでここには来ない
     }
 
-    const handleUpgradeSubscription = async (
-        subscriptionId: string,
-        priceId: string
-    ) => {
+    const handleUpgradeSubscription = async (priceId: string) => {
         if (loading) return
 
         setLoading(true)
 
-        const result = await UpgradeSubscription(subscriptionId, priceId)
+        const result = await UpgradeSubscription(priceId)
 
         setToastMessage(result)
 
@@ -92,7 +93,7 @@ export default function PlanCard({
         if (loading) return
         setLoading(true)
 
-        const message = await Unsubscription(userInfo!.user_id)
+        const message = await Unsubscription()
         setToastMessage(message)
 
         if (message.messageType !== 'error') {
@@ -101,6 +102,22 @@ export default function PlanCard({
         } else {
             console.error(message.message)
         }
+        setLoading(false)
+    }
+
+    const handleReactivate = async () => {
+        if (loading) return
+        setLoading(true)
+
+        const message = await ReactivateSubscription()
+        setToastMessage(message)
+
+        if (message.messageType !== 'error') {
+            refresh()
+        } else {
+            console.error(message.message)
+        }
+
         setLoading(false)
     }
 
@@ -158,22 +175,40 @@ export default function PlanCard({
                         </Button>
                     )
                 ) : userInfo && userPlan ? ( // サブスクアップグレード
-                    <Button
-                        className="mt-40-pc w-full"
-                        onClick={() => {
-                            userPlan.stripe_subscription_id
-                                ? handleUpgradeSubscription(
-                                      userPlan.stripe_subscription_id,
-                                      planInfo.priceId || ('' as string)
-                                  )
-                                : handleCheckout(planInfo.priceId || '')
-                        }}
-                        disabled={
-                            userPlan?.name == planInfo.name ? true : loading
-                        }
-                    >
-                        {loading ? 'アップグレードする' : 'アップグレードする'}
-                    </Button>
+                    userPlan.price_id === planInfo.priceId ? (
+                        // 現在のプラン
+                        userPlan.cancel_at_period_end ? (
+                            <Button
+                                className="mt-40-pc w-full"
+                                onClick={handleReactivate}
+                                disabled={loading}
+                            >
+                                {loading ? '解除しています…' : '解約を解除する'}
+                            </Button>
+                        ) : (
+                            <Button className="mt-40-pc w-full" disabled>
+                                現在のプラン
+                            </Button>
+                        )
+                    ) : (
+                        // 他の有料プラン
+                        <Button
+                            className="mt-40-pc w-full"
+                            onClick={() => {
+                                const priceId = planInfo.priceId || ''
+                                if (!userPlan.stripe_subscription_id)
+                                    return handleCheckout(priceId)
+                                if (userPlan.cancel_at_period_end)
+                                    return setPendingPriceId(priceId)
+                                handleUpgradeSubscription(priceId)
+                            }}
+                            disabled={loading}
+                        >
+                            {loading
+                                ? '処理しています…'
+                                : 'このプランに変更する'}
+                        </Button>
+                    )
                 ) : (
                     <Button
                         className="mt-40-pc w-full"
@@ -217,6 +252,21 @@ export default function PlanCard({
                 description={`${userPlan?.current_period_end}までは現在のプランを利用できます。\nそれ以降はフリープランになり、上限を超えた台本はロックされます（編集・プロンプター表示は不可、削除は可能）。\n再度アップグレードすると、ロックされた台本も利用できるようになります。`}
                 confirmText="ダウングレード"
             />
+            <ConfirmDialog
+                open={pendingPriceId !== null}
+                onOpenChange={(open) => !open && setPendingPriceId(null)}
+                onConfirm={async () => {
+                    if (!pendingPriceId) return
+                    await handleUpgradeSubscription(pendingPriceId)
+                    setPendingPriceId(null)
+                }}
+                title={`${planInfo.name}に変更しますか？`}
+                description={
+                    '現在の解約予定は取り消され、プランは継続されます。\n料金の差額は日割りで請求されます。'
+                }
+                confirmText="変更する"
+            />
+
             {toastMessage && (
                 <ToastMessage
                     message={toastMessage}
