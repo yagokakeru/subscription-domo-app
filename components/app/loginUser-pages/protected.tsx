@@ -92,17 +92,79 @@ export function Protected({
                     </div>
                     <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                         <InfoIcon size="16" strokeWidth={2} />
-                        決済機能見直し
+                        リリース準備
                         <br />
-                        ーCN-04の期待結果を「subscriptionの行がフリープランに更新される」に修正する（チェックリストExcel）
+                        【R1 今すぐ】
+                        <br />
+                        ーR1-1
+                        チェックリストExcel修正：CN-04のDB列を「フリープランに更新される」に、Stripe側列を「status=&apos;canceled&apos;」に戻す
+                        <br />
+                        ーR1-2
+                        チェックリストExcel修正：CN-04の画面表示（userPlanはnullにならない）・手順（stripe
+                        triggerは代替にならない）、RE-03の前提条件と★確認ポイント
+                        <br />
+                        ーR1-3 supabase db
+                        pullで現在のスキーマ（RLS・CASCADE・user_with_profileビュー・planの初期データ）をmigration化してGit管理
+                        <br />
+                        ーR1-4
+                        checkout()のcustomerID／userIDをセッションから取得し、price_idが有効なプランか検証する
+                        <br />
+                        ーR1-5 README：NEXT_PUBLIC_STRIPE_WEBHOOK_SECRET →
+                        STRIPE_WEBHOOK_SECRET に修正
+                        <br />
+                        ーR1-6
+                        支払い失敗（past_due）時の扱いを決める（猶予として許容
+                        or 制限してカード更新を促す）
+                        <br />
+                        【R2 スマホ表示】
+                        <br />
+                        ーR2-1 スマホデザインをClaude
+                        Designで生成してコーディング
+                        <br />
+                        【R3 リリース直前】
+                        <br />
+                        ーR3-1 特定商取引法に基づく表記ページを作成
+                        <br />
+                        ーR3-2 利用規約・プライバシーポリシーページを作成
+                        <br />
+                        ーR3-3
+                        最終確認画面の表示（料金・契約期間・自動更新・解約方法）をプランページ／Checkout前に追加
+                        <br />
+                        ーR3-4
+                        Stripe本番：商品・価格を作成し、本番DBのplan.stripe_price_idに登録
+                        <br />
+                        ーR3-5
+                        Stripe本番：Webhookエンドポイント登録（subscription.created/updated/deleted
+                        ほか）とSTRIPE_WEBHOOK_SECRET設定
+                        <br />
+                        ーR3-6 Supabase本番：Site
+                        URL／リダイレクトURLを本番ドメインに、カスタムSMTPを設定
+                        <br />
+                        ーR3-7
+                        Vercel環境変数：NEXT_PUBLIC_APP_URL、Stripe／Supabaseの本番キー（SERVICE_ROLE_KEYにNEXT_PUBLIC_を付けない）
+                        <br />
+                        ーR3-8 next buildが通ることを確認
+                        <br />
+                        ーR3-9 本番相当環境で手動テストチェックリストを全件実施
+                        <br />
+                        ーR3-10 この画面のタスクメモ（InfoIcon）をGitHub
+                        Issues等へ移して削除
+                        <br />
+                        【R4 余裕があれば】
+                        <br />
+                        ーR4-1 Webhookの絵文字入りconsole.logを整理
+                        <br />
+                        ーR4-2
+                        エラー監視（Sentry等）を導入し、Webhook処理失敗に気づけるようにする
+                        <br />
+                        ーR4-3
+                        ProfileCard：userPlanがnullの時は台本数を表示しない
+                        <br />
+                        ーR4-4 Lockアイコンにaria-labelを付ける
                     </div>
                     <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                         <InfoIcon size="16" strokeWidth={2} />
                         actions.tsをリファクタリング
-                    </div>
-                    <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
-                        <InfoIcon size="16" strokeWidth={2} />
-                        スマホデザインをClaude Designで生成
                     </div>
                 </div>
 
