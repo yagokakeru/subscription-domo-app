@@ -2,7 +2,7 @@
  * Stripe Webhookのエンドポイント
  */
 import { headers } from 'next/headers'
-import { NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { stripeClient } from '@/utils/stripe/server'
 import Stripe from 'stripe'
 
@@ -15,7 +15,7 @@ import { UnsubscriptionWebhook } from '@/lib/actions/stripe/unsubscription'
 // Stripeクライアントを作成
 const stripe = stripeClient()
 
-export async function POST(req: NextResponse) {
+export async function POST(req: NextRequest) {
     try {
         const body = await req.text()
         const headersList = await headers()

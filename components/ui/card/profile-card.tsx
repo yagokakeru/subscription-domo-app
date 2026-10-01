@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils'
 import { useAtomValue } from 'jotai'
 import { userProfileAtom } from '@/lib/atoms/authUser'
 import type { userPlan } from '@/types/userPlan'
+import type { Message } from '@/types/message'
 
 const profilePhotoVariants = cva(
     `bg-background-surface rounded-xl-pc flex items-center flex-col gap-24-pc mt-16-pc p-24-pc shadow-pcvw-[16] shadow-shadow absolute top-full right-0
@@ -34,10 +35,14 @@ export interface ProfileCardProps
     open: boolean
     onClose?: () => void
     userPlan: userPlan | null
+    setToastMessage: (message: Message) => void
 }
 
 const ProfileCard = React.forwardRef<HTMLDivElement, ProfileCardProps>(
-    ({ className, open, onClose, userPlan, ...props }, ref) => {
+    (
+        { className, open, onClose, userPlan, setToastMessage, ...props },
+        ref
+    ) => {
         const userProfile = useAtomValue(userProfileAtom)
 
         return (
@@ -98,7 +103,10 @@ const ProfileCard = React.forwardRef<HTMLDivElement, ProfileCardProps>(
                             pendingText="ログアウト中..."
                             variant={'ghost'}
                             size={'sm'}
-                            formAction={signOutAction}
+                            formAction={async () => {
+                                const message = await signOutAction()
+                                setToastMessage(message)
+                            }}
                         >
                             ログアウト
                         </SubmitButton>

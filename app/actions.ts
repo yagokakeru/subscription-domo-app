@@ -279,7 +279,7 @@ export const resetPasswordAction = async (
     }
 }
 
-export const signOutAction = async () => {
+export const signOutAction = async (): Promise<Message> => {
     const supabase = await createClient()
     const { error } = await supabase.auth.signOut()
 

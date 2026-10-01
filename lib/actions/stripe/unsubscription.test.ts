@@ -4,15 +4,16 @@ import {
     UnsubscriptionWebhook,
 } from '@/lib/actions/stripe/unsubscription'
 import { createClientRole } from '@/utils/supabase/server'
+import { getUserPlan } from '@/lib/functions/profile/getUserPlan'
 
-const { mockUnsubscription } = vi.hoisted(() => ({
-    mockUnsubscription: vi.fn(),
+const { mockSubscriptionsUpdate } = vi.hoisted(() => ({
+    mockSubscriptionsUpdate: vi.fn(),
 }))
 
 vi.mock('@/utils/stripe/server', () => ({
     stripeClient: vi.fn(() => ({
         subscriptions: {
-            update: mockUnsubscription,
+            update: mockSubscriptionsUpdate,
         },
     })),
 }))
@@ -21,201 +22,227 @@ vi.mock('@/utils/supabase/server', () => ({
     createClientRole: vi.fn(),
 }))
 
-const mockFrom = ({
-    selectResult = {
-        data: { stripe_subscription_id: 'sub_123456' },
-        error: null,
-    },
+// ログインユーザーはセッションから取るので、getUserPlanをモックして差し替える
+vi.mock('@/lib/functions/profile/getUserPlan', () => ({
+    getUserPlan: vi.fn(),
+}))
+
+const UNSUBSCRIPTION_ERROR = {
+    messageType: 'error',
+    message: 'サブスクリプションの解約に失敗しました',
+}
+
+const mockLoginUserPlan = (
+    stripeSubscriptionId: string | null = 'sub_123456'
+) => {
+    vi.mocked(getUserPlan).mockResolvedValue({
+        user_id: 'user-uuid-1',
+        stripe_subscription_id: stripeSubscriptionId,
+    } as unknown as Awaited<ReturnType<typeof getUserPlan>>)
+}
+
+const mockUnsubscriptionSupabase = ({
     updateResult = { error: null },
 }: {
-    selectResult?: {
-        data: { stripe_subscription_id: string } | null
-        error: { message: string } | null
-    }
     updateResult?: { error: { message: string } | null }
 } = {}) => {
+    const eq = vi.fn().mockResolvedValue(updateResult)
+    const update = vi.fn().mockReturnValue({ eq })
     const from = vi.fn((table: string) => {
         if (table !== 'subscription') {
             throw new Error(`想定外のテーブル: ${table}`)
         }
-
-        const select = vi.fn().mockReturnValue({
-            eq: vi.fn().mockReturnValue({
-                single: vi.fn().mockResolvedValue(selectResult),
-            }),
-        })
-
-        const update = vi.fn().mockReturnValue({
-            eq: vi.fn().mockResolvedValue(updateResult),
-        })
-
-        return {
-            select,
-            update,
-        }
+        return { update }
     })
 
-    return from
-}
+    vi.mocked(createClientRole).mockResolvedValue({
+        from,
+    } as unknown as Awaited<ReturnType<typeof createClientRole>>)
 
-const mockUnsubscriptionData = '141e52cd-3c27-4866-b0cb-765784e6e841'
+    return { from, update, eq }
+}
 
 describe('Unsubscription', () => {
     beforeEach(() => {
-        mockUnsubscription.mockReset()
+        // mockClearは呼び出し履歴しか消さないため、前のテストのmockRejectedValueが
+        // 残らないようmockResetで実装ごとリセットする
+        mockSubscriptionsUpdate.mockReset()
     })
 
-    it('サブスクリプションの解約成功時、成功メッセージが返る', async () => {
-        const from = mockFrom()
-        vi.mocked(createClientRole).mockResolvedValue({
-            from,
-        } as unknown as Awaited<ReturnType<typeof createClientRole>>)
+    it('解約に成功した場合、Stripeを期間終了時解約にしてDBを更新し、成功メッセージを返す', async () => {
+        mockLoginUserPlan()
+        const { update, eq } = mockUnsubscriptionSupabase()
+        mockSubscriptionsUpdate.mockResolvedValue({
+            cancel_at_period_end: true,
+        })
 
-        mockUnsubscription.mockResolvedValue({ cancel_at_period_end: true })
+        const result = await Unsubscription()
 
-        const result = await Unsubscription(mockUnsubscriptionData)
-
-        expect(from).toHaveBeenCalledWith('subscription')
+        expect(mockSubscriptionsUpdate).toHaveBeenCalledWith('sub_123456', {
+            cancel_at_period_end: true,
+        })
+        expect(update).toHaveBeenCalledWith({ cancel_at_period_end: true })
+        expect(eq).toHaveBeenCalledWith('user_id', 'user-uuid-1')
         expect(result).toEqual({
             messageType: 'success',
             message: 'サブスクリプションを解約しました',
         })
     })
 
-    it('subscription情報取得に失敗した場合、エラーメッセージが返る', async () => {
-        const from = mockFrom({
-            selectResult: {
-                data: null,
-                error: { message: '取得に失敗しました' },
-            },
-        })
-        vi.mocked(createClientRole).mockResolvedValue({
-            from,
-        } as unknown as Awaited<ReturnType<typeof createClientRole>>)
+    it('ログインユーザーのプランが取得できない場合、Stripeを呼ばずエラーメッセージを返す', async () => {
+        vi.mocked(getUserPlan).mockResolvedValue(null)
+        mockUnsubscriptionSupabase()
 
-        const result = await Unsubscription(mockUnsubscriptionData)
+        const result = await Unsubscription()
 
-        expect(mockUnsubscription).not.toHaveBeenCalled()
-        expect(result).toEqual({
-            messageType: 'error',
-            message: 'サブスクリプションの解約に失敗しました',
-        })
+        expect(mockSubscriptionsUpdate).not.toHaveBeenCalled()
+        expect(result).toEqual(UNSUBSCRIPTION_ERROR)
     })
 
-    it('subscription情報更新に失敗した場合、エラーメッセージが返る', async () => {
-        const from = mockFrom({
+    it('stripe_subscription_idが無い(フリープラン)場合、Stripeを呼ばずエラーメッセージを返す', async () => {
+        mockLoginUserPlan(null)
+        mockUnsubscriptionSupabase()
+
+        const result = await Unsubscription()
+
+        expect(mockSubscriptionsUpdate).not.toHaveBeenCalled()
+        expect(result).toEqual(UNSUBSCRIPTION_ERROR)
+    })
+
+    it('Stripeの解約処理に失敗した場合、DBを更新せずエラーメッセージを返す', async () => {
+        mockLoginUserPlan()
+        const { update } = mockUnsubscriptionSupabase()
+        mockSubscriptionsUpdate.mockRejectedValue(new Error('stripe down'))
+
+        const result = await Unsubscription()
+
+        expect(update).not.toHaveBeenCalled()
+        expect(result).toEqual(UNSUBSCRIPTION_ERROR)
+    })
+
+    it('DB更新に失敗した場合、Stripeを解約前の状態に戻してエラーメッセージを返す', async () => {
+        mockLoginUserPlan()
+        mockUnsubscriptionSupabase({
             updateResult: { error: { message: '更新に失敗しました' } },
         })
-        vi.mocked(createClientRole).mockResolvedValue({
-            from,
-        } as unknown as Awaited<ReturnType<typeof createClientRole>>)
-
-        mockUnsubscription.mockResolvedValue({ cancel_at_period_end: true })
-
-        const result = await Unsubscription(mockUnsubscriptionData)
-
-        expect(from).toHaveBeenCalledWith('subscription')
-        expect(result).toEqual({
-            messageType: 'error',
-            message: 'サブスクリプションの解約に失敗しました',
+        mockSubscriptionsUpdate.mockResolvedValue({
+            cancel_at_period_end: true,
         })
+
+        const result = await Unsubscription()
+
+        // 1回目: 解約 / 2回目: ロールバック
+        expect(mockSubscriptionsUpdate).toHaveBeenNthCalledWith(
+            2,
+            'sub_123456',
+            {
+                cancel_at_period_end: false,
+            }
+        )
+        expect(result).toEqual(UNSUBSCRIPTION_ERROR)
     })
 
-    it('Stripeの解約処理に失敗した場合、エラーメッセージが返る', async () => {
-        const from = mockFrom()
-        vi.mocked(createClientRole).mockResolvedValue({
-            from,
-        } as unknown as Awaited<ReturnType<typeof createClientRole>>)
-
-        mockUnsubscription.mockRejectedValue(new Error('stripe down'))
-
-        const result = await Unsubscription(mockUnsubscriptionData)
-
-        expect(result).toEqual({
-            messageType: 'error',
-            message: 'サブスクリプションの解約に失敗しました',
+    it('ロールバックも失敗した場合、CRITICALログを出してエラーメッセージを返す', async () => {
+        const consoleError = vi
+            .spyOn(console, 'error')
+            .mockImplementation(() => {})
+        mockLoginUserPlan()
+        mockUnsubscriptionSupabase({
+            updateResult: { error: { message: '更新に失敗しました' } },
         })
+        mockSubscriptionsUpdate
+            .mockResolvedValueOnce({ cancel_at_period_end: true })
+            .mockRejectedValueOnce(new Error('stripe down'))
+
+        const result = await Unsubscription()
+
+        expect(consoleError).toHaveBeenCalledWith(
+            expect.stringContaining('CRITICAL'),
+            expect.any(Error)
+        )
+        expect(result).toEqual(UNSUBSCRIPTION_ERROR)
+
+        consoleError.mockRestore()
     })
 })
 
-const mockUnsubscriptionFrom = ({
-    deleteResult = { data: [{ id: 'user_id' }], error: null },
+const mockUnsubscriptionWebhookSupabase = ({
+    planResult = { data: { id: 1 }, error: null },
+    updateResult = { error: null },
 }: {
-    deleteResult?: {
-        data: { id: string }[] | null
+    planResult?: {
+        data: { id: number } | null
         error: { message: string } | null
     }
+    updateResult?: { error: { message: string } | null }
 } = {}) => {
+    const eq = vi.fn().mockResolvedValue(updateResult)
+    const update = vi.fn().mockReturnValue({ eq })
     const from = vi.fn((table: string) => {
-        if (table !== 'subscription') {
-            throw new Error('Invalid table')
+        if (table === 'plan') {
+            return {
+                select: vi.fn().mockReturnValue({
+                    is: vi.fn().mockReturnValue({
+                        single: vi.fn().mockResolvedValue(planResult),
+                    }),
+                }),
+            }
         }
-
-        const deleteFn = vi.fn().mockReturnValue({
-            eq: vi.fn().mockReturnValue({
-                select: vi.fn().mockResolvedValue(deleteResult),
-            }),
-        })
-
-        return { delete: deleteFn }
+        if (table === 'subscription') {
+            return { update }
+        }
+        throw new Error(`想定外のテーブル: ${table}`)
     })
 
-    return from
+    vi.mocked(createClientRole).mockResolvedValue({
+        from,
+    } as unknown as Awaited<ReturnType<typeof createClientRole>>)
+
+    return { from, update, eq }
 }
 
 const mockUnsubscriptionWebhookData = 'sub_1234'
 
 describe('UnsubscriptionWebhook', () => {
-    it('サブスク解約後の後処理に成功する', async () => {
-        const consoleWarn = vi
-            .spyOn(console, 'warn')
-            .mockImplementation(() => {})
-        const from = mockUnsubscriptionFrom()
-        vi.mocked(createClientRole).mockResolvedValue({
-            from,
-        } as unknown as Awaited<ReturnType<typeof createClientRole>>)
+    it('解約成立時、該当行をフリープランに戻す', async () => {
+        const { update, eq } = mockUnsubscriptionWebhookSupabase()
 
         await expect(
             UnsubscriptionWebhook(mockUnsubscriptionWebhookData)
         ).resolves.not.toThrow()
-        expect(from).toHaveBeenCalledWith('subscription')
-        expect(consoleWarn).not.toHaveBeenCalled()
 
-        consoleWarn.mockRestore()
-    })
-
-    it('サブスク情報削除に失敗した場合エラーを投げる', async () => {
-        const from = mockUnsubscriptionFrom({
-            deleteResult: { data: null, error: { message: 'delete failed' } },
+        expect(update).toHaveBeenCalledWith({
+            stripe_subscription_id: null,
+            price_id: null,
+            status: 'active',
+            current_period_end: null,
+            cancel_at_period_end: false,
+            plan_id: 1,
         })
-        vi.mocked(createClientRole).mockResolvedValue({
-            from,
-        } as unknown as Awaited<ReturnType<typeof createClientRole>>)
-
-        await expect(
-            UnsubscriptionWebhook(mockUnsubscriptionWebhookData)
-        ).rejects.toThrow('Error deleting subscription')
-    })
-
-    it('サブスク情報がすでに削除されていた場合、console.warnが呼ばれる', async () => {
-        const consoleWarn = vi
-            .spyOn(console, 'warn')
-            .mockImplementation(() => {})
-
-        const from = mockUnsubscriptionFrom({
-            deleteResult: { data: [], error: null },
-        })
-        vi.mocked(createClientRole).mockResolvedValue({
-            from,
-        } as unknown as Awaited<ReturnType<typeof createClientRole>>)
-
-        await expect(
-            UnsubscriptionWebhook(mockUnsubscriptionWebhookData)
-        ).resolves.not.toThrow()
-        expect(consoleWarn).toHaveBeenCalledWith(
-            expect.stringContaining(mockUnsubscriptionWebhookData)
+        expect(eq).toHaveBeenCalledWith(
+            'stripe_subscription_id',
+            mockUnsubscriptionWebhookData
         )
+    })
 
-        consoleWarn.mockRestore()
+    it('フリープランの取得に失敗した場合、subscriptionを更新せずthrowする', async () => {
+        const { update } = mockUnsubscriptionWebhookSupabase({
+            planResult: { data: null, error: { message: 'not found' } },
+        })
+
+        await expect(
+            UnsubscriptionWebhook(mockUnsubscriptionWebhookData)
+        ).rejects.toThrow('Error fetching free plan')
+        expect(update).not.toHaveBeenCalled()
+    })
+
+    it('subscriptionの更新に失敗した場合、throwする', async () => {
+        mockUnsubscriptionWebhookSupabase({
+            updateResult: { error: { message: 'update failed' } },
+        })
+
+        await expect(
+            UnsubscriptionWebhook(mockUnsubscriptionWebhookData)
+        ).rejects.toThrow('Error updating subscription')
     })
 })

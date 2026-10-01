@@ -94,29 +94,7 @@ export function Protected({
                         <InfoIcon size="16" strokeWidth={2} />
                         決済機能見直し
                         <br />
-                        【テスト】
-                        <br />
-                        ーA6
-                        deleteAccountActionのテストを新仕様に合わせる（引数なし・getUserInfoモック・StripeモックにerrorsのStripeErrorを追加）
-                        <br />
-                        ーC4
-                        subscription.test.ts／unsubscription.test.tsを新仕様に合わせる（引数なし・getUserPlanモック、UpgradeSubscriptionはprice_idのみ）
-                        <br />
-                        ーC4
-                        stripe_subscription_idがnullの時にエラーを返すテストを追加（Upgrade／Unsubscription／Reactivate）
-                        <br />
-                        【その他】
-                        <br />
                         ーCN-04の期待結果を「subscriptionの行がフリープランに更新される」に修正する（チェックリストExcel）
-                        <br />
-                        ー型エラー修正：profile-card.tsx:101
-                        formのactionにMessageを返す関数を渡している
-                        <br />
-                        ー型エラー修正：sort_buttom.tsx:62,82
-                        stringをSortCategory／SortOrderに渡している
-                        <br />
-                        ー型エラー修正：webhook/route.ts:18 POST(req:
-                        NextResponse) → NextRequestにする
                     </div>
                     <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                         <InfoIcon size="16" strokeWidth={2} />

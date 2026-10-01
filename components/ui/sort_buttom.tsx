@@ -4,9 +4,13 @@ import { CircleArrowDown } from 'lucide-react'
 import type { SortCategory, SortOrder } from '@/types/sort'
 
 // 並び替えの種類の配列
-const CATEGORY_ITEMS = ['作成日', '最終更新', 'お気に入りを優先']
+const CATEGORY_ITEMS: SortCategory[] = [
+    '作成日',
+    '最終更新',
+    'お気に入りを優先',
+]
 // 並び替えの順序の配列
-const ORDER_ITEMS = ['昇順', '降順']
+const ORDER_ITEMS: SortOrder[] = ['昇順', '降順']
 
 // SortButtonのpropsの型
 type SortButtonProps = {

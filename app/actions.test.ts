@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import {
     forgotPasswordAction,
     signInAction,
@@ -38,13 +38,30 @@ vi.mock('@/lib/functions/profile/getUserInfo', () => ({
 // 参照を外に出しておく(vi.mock内から参照する変数は"mock"始まりにする必要がある)
 const mockCustomersCreate = vi.fn()
 const mockCustomersDel = vi.fn()
-vi.mock('stripe', () => ({
-    default: vi.fn().mockImplementation(function () {
+// deleteAccountActionは `error instanceof Stripe.errors.StripeError` で判定するため、
+// モックのStripeにもerrors.StripeErrorクラスを生やしておく
+const { MockStripeError } = vi.hoisted(() => {
+    class MockStripeError extends Error {
+        code?: string
+        constructor(code?: string) {
+            super(code)
+            this.code = code
+        }
+    }
+    return { MockStripeError }
+})
+vi.mock('stripe', () => {
+    const Stripe = vi.fn().mockImplementation(function () {
         return {
             customers: { create: mockCustomersCreate, del: mockCustomersDel },
         }
-    }),
-}))
+    })
+    return {
+        default: Object.assign(Stripe, {
+            errors: { StripeError: MockStripeError },
+        }),
+    }
+})
 
 const mockHeaders = (origin: string | null = 'https://example.com') => {
     vi.mocked(headers).mockResolvedValue({
@@ -626,47 +643,14 @@ describe('signUpAction', () => {
     })
 })
 
-const makeProfileBuilder = (
-    selectResult: { data: unknown; error: unknown } = {
-        data: [{ stripe_uuid: 'cus_123' }],
-        error: null,
-    }
-) => ({
-    select: vi.fn().mockReturnValue({
-        eq: vi.fn().mockResolvedValue(selectResult),
-    }),
-    delete: vi.fn().mockReturnValue({
-        eq: vi.fn().mockResolvedValue({ error: null }),
-    }),
-})
-
-const makeSubscriptionBuilder = () => ({
-    delete: vi.fn().mockReturnValue({
-        eq: vi.fn().mockResolvedValue({ error: null }),
-    }),
-})
-
-const mockDeleteAccountSupabase = ({
-    selectResult = { data: [{ stripe_uuid: 'cus_123' }], error: null } as {
-        data: unknown
-        error: unknown
-    },
-    signOut = vi.fn().mockResolvedValue({ error: null }),
-} = {}) => {
-    const profileBuilder = makeProfileBuilder(selectResult)
-    const subscriptionBuilder = makeSubscriptionBuilder()
-    const from = vi.fn((table: string) => {
-        if (table === 'profile') return profileBuilder
-        if (table === 'subscription') return subscriptionBuilder
-        throw new Error(`想定外のテーブル: ${table}`)
-    })
-
+// 関連テーブルはDBのON DELETE CASCADEで消えるため、
+// deleteAccountActionが使うのはsignOutだけ
+const mockDeleteAccountSupabase = () => {
+    const signOut = vi.fn().mockResolvedValue({ error: null })
     vi.mocked(createClient).mockResolvedValue({
         auth: { signOut },
-        from,
     } as unknown as Awaited<ReturnType<typeof createClient>>)
-
-    return { from, profileBuilder, subscriptionBuilder, signOut }
+    return { signOut }
 }
 
 const mockAdminDeleteUser = vi.fn().mockResolvedValue({ error: null })
@@ -676,30 +660,43 @@ const mockAdminSupabase = () => {
     } as unknown as ReturnType<typeof createClientAdmin>)
 }
 
-const makeFormData = (userID?: string) => {
-    const formData = new FormData()
-    if (userID) formData.set('user_id', userID)
-    return formData
+const mockLoginUser = () => {
+    vi.mocked(getUserInfo).mockResolvedValue({
+        user_id: 'user-1',
+        stripe_uuid: 'cus_123',
+    } as unknown as Awaited<ReturnType<typeof getUserInfo>>)
+}
+
+const DELETE_ACCOUNT_ERROR = {
+    messageType: 'error',
+    message:
+        'ユーザー削除に失敗しました。しばらくしてからもう一度お試しください。',
 }
 
 describe('deleteAccountAction', () => {
-    it('user_idが無い場合、エラーメッセージを返す', async () => {
-        const result = await deleteAccountAction(makeFormData())
+    beforeEach(() => {
+        // clearAllMocksでは実装が残るため、前のテストのmockRejectedValueなどを毎回上書きする
+        mockCustomersDel.mockResolvedValue({})
+        mockAdminDeleteUser.mockResolvedValue({ error: null })
+    })
 
-        expect(result).toEqual({
-            messageType: 'error',
-            message:
-                'ユーザー削除に失敗しました。しばらくしてからもう一度お試しください。',
-        })
+    it('ログインユーザーが取得できない場合、何も削除せずエラーメッセージを返す', async () => {
+        vi.mocked(getUserInfo).mockResolvedValue(null)
+
+        const result = await deleteAccountAction()
+
+        expect(result).toEqual(DELETE_ACCOUNT_ERROR)
+        expect(mockCustomersDel).not.toHaveBeenCalled()
+        expect(mockAdminDeleteUser).not.toHaveBeenCalled()
         expect(redirect).not.toHaveBeenCalled()
     })
 
-    it('正常に削除できた場合、サインアウトして/へredirectする', async () => {
+    it('正常に削除できた場合、Stripe顧客→authユーザーの順に削除し、サインアウトして/へredirectする', async () => {
+        mockLoginUser()
         mockAdminSupabase()
         const { signOut } = mockDeleteAccountSupabase()
-        mockCustomersDel.mockResolvedValue({})
 
-        await deleteAccountAction(makeFormData('user-1'))
+        await deleteAccountAction()
 
         expect(mockCustomersDel).toHaveBeenCalledWith('cus_123')
         expect(mockAdminDeleteUser).toHaveBeenCalledWith('user-1')
@@ -707,49 +704,60 @@ describe('deleteAccountAction', () => {
         expect(redirect).toHaveBeenCalledWith('/')
     })
 
-    it('プロフィール取得でエラーが返ってきた場合、エラーメッセージを返す', async () => {
+    it('Stripe顧客が既に削除済み(resource_missing)の場合、成功扱いで処理を続ける', async () => {
+        mockLoginUser()
         mockAdminSupabase()
-        mockDeleteAccountSupabase({
-            selectResult: { data: null, error: { message: 'select error' } },
-        })
+        const { signOut } = mockDeleteAccountSupabase()
+        mockCustomersDel.mockRejectedValue(
+            new MockStripeError('resource_missing')
+        )
 
-        const result = await deleteAccountAction(makeFormData('user-1'))
+        await deleteAccountAction()
 
-        expect(result).toEqual({
-            messageType: 'error',
-            message:
-                'ユーザー削除に失敗しました。しばらくしてからもう一度お試しください。',
-        })
-        expect(redirect).not.toHaveBeenCalled()
-    })
-
-    it('削除処理中に例外が発生した場合、エラーメッセージを返す', async () => {
-        mockAdminSupabase()
-        mockDeleteAccountSupabase()
-        mockCustomersDel.mockRejectedValue(new Error('stripe error'))
-
-        const result = await deleteAccountAction(makeFormData('user-1'))
-
-        expect(result).toEqual({
-            messageType: 'error',
-            message:
-                'ユーザー削除に失敗しました。しばらくしてからもう一度お試しください。',
-        })
-        expect(redirect).not.toHaveBeenCalled()
-    })
-
-    it('profileが見つからない(空配列)場合、クラッシュせずサインアウトして/へredirectする', async () => {
-        mockAdminSupabase()
-        const { signOut } = mockDeleteAccountSupabase({
-            selectResult: { data: [], error: null },
-        })
-
-        await deleteAccountAction(makeFormData('user-1'))
-
-        // 該当プロフィールが無いので削除系の呼び出しは発生しない
-        expect(mockCustomersDel).not.toHaveBeenCalled()
-        expect(mockAdminDeleteUser).not.toHaveBeenCalled()
+        expect(mockAdminDeleteUser).toHaveBeenCalledWith('user-1')
         expect(signOut).toHaveBeenCalled()
         expect(redirect).toHaveBeenCalledWith('/')
+    })
+
+    it('Stripe顧客の削除がresource_missing以外のStripeエラーの場合、authユーザーを削除せずエラーメッセージを返す', async () => {
+        mockLoginUser()
+        mockAdminSupabase()
+        mockDeleteAccountSupabase()
+        mockCustomersDel.mockRejectedValue(new MockStripeError('api_error'))
+
+        const result = await deleteAccountAction()
+
+        expect(result).toEqual(DELETE_ACCOUNT_ERROR)
+        // 課金が残ったままアカウントだけ消える事故を防ぐ
+        expect(mockAdminDeleteUser).not.toHaveBeenCalled()
+        expect(redirect).not.toHaveBeenCalled()
+    })
+
+    it('Stripe以外の例外の場合、authユーザーを削除せずエラーメッセージを返す', async () => {
+        mockLoginUser()
+        mockAdminSupabase()
+        mockDeleteAccountSupabase()
+        mockCustomersDel.mockRejectedValue(new Error('network error'))
+
+        const result = await deleteAccountAction()
+
+        expect(result).toEqual(DELETE_ACCOUNT_ERROR)
+        expect(mockAdminDeleteUser).not.toHaveBeenCalled()
+        expect(redirect).not.toHaveBeenCalled()
+    })
+
+    it('authユーザーの削除でエラーが返った場合、サインアウトせずエラーメッセージを返す', async () => {
+        mockLoginUser()
+        mockAdminSupabase()
+        const { signOut } = mockDeleteAccountSupabase()
+        mockAdminDeleteUser.mockResolvedValue({
+            error: { message: 'delete failed' },
+        })
+
+        const result = await deleteAccountAction()
+
+        expect(result).toEqual(DELETE_ACCOUNT_ERROR)
+        expect(signOut).not.toHaveBeenCalled()
+        expect(redirect).not.toHaveBeenCalled()
     })
 })

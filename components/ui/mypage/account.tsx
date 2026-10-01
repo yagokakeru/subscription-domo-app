@@ -1,6 +1,4 @@
 import { useState } from 'react'
-import { useAtomValue } from 'jotai'
-import { userProfileAtom } from '@/lib/atoms/authUser'
 import { Button } from '@/components/ui/button'
 import { SubmitButton } from '@/components/submit-button'
 import ConfirmDialog from '@/components/ui/comfirm/dialog'
@@ -12,7 +10,6 @@ export const MypageAccount = ({
 }: {
     setToastMessage: (message: Message) => void
 }) => {
-    const userProfile = useAtomValue(userProfileAtom)
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
     const [isDeleting, setIsDeleting] = useState(false)
 
@@ -29,9 +26,10 @@ export const MypageAccount = ({
 
             <form className="mt-40-pc">
                 <SubmitButton
-                    pendingText="Signing out..."
+                    pendingText="ログアウト中..."
                     formAction={async () => {
-                        await signOutAction()
+                        const message = await signOutAction()
+                        setToastMessage(message)
                     }}
                 >
                     ログアウト

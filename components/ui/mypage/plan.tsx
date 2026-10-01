@@ -1,5 +1,3 @@
-import { useAtomValue } from 'jotai'
-import { userProfileAtom } from '@/lib/atoms/authUser'
 import { PlanBadge } from '@/components/ui/plan-badge'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -18,7 +16,6 @@ export const MypagePlan = ({
     userPlan: userPlan | null
     setToastMessage: (message: Message) => void
 }) => {
-    const userProfile = useAtomValue(userProfileAtom)
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
     const { refresh } = useRouter()
 

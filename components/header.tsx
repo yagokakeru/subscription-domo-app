@@ -9,11 +9,15 @@ import { userProfileAtom } from '@/lib/atoms/authUser'
 import ProfilePhoto from '@/components/ui/profile-photo'
 import { ProfileCard } from '@/components/ui/card/profile-card'
 import { useEffect, useRef, useState } from 'react'
+import ToastMessage from '@/components/ui/message/toast'
+
 import type { userPlan } from '@/types/userPlan'
+import { Message } from '@/types/message'
 
 export default function Header({ userPlan }: { userPlan: userPlan | null }) {
     const userProfile = useAtomValue(userProfileAtom)
     const [isProfileCardOpen, setIsProfileCardOpen] = useState(false)
+    const [toastMessage, setToastMessage] = useState<Message | null>(null)
     const profileMenuRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
@@ -86,6 +90,7 @@ export default function Header({ userPlan }: { userPlan: userPlan | null }) {
                                 userPlan={userPlan}
                                 open={isProfileCardOpen}
                                 onClose={() => setIsProfileCardOpen(false)}
+                                setToastMessage={setToastMessage}
                             />
                         </div>
                     ) : (
@@ -101,6 +106,13 @@ export default function Header({ userPlan }: { userPlan: userPlan | null }) {
                     <ThemeSwitcher />
                 </div>
             </nav>
+
+            {toastMessage && (
+                <ToastMessage
+                    message={toastMessage}
+                    onClose={() => setToastMessage(null)}
+                />
+            )}
         </header>
     )
 }
