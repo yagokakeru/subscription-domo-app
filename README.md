@@ -170,6 +170,54 @@ pnpm dev
 
 http://localhost:3000 で確認できます。
 
+### supabase migration
+
+DB の構成（テーブル・RLS ポリシー・関数など）は `supabase/migrations/` の SQL ファイルで管理します。
+**ダッシュボードで直接変更せず、必ず migration ファイル経由で変更してください。** 開発用と本番の DB の構成がずれるのを防ぐためです。
+
+#### ローカル DB の起動
+
+Docker を起動した状態で実行します。
+
+```bash
+supabase start       # ローカル DB を起動（migrations と seed.sql が適用される）
+supabase stop        # 停止
+```
+
+#### DB の構成を変更するとき
+
+```bash
+# 1. migration ファイルを作成
+supabase migration new <変更内容がわかる名前>   # 例: add_plan_sort_order
+
+# 2. 作成された supabase/migrations/<日時>_<名前>.sql に SQL を書く
+
+# 3. ローカル DB を作り直して確認（全 migration と seed.sql を最初から適用）
+supabase db reset
+
+# 4. 問題なければ開発用 DB に反映
+supabase link --project-ref <開発用のproject-ref>
+supabase db push
+```
+
+migration ファイルは一度 push したら編集せず、修正が必要なときは新しい migration ファイルを追加してください。
+
+#### 本番環境へのセットアップ・反映
+
+```bash
+supabase link --project-ref <本番のproject-ref>
+supabase db push      # migrations を本番DBに適用
+```
+
+- `supabase/seed.sql` はローカル DB 専用です（`db push` では適用されません）。
+- 本番用の plan データは、**本番の Stripe 価格 ID** で別に登録してください。
+- `db push` の前に `supabase link` の接続先が正しいかを必ず確認してください。
+
+#### 注意点
+
+- `supabase/config.toml` の `[db] major_version` は、リモート DB の Postgres のバージョンに合わせてください（現在は `15`）。違うと `supabase db pull` などが `error running container: exit 1` で失敗します。
+- `supabase db pull` でリモートから差分を取り込んだときは、生成された SQL を必ず確認してください。`storage` スキーマのトリガー（`drop trigger ... on "storage"."prefixes"` など）が含まれていると、`must be owner of relation ...` エラーで適用できません。これらは Supabase 側が管理しているものなので削除してください。`storage.objects` の RLS ポリシー（`create policy`）は残します。
+
 ## 🧹 Lint / Format
 
 #### ESLint（コード品質チェック）
