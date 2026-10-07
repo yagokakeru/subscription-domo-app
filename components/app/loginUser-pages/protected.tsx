@@ -119,6 +119,15 @@ export function Protected({
                         ーR1-7
                         チェックリスト：残りの古い記述（SU-08/10、CH-02〜05、DL-01/02/04）を修正し、新機能のケース（CH-06、LK-01〜04、SC-01、DL-06）を追加
                         <br />
+                        ーR1-8
+                        【重大】RLS修正migration（tighten_rls）：subscriptionのユーザー書き込み禁止・全員読み取り削除、profileの全員読み取り／無条件INSERT削除＋UPDATE列をname/avatar_urlに限定、user_with_profileを自分の行のみ＋anonからrevoke
+                        <br />
+                        ーR1-9
+                        R1-8に合わせてサインアップ時のprofile／subscriptionのINSERTをcreateClientRoleに変更し、テスト・手動確認
+                        <br />
+                        ーR1-10 get_script_countをanonからrevoke、未使用のStripe
+                        Wrapperをmigrationから除外、avatarsバケットをseed.sqlに追加
+                        <br />
                         【R2 スマホ表示】
                         <br />
                         ーR2-1 スマホデザインをClaude

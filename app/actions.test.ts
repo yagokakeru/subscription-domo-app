@@ -302,6 +302,9 @@ const mockFrom = vi.fn((table: string) => {
     throw new Error(`想定外のテーブル: ${table}`)
 })
 
+// RLSでユーザー本人の書き込みを禁止しているため、profile/plan/subscriptionへの
+// アクセスはservice role（createClientAdmin）経由で行う。
+// セッションのクライアントにはfromを持たせず、誤って本人権限で書き込むと落ちるようにしておく
 const mockSignUpSupabase = ({
     signUp = vi.fn().mockResolvedValue({ data: { user: null }, error: null }),
     signOut = vi.fn().mockResolvedValue({ error: null }),
@@ -309,8 +312,8 @@ const mockSignUpSupabase = ({
 } = {}) => {
     vi.mocked(createClient).mockResolvedValue({
         auth: { signUp, signOut },
-        from,
     } as unknown as Awaited<ReturnType<typeof createClient>>)
+    mockAdminSupabase(from)
     return { signUp, signOut, from }
 }
 
@@ -335,8 +338,9 @@ describe('signUpAction', () => {
         expect(mockCustomersCreate).toHaveBeenCalledWith({
             email: 'new@example.com',
         })
-        // profileテーブルにStripe顧客IDとsupabaseユーザーIDが正しく紐づいたか
+        // profile/subscriptionへの書き込みがservice role（createClientAdmin）経由で行われたか
         expect(mockFrom).toHaveBeenCalledWith('profile')
+        expect(mockFrom).toHaveBeenCalledWith('subscription')
         // 最終的に/protectedへredirectしたか
         expect(redirect).toHaveBeenCalledWith('/protected')
     })
@@ -364,7 +368,6 @@ describe('signUpAction', () => {
                 error: null,
             }),
         })
-        mockAdminSupabase()
         mockCustomersCreate.mockRejectedValue(new Error('stripe down'))
 
         const result = await signUpAction({
@@ -404,7 +407,6 @@ describe('signUpAction', () => {
                 throw new Error(`想定外のテーブル: ${table}`)
             }),
         })
-        mockAdminSupabase()
         mockCustomersCreate.mockResolvedValue({ id: 'cus_123' })
 
         const result = await signUpAction({
@@ -454,7 +456,6 @@ describe('signUpAction', () => {
                 throw new Error(`想定外のテーブル: ${table}`)
             }),
         })
-        mockAdminSupabase()
         mockCustomersCreate.mockResolvedValue({ id: 'cus_123' })
 
         const result = await signUpAction({
@@ -517,7 +518,6 @@ describe('signUpAction', () => {
                 throw new Error(`想定外のテーブル: ${table}`)
             }),
         })
-        mockAdminSupabase()
         mockCustomersCreate.mockResolvedValue({ id: 'cus_123' })
 
         const result = await signUpAction({
@@ -654,9 +654,10 @@ const mockDeleteAccountSupabase = () => {
 }
 
 const mockAdminDeleteUser = vi.fn().mockResolvedValue({ error: null })
-const mockAdminSupabase = () => {
+const mockAdminSupabase = (from?: ReturnType<typeof vi.fn>) => {
     vi.mocked(createClientAdmin).mockReturnValue({
         auth: { admin: { deleteUser: mockAdminDeleteUser } },
+        from,
     } as unknown as ReturnType<typeof createClientAdmin>)
 }
 

@@ -96,11 +96,13 @@ export const signUpAction = async (
         }
 
         // SupabeseとStripeのユーザIDをDBに挿入
-        const { error: profileError } = await supabase.from('profile').insert({
-            stripe_uuid: customer.id,
-            supabase_uuid: data.user.id,
-            email: data.user.email,
-        })
+        const { error: profileError } = await supabaseAdmin
+            .from('profile')
+            .insert({
+                stripe_uuid: customer.id,
+                supabase_uuid: data.user.id,
+                email: data.user.email,
+            })
         if (profileError) {
             await rollbackSignUp(data.user.id, customer.id) // ユーザー作成をロールバック
             console.error(profileError)
@@ -111,14 +113,14 @@ export const signUpAction = async (
             }
         }
 
-        const { data: planData, error: planError } = await supabase
+        const { data: planData, error: planError } = await supabaseAdmin
             .from('plan')
             .select('id')
             .is('stripe_price_id', null) // priceIDがnullのプランを取得
             .single()
 
         if (planError) {
-            await supabase
+            await supabaseAdmin
                 .from('profile')
                 .delete()
                 .eq('supabase_uuid', data.user.id) // supabase profile情報削除
@@ -132,7 +134,7 @@ export const signUpAction = async (
             }
         }
 
-        const { error: subError } = await supabase
+        const { error: subError } = await supabaseAdmin
             .from('subscription')
             .insert({
                 plan_id: planData.id,
@@ -147,7 +149,7 @@ export const signUpAction = async (
             .select()
 
         if (subError) {
-            await supabase
+            await supabaseAdmin
                 .from('profile')
                 .delete()
                 .eq('supabase_uuid', data.user.id) // supabase profile情報削除
