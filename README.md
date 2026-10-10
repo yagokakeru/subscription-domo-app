@@ -1,117 +1,18 @@
-<a href="https://demo-nextjs-with-supabase.vercel.app/">
-  <h1 align="center">Next.js and Supabase Starter Kit</h1>
+<a href="#">
+  <h1 style="text-align: center;">しゃべる台本</h1>
 </a>
 
-<p align="center">
- The fastest way to build apps with Next.js and Supabase
-</p>
+<p style="text-align: center;">NextJS/Supabase/Stripe学習用のWebアプリ</p>
 
-<p align="center">
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#demo"><strong>Demo</strong></a> ·
-  <a href="#deploy-to-vercel"><strong>Deploy to Vercel</strong></a> ·
-  <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
+<ul>
+  <a href="#技術スタック"><strong>技術スタック</strong></a> /
+  <a href="#demo"><strong>Demo</strong></a> /
+  <a href="#deploy-to-vercel"><strong>Deploy to Vercel</strong></a> /
+  <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> /
   <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
   <a href="#more-supabase-examples"><strong>More Examples</strong></a>
-</p>
+</ul>
 <br/>
-
-## Features
-
-- Works across the entire [Next.js](https://nextjs.org) stack
-    - App Router
-    - Pages Router
-    - Middleware
-    - Client
-    - Server
-    - It just works!
-- supabase-ssr. A package to configure Supabase Auth to use cookies
-- Styling with [Tailwind CSS](https://tailwindcss.com)
-- Components with [shadcn/ui](https://ui.shadcn.com/)
-- Optional deployment with [Supabase Vercel Integration and Vercel deploy](#deploy-your-own)
-    - Environment variables automatically assigned to Vercel project
-
-## Demo
-
-You can view a fully working demo at [demo-nextjs-with-supabase.vercel.app](https://demo-nextjs-with-supabase.vercel.app/).
-
-## Deploy to Vercel
-
-Vercel deployment will guide you through creating a Supabase account and project.
-
-After installation of the Supabase integration, all relevant environment variables will be assigned to the project so the deployment is fully functioning.
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&project-name=nextjs-with-supabase&repository-name=nextjs-with-supabase&demo-title=nextjs-with-supabase&demo-description=This+starter+configures+Supabase+Auth+to+use+cookies%2C+making+the+user%27s+session+available+throughout+the+entire+Next.js+app+-+Client+Components%2C+Server+Components%2C+Route+Handlers%2C+Server+Actions+and+Middleware.&demo-url=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2F&external-id=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&demo-image=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2Fopengraph-image.png)
-
-The above will also clone the Starter kit to your GitHub, you can clone that locally and develop locally.
-
-If you wish to just develop locally and not deploy to Vercel, [follow the steps below](#clone-and-run-locally).
-
-## Clone and run locally
-
-1. You'll first need a Supabase project which can be made [via the Supabase dashboard](https://database.new)
-
-2. Create a Next.js app using the Supabase Starter template npx command
-
-    ```bash
-    npx create-next-app --example with-supabase with-supabase-app
-    ```
-
-    ```bash
-    yarn create next-app --example with-supabase with-supabase-app
-    ```
-
-    ```bash
-    pnpm create next-app --example with-supabase with-supabase-app
-    ```
-
-3. Use `cd` to change into the app's directory
-
-    ```bash
-    cd with-supabase-app
-    ```
-
-4. Rename `.env.example` to `.env.local` and update the following:
-
-    ```
-    NEXT_PUBLIC_SUPABASE_URL=[INSERT SUPABASE PROJECT URL]
-    NEXT_PUBLIC_SUPABASE_ANON_KEY=[INSERT SUPABASE PROJECT API ANON KEY]
-    ```
-
-    Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` can be found in [your Supabase project's API settings](https://app.supabase.com/project/_/settings/api)
-
-5. You can now run the Next.js local development server:
-
-    ```bash
-    npm run dev
-    ```
-
-    The starter kit should now be running on [localhost:3000](http://localhost:3000/).
-
-6. This template comes with the default shadcn/ui style initialized. If you instead want other ui.shadcn styles, delete `components.json` and [re-install shadcn/ui](https://ui.shadcn.com/docs/installation/next)
-
-> Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
-
-## Feedback and issues
-
-Please file feedback and issues over on the [Supabase GitHub org](https://github.com/supabase/supabase/issues/new/choose).
-
-## More Supabase examples
-
-- [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)
-- [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
-- [Supabase Auth and the Next.js App Router](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
-
-<a href="">
-  <h1 align="center">Subscription Domo App</h1>
-</a>
-
-<p align="center">
-サブスクリプション管理用の Web アプリケーションです。<br>
-Next.js + Supabase を使った個人開発プロジェクト。
-</p>
-
----
 
 ## 🔧 技術スタック
 
@@ -154,10 +55,10 @@ NEXT_PUBLIC_APP_URL=
 
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
-NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
 
-NEXT_PUBLIC_STRIPE_SECRET_KEY=
-NEXT_PUBLIC_STRIPE_WEBHOOK_SECRET=
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
 ```
 
 ## 🧑‍💻 開発
@@ -249,7 +150,7 @@ eslint --fix
 prettier --write
 ```
 
-## Stripe Webhookのテスト
+## 👛 Stripe Webhookのテスト
 
 #### 1. Stripe CLI をインストール
 
@@ -267,7 +168,7 @@ stripe login
 stripe listen --forward-to localhost:3000/api/stripe/webhook
 ```
 
-発行されたシークレットキーを`.env.local`の`NEXT_PUBLIC_STRIPE_WEBHOOK_SECRET`に設定する
+発行されたシークレットキーを`.env.local`の`STRIPE_WEBHOOK_SECRET`に設定する
 
 #### 4. CLIでテストイベントを発火させる
 
@@ -291,5 +192,6 @@ prettier.config.cjs # Prettier 設定
 - tailwindでコーディングするときリキッドコーディングするために[`vw.ts`](./lib/tailwind/vw.ts)でプラグインを作っているがそこまでする必要はあるか。tailwindの標準でコーディングするべきか。  
   指定は`rem`にしてhtmlタグに`vw`で可変になるようにする？そうすれば[`vw.ts`](./lib/tailwind/vw.ts)みたいなものを作らなくていい
 - エラー表示の方法（関数やactionがどんな値を返すのか、該当なしの場合はnullを返すのか）、エラーメッセージの統一など最初にやるべき設計のやり方が知りたい
+- 処理の流れがよく分からなくなるので要件定義書や設計書を作った方がいいのか？（DBから値を持ってくるファイルがあるところやそのファイルがどんな値を返すのかなどいちいちコードを追わないと分からなくなる。）
 - 日本でサブスクを提供するには
   特定商取引法に基づく表記・利用規約・プライバシーポリシー・最終確認画面での表示：2022年の特定商取引法の改正で、申し込みの最終確認画面には、料金・契約期間・自動更新であること・解約方法を表示する義務ができました。プランページの直前に表示が必要。
