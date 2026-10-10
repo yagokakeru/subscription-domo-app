@@ -112,9 +112,8 @@ export function Protected({
                         ーR1-5 README：NEXT_PUBLIC_STRIPE_WEBHOOK_SECRET →
                         STRIPE_WEBHOOK_SECRET に修正
                         <br />
-                        ーR1-6
-                        支払い失敗（past_due）時の扱いを決める（猶予として許容
-                        or 制限してカード更新を促す）
+                        ーR1-6 支払い失敗（past_due）時の扱い →
+                        【決定】猶予期間として許容（アプリ側の変更なし。Stripeの再請求がすべて失敗したら解約→フリーに戻る）
                         <br />
                         ーR1-7
                         チェックリスト：残りの古い記述（SU-08/10、CH-02〜05、DL-01/02/04）を修正し、新機能のケース（CH-06、LK-01〜04、SC-01、DL-06）を追加
@@ -148,6 +147,9 @@ export function Protected({
                         ーR3-5
                         Stripe本番：Webhookエンドポイント登録（subscription.created/updated/deleted
                         ほか）とSTRIPE_WEBHOOK_SECRET設定
+                        <br />
+                        ーR3-11 Stripe本番：Billing → Revenue recovery
+                        で再請求スケジュール（全失敗時はサブスクを解約）と支払い失敗メールを設定（R1-6の決定に基づく）
                         <br />
                         ーR3-6 Supabase本番：Site
                         URL／リダイレクトURLを本番ドメインに、カスタムSMTPを設定
