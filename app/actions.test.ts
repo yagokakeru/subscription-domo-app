@@ -634,7 +634,8 @@ describe('signUpAction', () => {
             password: 'Password1',
         })
 
-        expect(checkout).toHaveBeenCalledWith('price_123', 'cus_123', 'user-1')
+        // customer ID / user ID はcheckout内でセッションから取るので、渡すのは選んだpriceだけ
+        expect(checkout).toHaveBeenCalledWith('price_123')
         expect(result).toEqual({
             messageType: 'error',
             message:

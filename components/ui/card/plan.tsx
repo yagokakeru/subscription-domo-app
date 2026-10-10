@@ -57,11 +57,7 @@ export default function PlanCard({
 
         setLoading(true)
 
-        const result = await checkout(
-            priceId,
-            userInfo?.stripe_uuid || '',
-            userInfo?.user_id || ''
-        )
+        const result = await checkout(priceId)
 
         if (result) {
             console.error(result.message)

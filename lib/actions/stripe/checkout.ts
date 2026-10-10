@@ -2,18 +2,49 @@
 
 import { redirect } from 'next/navigation'
 import { stripeClient } from '@/utils/stripe/server'
+import { createClient } from '@/utils/supabase/server'
+import { getUserPlan } from '@/lib/functions/profile/getUserPlan'
 
 import type { Message } from '@/types/message'
-import type { userProfile } from '@/types/userProfile'
 
 // Stripeクライアントを作成
 const stripe = stripeClient()
 
-export const checkout = async (
-    priceID: string,
-    customerID: string,
-    userID: userProfile['user_id']
-): Promise<Message> => {
+export const checkout = async (newPriceID: string): Promise<Message> => {
+    const userPlan = await getUserPlan()
+
+    if (!userPlan) {
+        return {
+            messageType: 'error',
+            message:
+                '決済を開始できませんでした。時間をおいて再度お試しください。',
+        }
+    }
+
+    if (userPlan.stripe_subscription_id) {
+        return {
+            messageType: 'error',
+            message:
+                '決済を開始できませんでした。時間をおいて再度お試しください。',
+        }
+    }
+
+    const supabase = await createClient()
+    const { data: planData, error: planError } = await supabase
+        .from('plan')
+        .select('id')
+        .eq('stripe_price_id', newPriceID)
+        .is('is_active', true)
+        .single()
+
+    if (planError || !planData) {
+        return {
+            messageType: 'error',
+            message:
+                'プラン情報の取得に失敗しました。時間をおいて再度お試しください。',
+        }
+    }
+
     let session
     // 決算を作成
     try {
@@ -21,15 +52,15 @@ export const checkout = async (
             payment_method_types: ['card'],
             line_items: [
                 {
-                    price: priceID,
+                    price: newPriceID,
                     quantity: 1,
                 },
             ],
-            customer: customerID,
+            customer: userPlan.stripe_customer_id,
             mode: 'subscription',
             subscription_data: {
                 metadata: {
-                    user_id: userID,
+                    user_id: userPlan.user_id,
                 },
             },
             success_url: `${process.env.NEXT_PUBLIC_APP_URL}/protected/?session_id={CHECKOUT_SESSION_ID}`,

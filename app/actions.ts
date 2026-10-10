@@ -170,7 +170,7 @@ export const signUpAction = async (
         const userData = await getUserInfo()
 
         if (userData) {
-            return checkout(priceID, userData.stripe_uuid, userData.user_id)
+            return checkout(priceID)
         } else {
             return {
                 messageType: 'error',
