@@ -165,6 +165,13 @@ export function Protected({
                         ーR3-10 この画面のタスクメモ（InfoIcon）をGitHub
                         Issues等へ移して削除
                         <br />
+                        ーR3-12
+                        メールテンプレート：recovery.htmlはローカル確認済み →
+                        本番はダッシュボード（Authentication → Email
+                        Templates）に手で貼る。【決定】サインアップ時のメール確認はしない
+                        → 本番の「Confirm
+                        email」をOFFにする（新規プロジェクトは初期値ONのため）
+                        <br />
                         【R4 余裕があれば】
                         <br />
                         ーR4-1 Webhookの絵文字入りconsole.logを整理

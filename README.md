@@ -270,7 +270,9 @@ supabase db push                                  # migrations を本番 DB に�
 
 - `plan` テーブルのデータは、**Stripe 本番モードの価格 ID** で別途登録してください（`seed.sql` は本番には適用されません）。
 - Authentication の **Site URL / Redirect URLs** を本番のドメインに設定してください。
+- サインアップ時のメール確認は行わない仕様のため、Authentication → Sign In / Providers → Email の **「Confirm email」を OFF** にしてください（新規プロジェクトは初期値が ON です。ON のままだとサインアップ直後にセッションが作られず、そのまま決済へ進む流れが失敗します）。
 - 初期設定のメール送信は送信数の制限が厳しいため、**カスタム SMTP** を設定してください。
+- 認証メール（パスワード再設定・サインアップ確認など）の文面は `supabase/templates/*.html` を正本とし、本番にはダッシュボードの **Authentication → Email Templates** に内容を貼り付けて反映します（件名は `supabase/config.toml` の `[auth.email.template.*]` の `subject` に合わせる）。`supabase config push` は Site URL などローカル用の値も送ってしまうため使いません。
 
 #### 2. Stripe（本番モード）
 
