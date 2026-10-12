@@ -5,7 +5,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
 const planBadgeVariants = cva(
-    `inline-block rounded-full px-8-pc py-4-pc text-body-small-pc`,
+    `inline-block rounded-full px-8-pc py-4-pc text-body-small-pc max-md:px-8-sp max-md:py-4-sp max-md:text-body-small-sp`,
     {
         variants: {
             variant: {

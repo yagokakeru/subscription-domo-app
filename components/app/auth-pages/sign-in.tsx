@@ -28,20 +28,22 @@ export function LoginForm({
     }
 
     return (
-        <div className="pt-pcvw-[150]">
+        <div className="pt-pcvw-[150] max-md:pt-32-sp max-md:px-16-sp">
             <form
                 onSubmit={form.handleSubmit(handleSubmit)}
-                className="bg-background-surface rounded-xl-pc mx-auto p-24-pc w-pcvw-[500]"
+                className="bg-background-surface rounded-xl-pc max-md:rounded-xl-sp mx-auto p-24-pc max-md:p-spvw-[20] w-pcvw-[500] max-md:w-full"
             >
-                <h1 className="text-heading-h3-pc">ログイン</h1>
+                <h1 className="text-heading-h3-pc max-md:text-heading-h3-sp">
+                    ログイン
+                </h1>
 
                 {message && (
-                    <div className="mt-16-pc">
+                    <div className="mt-16-pc max-md:mt-16-sp">
                         <FormMessage message={message} />
                     </div>
                 )}
 
-                <div className="mt-32-pc">
+                <div className="mt-32-pc max-md:mt-32-sp">
                     <div>
                         <Label htmlFor="email">メールアドレス</Label>
                         <Input
@@ -52,17 +54,17 @@ export function LoginForm({
                                     ? 'error'
                                     : 'default'
                             }
-                            className="mt-8-pc"
+                            className="mt-8-pc max-md:mt-8-sp"
                             id="email"
                         />
                         {form.formState.errors.email && (
-                            <p className="text-status-error text-body-small-pc mt-4-pc">
+                            <p className="text-status-error text-body-small-pc max-md:text-body-small-sp mt-4-pc max-md:mt-4-sp">
                                 {form.formState.errors.email.message}
                             </p>
                         )}
                     </div>
 
-                    <div className="mt-24-pc">
+                    <div className="mt-24-pc max-md:mt-24-sp">
                         <Label htmlFor="password">パスワード</Label>
                         <InputPassword
                             {...form.register('password')}
@@ -71,15 +73,15 @@ export function LoginForm({
                                     ? 'error'
                                     : 'default'
                             }
-                            className="mt-8-pc"
+                            className="mt-8-pc max-md:mt-8-sp"
                             id="password"
                         />
                         {form.formState.errors.password ? (
-                            <p className="text-status-error text-body-small-pc mt-4-pc">
+                            <p className="text-status-error text-body-small-pc max-md:text-body-small-sp mt-4-pc max-md:mt-4-sp">
                                 {form.formState.errors.password.message}
                             </p>
                         ) : (
-                            <div className="text-text-secondary text-body-small-pc mt-4-pc">
+                            <div className="text-text-secondary text-body-small-pc max-md:text-body-small-sp mt-4-pc max-md:mt-4-sp">
                                 ※半角英数字（大文字・小文字）を含む8文字以上で入力してください。
                             </div>
                         )}
@@ -87,21 +89,21 @@ export function LoginForm({
 
                     <SubmitButton
                         pendingText="ログイン中..."
-                        className="w-full mt-48-pc"
+                        className="w-full mt-48-pc max-md:mt-48-sp"
                     >
                         ログイン
                     </SubmitButton>
 
-                    <div className="flex flex-col items-center gap-12-pc mt-32-pc">
+                    <div className="flex flex-col items-center gap-12-pc max-md:gap-12-sp mt-32-pc max-md:mt-32-sp">
                         <Link
                             href="/forgot-password"
-                            className="text-body-small-pc text-text-secondary underline"
+                            className="text-body-small-pc max-md:text-body-small-sp text-text-secondary underline"
                         >
                             パスワードをお忘れですか？
                         </Link>
                         <Link
                             href="/sign-up"
-                            className="text-body-small-pc text-text-secondary underline"
+                            className="text-body-small-pc max-md:text-body-small-sp text-text-secondary underline"
                         >
                             新規登録はこちら
                         </Link>

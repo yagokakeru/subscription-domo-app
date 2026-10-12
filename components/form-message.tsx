@@ -16,7 +16,7 @@ import { Message } from '@/types/message'
  * @description The variants for the root element
  */
 const rootVariants = cva(
-    'rounded-md-pc flex items-start gap-16-pc border-l-8 px-16-pc py-12-pc w-full',
+    'rounded-md-pc max-md:rounded-md-sp flex items-start gap-16-pc max-md:gap-16-sp border-l-8 px-16-pc max-md:px-16-sp py-12-pc max-md:py-12-sp w-full',
     {
         variants: {
             variant: {
@@ -80,31 +80,33 @@ export function FormMessage({ message, className }: FormMessageProps) {
             <>
                 {(message.messageType === 'success' && (
                     <CircleCheck
-                        className="aspect-square w-pcvw-[24] shrink-0 block h-auto"
+                        className="aspect-square w-pcvw-[24] max-md:w-spvw-[24] shrink-0 block h-auto"
                         strokeWidth={3}
                     />
                 )) ||
                     (message.messageType === 'error' && (
                         <TriangleAlert
-                            className="aspect-square w-pcvw-[24] shrink-0 block h-auto"
+                            className="aspect-square w-pcvw-[24] max-md:w-spvw-[24] shrink-0 block h-auto"
                             strokeWidth={3}
                         />
                     )) ||
                     (message.messageType === 'warning' && (
                         <ShieldAlert
-                            className="aspect-square w-pcvw-[24] shrink-0 block h-auto"
+                            className="aspect-square w-pcvw-[24] max-md:w-spvw-[24] shrink-0 block h-auto"
                             strokeWidth={3}
                         />
                     )) ||
                     (message.messageType === 'message' && (
                         <Info
-                            className="aspect-square w-pcvw-[24] shrink-0 block h-auto"
+                            className="aspect-square w-pcvw-[24] max-md:w-spvw-[24] shrink-0 block h-auto"
                             strokeWidth={3}
                         />
                     ))}
-                <div className="text-body-small-pc">{message.message}</div>
+                <div className="text-body-small-pc max-md:text-body-small-sp">
+                    {message.message}
+                </div>
                 <Cancel
-                    className="aspect-square cursor-pointer shrink-0 ml-auto w-pcvw-[16] block h-auto"
+                    className="aspect-square cursor-pointer shrink-0 ml-auto w-pcvw-[16] max-md:w-spvw-[16] block h-auto"
                     strokeWidth={2}
                     onClick={handleCancel}
                 />

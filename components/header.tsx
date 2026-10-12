@@ -13,6 +13,7 @@ import ToastMessage from '@/components/ui/message/toast'
 
 import type { userPlan } from '@/types/userPlan'
 import { Message } from '@/types/message'
+import { cn } from '@/lib/utils'
 
 export default function Header({ userPlan }: { userPlan: userPlan | null }) {
     const userProfile = useAtomValue(userProfileAtom)
@@ -39,15 +40,28 @@ export default function Header({ userPlan }: { userPlan: userPlan | null }) {
     return (
         <header
             className={
-                'bg-background-surface rounded-xl-pc flex items-center py-16-pc px-48-pc fixed top-16-pc left-1/2 translate-x-[-50%] w-pcvw-[1280] max-h-pcvw-[72] z-100'
+                'bg-background-surface rounded-xl-pc flex items-center py-16-pc px-48-pc fixed top-16-pc left-1/2 translate-x-[-50%] w-pcvw-[1280] max-h-pcvw-[72] z-100 max-md:sticky max-md:top-16-sp max-md:left-auto max-md:translate-x-0 max-md:mx-16-sp max-md:mt-16-sp max-md:w-auto max-md:max-h-none max-md:p-12-sp max-md:rounded-xl-sp'
             }
         >
-            <nav className="flex justify-between items-center w-full">
-                <div className="flex items-center gap-32-pc">
+            {/* SP: ログイン時はロゴとメニューを左側で折り返し、未ログイン時はボタン群を2段目に折り返す */}
+            <nav
+                className={cn(
+                    'flex justify-between items-center w-full',
+                    !userProfile && 'max-md:flex-wrap max-md:gap-y-12-sp'
+                )}
+            >
+                <div
+                    className={cn(
+                        'flex items-center gap-32-pc',
+                        userProfile
+                            ? 'max-md:flex-1 max-md:flex-wrap max-md:gap-8-sp'
+                            : 'max-md:gap-32-sp'
+                    )}
+                >
                     <h1>
                         <Link href={'/'}>
                             <Image
-                                className="w-pcvw-[170]"
+                                className="w-pcvw-[170] max-md:w-spvw-[170]"
                                 src={'/header_logo.svg'}
                                 alt="logo"
                                 width={100}
@@ -55,11 +69,18 @@ export default function Header({ userPlan }: { userPlan: userPlan | null }) {
                             ></Image>
                         </Link>
                     </h1>
-                    <ul className="flex items-center gap-32-pc">
+                    <ul
+                        className={cn(
+                            'flex items-center gap-32-pc',
+                            userProfile
+                                ? 'max-md:gap-spvw-[20]'
+                                : 'max-md:gap-32-sp'
+                        )}
+                    >
                         {userProfile && (
                             <li>
                                 <Link
-                                    className="text-body-default-pc"
+                                    className="text-body-default-pc max-md:text-body-default-sp"
                                     href={'/protected'}
                                 >
                                     台本一覧
@@ -68,7 +89,7 @@ export default function Header({ userPlan }: { userPlan: userPlan | null }) {
                         )}
                         <li>
                             <Link
-                                className="text-body-default-pc"
+                                className="text-body-default-pc max-md:text-body-default-sp"
                                 href={'/plan'}
                             >
                                 プラン
@@ -76,7 +97,7 @@ export default function Header({ userPlan }: { userPlan: userPlan | null }) {
                         </li>
                     </ul>
                 </div>
-                <div className="flex items-center gap-8-pc">
+                <div className="flex items-center gap-8-pc max-md:gap-8-sp">
                     {userProfile ? (
                         <div ref={profileMenuRef}>
                             <div
@@ -94,11 +115,21 @@ export default function Header({ userPlan }: { userPlan: userPlan | null }) {
                             />
                         </div>
                     ) : (
-                        <div className="flex gap-24-pc">
-                            <Button asChild size="sm" variant={'secondary'}>
+                        <div className="flex gap-24-pc max-md:gap-12-sp max-md:w-spvw-[216]">
+                            <Button
+                                asChild
+                                size="sm"
+                                variant={'secondary'}
+                                className="max-md:flex-1"
+                            >
                                 <Link href="/sign-in">ログイン</Link>
                             </Button>
-                            <Button asChild size="sm" variant={'default'}>
+                            <Button
+                                asChild
+                                size="sm"
+                                variant={'default'}
+                                className="max-md:flex-1"
+                            >
                                 <Link href="/sign-up">新規登録</Link>
                             </Button>
                         </div>

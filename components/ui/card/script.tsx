@@ -57,25 +57,25 @@ export default function ScriptCard({
     return (
         <div
             className={cn(
-                `bg-background-surface border-border-focus border-solid border-t-pcvw-[4] rounded-lg-pc py-24-pc px-16-pc`,
+                `bg-background-surface border-border-focus border-solid border-t-pcvw-[4] max-md:border-t-spvw-[4] rounded-lg-pc max-md:rounded-lg-sp py-24-pc max-md:py-24-sp px-16-pc max-md:px-16-sp`,
                 className
             )}
         >
             <div className={`${scriptInfo.data.isLocked && 'opacity-50'}`}>
                 <div className="flex items-center justify-between">
-                    <h3 className="aspect-square bg-background-primary flex items-center justify-center text-text-onPrimary text-heading-h3-pc rounded-md-pc w-pcvw-[32]">
+                    <h3 className="aspect-square bg-background-primary flex items-center justify-center text-text-onPrimary text-heading-h3-pc max-md:text-heading-h3-sp rounded-md-pc max-md:rounded-md-sp w-pcvw-[32] max-md:w-spvw-[32]">
                         {scriptInfo.data.plain_content
                             ? scriptInfo.data.plain_content
                                   .slice(0, 1)
                                   .toUpperCase()
                             : '台'}
                     </h3>
-                    <div className="flex items-center gap-8-pc">
+                    <div className="flex items-center gap-8-pc max-md:gap-8-sp">
                         {scriptInfo.data.isLocked && (
-                            <Lock className="w-pcvw-[20] h-auto" />
+                            <Lock className="w-pcvw-[20] max-md:w-spvw-[20] h-auto" />
                         )}
                         <svg
-                            className="cursor-pointer block w-pcvw-[20] h-auto"
+                            className="cursor-pointer block w-pcvw-[20] max-md:w-spvw-[20] h-auto"
                             xmlns="http://www.w3.org/2000/svg"
                             viewBox="0 0 20 19"
                             onClick={() => {
@@ -124,7 +124,7 @@ export default function ScriptCard({
                     </div>
                 </div>
                 <form
-                    className="mt-16-pc"
+                    className="mt-16-pc max-md:mt-16-sp"
                     onSubmit={form.handleSubmit(onSubmit)}
                 >
                     <Input
@@ -133,14 +133,14 @@ export default function ScriptCard({
                         disabled={scriptInfo.data.isLocked}
                     />
                 </form>
-                <p className="text-body-small-pc text-text-secondary mt-8-pc">
+                <p className="text-body-small-pc max-md:text-body-small-sp text-text-secondary mt-8-pc max-md:mt-8-sp">
                     最終更新日：{dateFormat(scriptInfo.data.updated_at)}
                 </p>
-                <p className="text-body-notice-pc text-text-secondary mt-16-pc line-clamp-3">
+                <p className="text-body-notice-pc max-md:text-body-notice-sp text-text-secondary mt-16-pc max-md:mt-16-sp line-clamp-3">
                     {scriptInfo.data.plain_content}
                 </p>
             </div>
-            <div className="flex flex-wrap justify-between gap-y-12-pc mt-40-pc">
+            <div className="flex flex-wrap justify-between gap-y-12-pc max-md:gap-y-12-sp mt-40-pc max-md:mt-40-sp">
                 {scriptInfo.data.isLocked ? (
                     <>
                         <Button

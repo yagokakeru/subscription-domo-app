@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils'
 import { cva, type VariantProps } from 'class-variance-authority'
 
 const inputVariants = cva(
-    `rounded-md-pc bg-background-surface text-input-text-pc w-full border-pcvw-[1] px-16-pc py-12-pc
+    `rounded-md-pc max-md:rounded-md-sp bg-background-surface text-input-text-pc max-md:text-input-text-sp w-full border-pcvw-[1] max-md:border-spvw-[1] px-16-pc max-md:px-16-sp py-12-pc max-md:py-12-sp
     placeholder:text-text-secondary
     focus-visible:border-border-focus focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus
     disabled:cursor-not-allowed disabled:bg-background-disabled disabled:border-border-disabled disabled:placeholder:text-text-disabled`,

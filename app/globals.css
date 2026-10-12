@@ -1,6 +1,6 @@
 /* tiptapのスタイル初期化 */
 .tiptap {
-    @apply bg-background-surface border border-solid border-border-strong rounded-lg-pc mt-16-pc p-24-pc min-h-pcvw-[500];
+    @apply bg-background-surface border border-solid border-border-strong rounded-lg-pc mt-16-pc p-24-pc min-h-pcvw-[500] max-md:rounded-xl-sp max-md:mt-16-sp max-md:p-spvw-[20] max-md:min-h-spvw-[500];
 }
 
 @tailwind base;

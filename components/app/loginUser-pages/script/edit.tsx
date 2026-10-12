@@ -62,16 +62,16 @@ export function EditComponent({ script }: { script: getEditScript }) {
 
     return (
         <>
-            <section className="pt-pcvw-[16]">
-                <div className="w-pcvw-[1280] mx-auto">
-                    <div className="flex items-center gap-pcvw-[24]">
+            <section className="pt-pcvw-[16] max-md:pt-16-sp">
+                <div className="w-pcvw-[1280] mx-auto max-md:w-auto max-md:mx-16-sp">
+                    <div className="flex items-center gap-pcvw-[24] max-md:flex-wrap max-md:gap-16-sp">
                         <Link href="/protected">
-                            <CircleArrowLeft className="block w-pcvw-[44] h-auto" />
+                            <CircleArrowLeft className="block w-pcvw-[44] max-md:w-spvw-[44] h-auto" />
                         </Link>
-                        <div className="flex items-center gap-pcvw-[8]">
+                        <div className="flex items-center gap-pcvw-[8] max-md:gap-spvw-[8]">
                             <form onSubmit={form.handleSubmit(handleSubmit)}>
                                 <Input
-                                    className="border-none !text-heading-h3-pc max-w-pcvw-[400]"
+                                    className="border-none !text-heading-h3-pc max-md:!text-heading-h3-sp max-w-pcvw-[400] max-md:max-w-spvw-[200]"
                                     {...nameRegister}
                                     onChange={(e) => {
                                         nameRegister.onChange(e)
@@ -80,25 +80,32 @@ export function EditComponent({ script }: { script: getEditScript }) {
                                 />
                             </form>
                             <div
-                                className={`aspect-square w-pcvw-[20] rounded-full ${saveStatusClass}`}
+                                className={`aspect-square w-pcvw-[20] max-md:w-spvw-[20] rounded-full ${saveStatusClass}`}
                             ></div>
                         </div>
-                        <div className="flex items-center gap-pcvw-[16]">
+                        <div className="flex items-center gap-pcvw-[16] max-md:w-full max-md:gap-spvw-[12]">
                             <SubmitButton
                                 pendingText="saving"
                                 form="edit-script-form"
                             >
                                 保存
                             </SubmitButton>
-                            <Link href={`/protected/script/prompter/${id}`}>
-                                <Button variant="ghost">
+                            <Link
+                                href={`/protected/script/prompter/${id}`}
+                                className="max-md:flex-1"
+                            >
+                                {/* SP: デザインに合わせて枠線付きの全幅ボタンにする */}
+                                <Button
+                                    variant="ghost"
+                                    className="max-md:w-full max-md:border max-md:border-solid max-md:border-border max-md:bg-background-surface"
+                                >
                                     プロンプター表示
                                 </Button>
                             </Link>
                         </div>
                     </div>
                     <form
-                        className="mt-16-pc"
+                        className="mt-16-pc max-md:mt-16-sp"
                         id="edit-script-form"
                         onSubmit={form.handleSubmit(handleSubmit)}
                     >

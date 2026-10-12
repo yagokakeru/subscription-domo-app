@@ -44,8 +44,8 @@ const EditMenu = ({ editor }: { editor: Editor }) => {
 
     return (
         <>
-            <div className="bg-background-surface rounded-full flex gap-pcvw-[12] mt-8-pc px-32-pc py-8-pc w-fit">
-                <div className="flex items-center gap-pcvw-[12] border-r border-border-default pr-12-pc py-12-pc">
+            <div className="bg-background-surface rounded-full flex gap-pcvw-[12] max-md:gap-spvw-[8] mt-8-pc max-md:mt-16-sp px-32-pc max-md:px-16-sp py-8-pc max-md:py-8-sp w-fit max-md:w-full max-md:min-h-spvw-[60]">
+                <div className="flex items-center gap-pcvw-[12] max-md:gap-spvw-[8] border-r border-border-default pr-12-pc max-md:pr-8-sp py-12-pc max-md:py-12-sp">
                     <IconButton
                         active={editorState?.isBold}
                         onClick={() => editor.commands.toggleBold()}
@@ -59,7 +59,7 @@ const EditMenu = ({ editor }: { editor: Editor }) => {
                         <ItalicIcon className="h-auto" />
                     </IconButton>
                 </div>
-                <div className="flex items-center gap-pcvw-[12] border-r border-border-default pr-12-pc py-12-pc">
+                <div className="flex items-center gap-pcvw-[12] max-md:gap-spvw-[8] border-r border-border-default pr-12-pc max-md:pr-8-sp py-12-pc max-md:py-12-sp">
                     <IconButton
                         active={editorState?.isBlack}
                         onClick={() =>
@@ -68,7 +68,7 @@ const EditMenu = ({ editor }: { editor: Editor }) => {
                             })
                         }
                     >
-                        <div className="aspect-square bg-text w-pcvw-[14] rounded-full"></div>
+                        <div className="aspect-square bg-text w-pcvw-[14] max-md:w-spvw-[14] rounded-full"></div>
                     </IconButton>
                     <IconButton
                         active={editorState?.isRed}
@@ -78,7 +78,7 @@ const EditMenu = ({ editor }: { editor: Editor }) => {
                             })
                         }
                     >
-                        <div className="aspect-square bg-[#EF4444] w-pcvw-[14] rounded-full"></div>
+                        <div className="aspect-square bg-[#EF4444] w-pcvw-[14] max-md:w-spvw-[14] rounded-full"></div>
                     </IconButton>
                     <IconButton
                         active={editorState?.isBlue}
@@ -88,7 +88,7 @@ const EditMenu = ({ editor }: { editor: Editor }) => {
                             })
                         }
                     >
-                        <div className="aspect-square bg-[#3B82F6] w-pcvw-[14] rounded-full"></div>
+                        <div className="aspect-square bg-[#3B82F6] w-pcvw-[14] max-md:w-spvw-[14] rounded-full"></div>
                     </IconButton>
                     <IconButton
                         active={editorState?.isGreen}
@@ -98,7 +98,7 @@ const EditMenu = ({ editor }: { editor: Editor }) => {
                             })
                         }
                     >
-                        <div className="aspect-square bg-[#22C55E] w-pcvw-[14] rounded-full"></div>
+                        <div className="aspect-square bg-[#22C55E] w-pcvw-[14] max-md:w-spvw-[14] rounded-full"></div>
                     </IconButton>
                     <IconButton
                         active={editorState?.isYellow}
@@ -108,7 +108,7 @@ const EditMenu = ({ editor }: { editor: Editor }) => {
                             })
                         }
                     >
-                        <div className="aspect-square bg-[#EAB308] w-pcvw-[14] rounded-full"></div>
+                        <div className="aspect-square bg-[#EAB308] w-pcvw-[14] max-md:w-spvw-[14] rounded-full"></div>
                     </IconButton>
                     <IconButton
                         active={editorState?.isOrange}
@@ -118,10 +118,10 @@ const EditMenu = ({ editor }: { editor: Editor }) => {
                             })
                         }
                     >
-                        <div className="aspect-square bg-[#F97316] w-pcvw-[14] rounded-full"></div>
+                        <div className="aspect-square bg-[#F97316] w-pcvw-[14] max-md:w-spvw-[14] rounded-full"></div>
                     </IconButton>
                 </div>
-                <div className="flex items-center gap-pcvw-[12] py-12-pc">
+                <div className="flex items-center gap-pcvw-[12] max-md:gap-spvw-[8] py-12-pc max-md:py-12-sp">
                     <IconButton onClick={() => editor.commands.unsetAllMarks()}>
                         <RemoveFormatting className="h-auto" />
                     </IconButton>

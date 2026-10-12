@@ -73,9 +73,11 @@ export const MypageProfile = (props: {
 
     return (
         <div>
-            <h2 className="text-heading-h2-pc">プロフィール</h2>
+            <h2 className="text-heading-h2-pc max-md:text-heading-h2-sp">
+                プロフィール
+            </h2>
 
-            <Label className="block mt-48-pc">
+            <Label className="block mt-48-pc max-md:mt-48-sp">
                 <ProfilePhoto />
                 <Input
                     type="file"
@@ -93,7 +95,7 @@ export const MypageProfile = (props: {
                 {userProfile?.avatar_url && (
                     <Button
                         variant="secondary"
-                        className="mt-16-pc"
+                        className="mt-16-pc max-md:mt-16-sp"
                         type="button"
                         onClick={() => {
                             handleDeleteImage()
@@ -110,7 +112,7 @@ export const MypageProfile = (props: {
                     </p>
                 )}
             <form onSubmit={form.handleSubmit(handleSubmit)}>
-                <div className="mt-32-pc max-w-pcvw-[452]">
+                <div className="mt-32-pc max-md:mt-32-sp max-w-pcvw-[452] max-md:max-w-none">
                     <div>
                         <Label htmlFor="name">名前</Label>
                         <Input
@@ -120,19 +122,22 @@ export const MypageProfile = (props: {
                         />
                     </div>
                     {form.formState.errors.name && (
-                        <p className="text-status-error text-body-small-pc mt-4-pc">
+                        <p className="text-status-error text-body-small-pc max-md:text-body-small-sp mt-4-pc max-md:mt-4-sp">
                             {form.formState.errors.name.message}
                         </p>
                     )}
-                    <div className="mt-24-pc">
+                    <div className="mt-24-pc max-md:mt-24-sp">
                         <Label>メールアドレス</Label>
-                        <div className="text-body-default-pc mt-8-pc">
+                        <div className="text-body-default-pc max-md:text-body-default-sp mt-8-pc max-md:mt-8-sp">
                             {userProfile?.email}
                         </div>
                     </div>
                 </div>
 
-                <SubmitButton pendingText="保存中..." className="mt-40-pc">
+                <SubmitButton
+                    pendingText="保存中..."
+                    className="mt-40-pc max-md:mt-40-sp"
+                >
                     保存
                 </SubmitButton>
             </form>

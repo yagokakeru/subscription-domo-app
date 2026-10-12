@@ -14,6 +14,7 @@ import type { Message } from '@/types/message'
 
 const profilePhotoVariants = cva(
     `bg-background-surface rounded-xl-pc flex items-center flex-col gap-24-pc mt-16-pc p-24-pc shadow-pcvw-[16] shadow-shadow absolute top-full right-0
+    max-md:left-0 max-md:rounded-xl-sp max-md:gap-24-sp max-md:mt-16-sp max-md:p-24-sp max-md:shadow-spvw-[16]
     transition-all duration-button ease-button`,
     {
         variants: {
@@ -51,28 +52,32 @@ const ProfileCard = React.forwardRef<HTMLDivElement, ProfileCardProps>(
                 ref={ref}
                 {...props}
             >
-                <div className="flex items-center flex-col gap-4-pc">
+                <div className="flex items-center flex-col gap-4-pc max-md:gap-4-sp">
                     <ProfilePhoto className="pointer-events-none" />
-                    <div className="text-body-default-pc">
+                    <div className="text-body-default-pc max-md:text-body-default-sp">
                         {userProfile?.name || userProfile?.email}
                     </div>
                     {userProfile?.name && (
-                        <div className="text-body-notice-pc">
+                        <div className="text-body-notice-pc max-md:text-body-notice-sp">
                             {userProfile?.email}
                         </div>
                     )}
                 </div>
-                <div className="flex items-center flex-col gap-8-pc">
-                    <div className="flex items-center gap-4-pc">
-                        <div className="text-body-small-pc">現在のプラン：</div>
+                <div className="flex items-center flex-col gap-8-pc max-md:gap-8-sp">
+                    <div className="flex items-center gap-4-pc max-md:gap-4-sp">
+                        <div className="text-body-small-pc max-md:text-body-small-sp">
+                            現在のプラン：
+                        </div>
                         <PlanBadge
-                            variant={userPlan?.name ? 'paid' : 'default'}
+                            variant={
+                                userPlan?.stripe_price_id ? 'paid' : 'default'
+                            }
                         >
                             {userPlan?.name ?? 'フリー'}
                         </PlanBadge>
                     </div>
-                    <div className="text-body-notice-pc">
-                        <span className="text-body-strong-pc">
+                    <div className="text-body-notice-pc max-md:text-body-notice-sp">
+                        <span className="text-body-strong-pc max-md:text-body-strong-sp">
                             {userPlan?.script_count} /{' '}
                             {userPlan?.max_scripts
                                 ? userPlan?.max_scripts
@@ -86,11 +91,11 @@ const ProfileCard = React.forwardRef<HTMLDivElement, ProfileCardProps>(
                         </Link>
                     </Button>
                 </div>
-                <div className="flex items-center w-full justify-between w-pcvw-[230]">
+                <div className="flex items-center w-full justify-between w-pcvw-[230] max-md:w-auto max-md:justify-center max-md:gap-8-sp">
                     <Button
                         variant={'secondary'}
                         size={'sm'}
-                        className="w-pcvw-[110]"
+                        className="w-pcvw-[110] max-md:w-auto"
                         asChild
                     >
                         <Link href={'/protected/mypage'} onClick={onClose}>
@@ -99,7 +104,7 @@ const ProfileCard = React.forwardRef<HTMLDivElement, ProfileCardProps>(
                     </Button>
                     <form onSubmit={onClose}>
                         <SubmitButton
-                            className="w-pcvw-[110]"
+                            className="w-pcvw-[110] max-md:w-auto"
                             pendingText="ログアウト中..."
                             variant={'ghost'}
                             size={'sm'}

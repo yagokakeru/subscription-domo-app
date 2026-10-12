@@ -101,8 +101,8 @@ export function PrompterComponent({ script }: { script: getEditScript }) {
     return (
         <>
             <section>
-                <div className="w-pcvw-[1280] mx-auto h-screen relative">
-                    <div className="fixed top-pcvw-[16] left-1/2 -translate-x-1/2 w-pcvw-[1280] z-10">
+                <div className="w-pcvw-[1280] mx-auto h-screen relative max-md:w-auto max-md:mx-16-sp">
+                    <div className="fixed top-pcvw-[16] left-1/2 -translate-x-1/2 w-pcvw-[1280] z-10 max-md:top-16-sp max-md:w-[calc(100vw-32px)]">
                         <PrompterMenu
                             prompterSetting={prompterSetting}
                             onPrompterSettingChange={setPrompterSetting}
@@ -134,12 +134,12 @@ export function PrompterComponent({ script }: { script: getEditScript }) {
                         }}
                     >
                         {countdown !== null && (
-                            <div className="bg-background-primary text-text-onPrimary text-pcvw-[48] font-bold rounded-xl-pc flex align-center justify-center py-16-pc w-full absolute top-pcvw-[140] left-1/2 -translate-x-1/2">
+                            <div className="bg-background-primary text-text-onPrimary text-pcvw-[48] max-md:text-spvw-[48] font-bold rounded-xl-pc max-md:rounded-xl-sp flex align-center justify-center py-16-pc max-md:py-16-sp w-full absolute top-pcvw-[140] max-md:top-spvw-[284] left-1/2 -translate-x-1/2">
                                 {countdown}
                             </div>
                         )}
                         <div
-                            className="pt-pcvw-[380] pb-pcvw-[380]"
+                            className="pt-pcvw-[380] pb-pcvw-[380] max-md:pt-spvw-[432] max-md:pb-spvw-[380]"
                             dangerouslySetInnerHTML={{ __html: prompterHtml }}
                         />
                     </div>

@@ -55,16 +55,16 @@ const PrompterMenu = ({
     }
 
     return (
-        <div className="bg-background-surface rounded-full flex justify-between items-center px-32-pc py-8-pc w-full">
-            <div className="flex items-center gap-pcvw-[12]">
-                <div className="flex items-center gap-pcvw-[12] border-r border-border-default pr-12-pc py-12-pc">
+        <div className="bg-background-surface rounded-full flex justify-between items-center px-32-pc py-8-pc w-full max-md:rounded-xl-sp max-md:flex-wrap max-md:gap-y-16-sp max-md:p-16-sp">
+            <div className="flex items-center gap-pcvw-[12] max-md:flex-1 max-md:flex-wrap max-md:gap-16-sp">
+                <div className="flex items-center gap-pcvw-[12] max-md:gap-spvw-[12] border-r border-border-default pr-12-pc py-12-pc max-md:border-r-0 max-md:p-0">
                     <IconButton>
                         <Link href="/protected">
                             <CircleArrowLeft className="h-auto" />
                         </Link>
                     </IconButton>
                 </div>
-                <div className="flex items-center gap-pcvw-[12] border-r border-border-default pr-12-pc py-12-pc">
+                <div className="flex items-center gap-pcvw-[12] max-md:gap-spvw-[12] border-r border-border-default pr-12-pc py-12-pc max-md:border-r-0 max-md:p-0">
                     <IconButton onClick={onStartScroll}>
                         <Play className="h-auto" />
                     </IconButton>
@@ -72,7 +72,7 @@ const PrompterMenu = ({
                         <RotateCcw className="h-auto" />
                     </IconButton>
                 </div>
-                <div className="flex items-center gap-pcvw-[12] border-r border-border-default pr-12-pc py-12-pc">
+                <div className="flex items-center gap-pcvw-[12] max-md:gap-spvw-[12] border-r border-border-default pr-12-pc py-12-pc max-md:border-r-0 max-md:p-0">
                     <IconButton>
                         <ALargeSmall className="h-auto" />
                     </IconButton>
@@ -91,7 +91,7 @@ const PrompterMenu = ({
                         }
                     />
                 </div>
-                <div className="flex items-center gap-pcvw-[12] border-r border-border-default pr-12-pc py-12-pc">
+                <div className="flex items-center gap-pcvw-[12] max-md:gap-spvw-[12] border-r border-border-default pr-12-pc py-12-pc max-md:border-r-0 max-md:p-0">
                     <IconButton>
                         <TableOfContents className="h-auto" />
                     </IconButton>
@@ -110,7 +110,7 @@ const PrompterMenu = ({
                         }
                     />
                 </div>
-                <div className="flex items-center gap-pcvw-[12] border-r border-border-default pr-12-pc py-12-pc">
+                <div className="flex items-center gap-pcvw-[12] max-md:gap-spvw-[12] border-r border-border-default pr-12-pc py-12-pc max-md:border-r-0 max-md:p-0">
                     <IconButton>
                         <Clock className="h-auto" />
                     </IconButton>
@@ -129,7 +129,7 @@ const PrompterMenu = ({
                         }
                     />
                 </div>
-                <div className="flex items-center gap-pcvw-[12] border-r border-border-default pr-12-pc py-12-pc">
+                <div className="flex items-center gap-pcvw-[12] max-md:gap-spvw-[12] border-r border-border-default pr-12-pc py-12-pc max-md:border-r-0 max-md:p-0">
                     <IconButton>
                         <AlarmClock className="h-auto" />
                     </IconButton>
@@ -149,7 +149,7 @@ const PrompterMenu = ({
                     />
                 </div>
             </div>
-            <div className="flex items-center gap-pcvw-[12]">
+            <div className="flex items-center gap-pcvw-[12] max-md:flex-1 max-md:justify-between max-md:gap-spvw-[12]">
                 <IconButton
                     active={prompterSetting.rotateY}
                     onClick={() =>

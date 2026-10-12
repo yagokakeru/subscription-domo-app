@@ -29,9 +29,9 @@ const SliderDemo = ({
     }
 
     return (
-        <form className="flex items-center gap-pcvw-[8]">
+        <form className="flex items-center gap-pcvw-[8] max-md:gap-spvw-[8]">
             <Slider.Root
-                className="relative flex h-pcvw-[4] w-pcvw-[64] touch-none select-none items-center"
+                className="relative flex h-pcvw-[4] max-md:h-spvw-[4] w-pcvw-[64] max-md:w-spvw-[64] touch-none select-none items-center"
                 value={[currentValue]}
                 max={max}
                 min={min}
@@ -42,11 +42,11 @@ const SliderDemo = ({
                     <Slider.Range className="absolute h-full rounded-full bg-background-primary" />
                 </Slider.Track>
                 <Slider.Thumb
-                    className="aspect-square block rounded-full bg-background-primary w-pcvw-[10] hover:bg-background-primary-hover active:bg-background-primary-active focus:outline-none"
+                    className="aspect-square block rounded-full bg-background-primary w-pcvw-[10] max-md:w-spvw-[10] hover:bg-background-primary-hover active:bg-background-primary-active focus:outline-none"
                     aria-label="Volume"
                 />
             </Slider.Root>
-            <span className="min-w-pcvw-[24] text-center text-pcvw-[12] text-text-primary">
+            <span className="min-w-pcvw-[24] text-center text-pcvw-[12] max-md:text-spvw-[12] text-text-primary">
                 {currentValue}
                 {unit && ` ${unit}`}
             </span>

@@ -21,7 +21,7 @@ export const MypagePlan = ({
 
     if (!userPlan)
         return (
-            <p className="text-body-default-pc">
+            <p className="text-body-default-pc max-md:text-body-default-sp">
                 プラン情報を取得できませんでした。
             </p>
         )
@@ -50,21 +50,27 @@ export const MypagePlan = ({
 
     return (
         <div>
-            <h2 className="text-heading-h2-pc">プラン</h2>
-            <div className="flex items-center gap-4-pc text-body-default-pc mt-40-pc">
+            <h2 className="text-heading-h2-pc max-md:text-heading-h2-sp">
+                プラン
+            </h2>
+            <div className="flex items-center gap-4-pc max-md:gap-4-sp text-body-default-pc max-md:text-body-default-sp mt-40-pc max-md:mt-40-sp">
                 <div>現在のプラン：</div>
-                <PlanBadge>{userPlan?.name}</PlanBadge>
+                <PlanBadge
+                    variant={userPlan?.stripe_price_id ? 'paid' : 'default'}
+                >
+                    {userPlan?.name}
+                </PlanBadge>
             </div>
             {userPlan?.cancel_at_period_end ? (
                 <>
-                    <div className="flex items-center gap-4-pc text-body-default-pc mt-16-pc">
+                    <div className="flex items-center gap-4-pc max-md:gap-4-sp text-body-default-pc max-md:text-body-default-sp mt-16-pc max-md:mt-16-sp">
                         <div>解約予定日：</div>
                         <div>{userPlan?.current_period_end}</div>
                     </div>
                 </>
             ) : (
                 <>
-                    <div className="flex items-center gap-4-pc text-body-default-pc mt-16-pc">
+                    <div className="flex items-center gap-4-pc max-md:gap-4-sp text-body-default-pc max-md:text-body-default-sp mt-16-pc max-md:mt-16-sp">
                         <div>次回の支払い：</div>
                         <div>
                             {userPlan?.current_period_end ?? '支払いなし'}
@@ -72,23 +78,26 @@ export const MypagePlan = ({
                     </div>
                 </>
             )}
-            <div className="text-body-default-pc mt-16-pc">
+            <div className="text-body-default-pc max-md:text-body-default-sp mt-16-pc max-md:mt-16-sp">
                 現在の台本数：
-                <span className="text-heading-h3-pc">
+                <span className="text-heading-h3-pc max-md:text-heading-h3-sp">
                     {userPlan?.script_count} /{' '}
                     {userPlan.max_scripts ? userPlan.max_scripts : '無制限'}
                 </span>{' '}
                 作成済み
             </div>
 
-            <Button asChild className="mt-40-pc w-pcvw-[180]">
+            <Button
+                asChild
+                className="mt-40-pc max-md:mt-40-sp w-pcvw-[180] max-md:w-spvw-[180]"
+            >
                 <Link href={'/plan'}>プランを変更する</Link>
             </Button>
             {userPlan.stripe_subscription_id &&
                 (userPlan.cancel_at_period_end ? (
                     <Button
                         variant={'secondary'}
-                        className="mt-8-pc w-pcvw-[180]"
+                        className="mt-8-pc max-md:mt-8-sp w-pcvw-[180] max-md:w-spvw-[180]"
                         onClick={handleReactivateSubscription}
                     >
                         解約を解除する
@@ -96,7 +105,7 @@ export const MypagePlan = ({
                 ) : (
                     <Button
                         variant={'secondary'}
-                        className="mt-16-pc w-pcvw-[180]"
+                        className="mt-16-pc max-md:mt-16-sp w-pcvw-[180] max-md:w-spvw-[180]"
                         onClick={() => setConfirmDialogOpen(true)}
                     >
                         プランを解約する

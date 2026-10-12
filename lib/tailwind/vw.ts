@@ -23,6 +23,13 @@ const createUtility = (property: string, baseWidth: number) => {
     })
 }
 
+const createMultiUtility = (properties: string[], baseWidth: number) => {
+    return (value: string) =>
+        Object.fromEntries(
+            properties.map((property) => [property, toMinVw(value, baseWidth)])
+        )
+}
+
 const createShadowUtility = (baseWidth: number) => (value: string) => ({
     boxShadow: `0 0 ${toMinVw(value, baseWidth)} 0 var(--tw-shadow-color, var(--colorShadowDefault))`,
 })
@@ -61,6 +68,17 @@ export const vwPlugin = plugin(({ matchUtilities }) => {
             'shadow-spvw': createShadowUtility(SP_WIDTH),
             'right-spvw': createUtility('right', SP_WIDTH),
             'top-spvw': createUtility('top', SP_WIDTH),
+            'p-spvw': createUtility('padding', SP_WIDTH),
+            'px-spvw': createMultiUtility(
+                ['padding-left', 'padding-right'],
+                SP_WIDTH
+            ),
+            'py-spvw': createMultiUtility(
+                ['padding-top', 'padding-bottom'],
+                SP_WIDTH
+            ),
+            'mt-spvw': createUtility('margin-top', SP_WIDTH),
+            'rounded-spvw': createUtility('border-radius', SP_WIDTH),
         },
         {
             supportsNegativeValues: false,

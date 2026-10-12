@@ -3,7 +3,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
 const iconButtonVariants = cva(
-    `aspect-square flex items-center justify-center rounded-sm-pc w-pcvw-[24] h-auto
+    `aspect-square flex items-center justify-center rounded-sm-pc max-md:rounded-sm-sp w-pcvw-[24] max-md:w-spvw-[24] h-auto
     transition-colors duration-button ease-button
     hover:bg-background-surface-hover
     active:bg-background-surface-active`,

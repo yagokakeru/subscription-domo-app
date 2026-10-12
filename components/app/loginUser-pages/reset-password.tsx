@@ -20,20 +20,22 @@ export default function ResetPasswordForm() {
 
     return (
         <>
-            <div className="pt-pcvw-[150]">
+            <div className="pt-pcvw-[150] max-md:pt-32-sp max-md:px-16-sp">
                 <form
                     onSubmit={form.handleSubmit(handleSubmit)}
-                    className="bg-background-surface rounded-xl-pc mx-auto p-24-pc w-pcvw-[500]"
+                    className="bg-background-surface rounded-xl-pc max-md:rounded-xl-sp mx-auto p-24-pc max-md:p-spvw-[20] w-pcvw-[500] max-md:w-full"
                 >
-                    <h1 className="text-heading-h3-pc">パスワードをリセット</h1>
+                    <h1 className="text-heading-h3-pc max-md:text-heading-h3-sp">
+                        パスワードをリセット
+                    </h1>
 
                     {message && (
-                        <div className="mt-16-pc">
+                        <div className="mt-16-pc max-md:mt-16-sp">
                             <FormMessage message={message} />
                         </div>
                     )}
 
-                    <div className="mt-32-pc">
+                    <div className="mt-32-pc max-md:mt-32-sp">
                         <div>
                             <Label htmlFor="newPassword">パスワード</Label>
                             <InputPassword
@@ -44,17 +46,17 @@ export default function ResetPasswordForm() {
                                         : 'default'
                                 }
                                 placeholder="パスワードを入力してください"
-                                className="mt-8-pc"
+                                className="mt-8-pc max-md:mt-8-sp"
                                 id="newPassword"
                             />
                             {form.formState.errors.newPassword && (
-                                <p className="text-status-error text-body-small-pc mt-4-pc">
+                                <p className="text-status-error text-body-small-pc max-md:text-body-small-sp mt-4-pc max-md:mt-4-sp">
                                     {form.formState.errors.newPassword.message}
                                 </p>
                             )}
                         </div>
 
-                        <div className="mt-24-pc">
+                        <div className="mt-24-pc max-md:mt-24-sp">
                             <Label htmlFor="newPasswordConfirm">
                                 パスワードを確認してください
                             </Label>
@@ -66,11 +68,11 @@ export default function ResetPasswordForm() {
                                         ? 'error'
                                         : 'default'
                                 }
-                                className="mt-8-pc"
+                                className="mt-8-pc max-md:mt-8-sp"
                                 id="newPasswordConfirm"
                             />
                             {form.formState.errors.newPasswordConfirm && (
-                                <p className="text-status-error text-body-small-pc mt-4-pc">
+                                <p className="text-status-error text-body-small-pc max-md:text-body-small-sp mt-4-pc max-md:mt-4-sp">
                                     {
                                         form.formState.errors.newPasswordConfirm
                                             .message
@@ -81,7 +83,7 @@ export default function ResetPasswordForm() {
 
                         <SubmitButton
                             pendingText="リセット中..."
-                            className="w-full mt-48-pc"
+                            className="w-full mt-48-pc max-md:mt-48-sp"
                         >
                             続ける
                         </SubmitButton>

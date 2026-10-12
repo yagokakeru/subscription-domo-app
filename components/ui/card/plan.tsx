@@ -19,17 +19,20 @@ import { Unsubscription } from '@/lib/actions/stripe/unsubscription'
 import ConfirmDialog from '@/components/ui/comfirm/dialog'
 import type { Message } from '@/types/message'
 
-const planCardVariants = cva('bg-background-surface rounded-xl-pc p-24-pc', {
-    variants: {
-        recommended: {
-            false: '',
-            true: 'border-border-focus border-solid border-pcvw-[4] border-t-0 rounded-t-none',
+const planCardVariants = cva(
+    'bg-background-surface rounded-xl-pc p-24-pc max-md:rounded-xl-sp max-md:p-24-sp',
+    {
+        variants: {
+            recommended: {
+                false: '',
+                true: 'border-border-focus border-solid border-pcvw-[4] border-t-0 rounded-t-none max-md:border-spvw-[4] max-md:border-t-0 max-md:rounded-t-none',
+            },
+            defaultVariants: {
+                variant: 'false',
+            },
         },
-        defaultVariants: {
-            variant: 'false',
-        },
-    },
-})
+    }
+)
 
 export interface PlanCardProps
     extends
@@ -120,7 +123,7 @@ export default function PlanCard({
     return (
         <div>
             {planInfo.isRecommended && (
-                <div className="bg-background-primary text-body-strong-pc text-text-onPrimary text-center rounded-t-xl-pc px-16-pc py-8-pc">
+                <div className="bg-background-primary text-body-strong-pc text-text-onPrimary text-center rounded-t-xl-pc px-16-pc py-8-pc max-md:text-body-strong-sp max-md:rounded-t-xl-sp max-md:px-24-sp max-md:py-8-sp">
                     もっとも選ばれています！
                 </div>
             )}
@@ -132,15 +135,15 @@ export default function PlanCard({
                     })
                 )}
             >
-                <h3 className="text-heading-h2-pc text-center">
+                <h3 className="text-heading-h2-pc text-center max-md:text-heading-h2-sp">
                     {planInfo.name}
                 </h3>
-                <p className="text-body-small-pc mt-12-pc text-center">
+                <p className="text-body-small-pc mt-12-pc text-center max-md:text-body-small-sp max-md:mt-12-sp">
                     {planInfo.description}
                 </p>
-                <p className="text-heading-h1-pc mt-40-pc text-center">
+                <p className="text-heading-h1-pc mt-40-pc text-center max-md:text-heading-h1-sp max-md:mt-40-sp">
                     ¥{planInfo.amount}
-                    <span className="text-heading-h2-pc">
+                    <span className="text-heading-h2-pc max-md:text-heading-h2-sp">
                         /{planInfo.interval}
                     </span>
                 </p>
@@ -148,22 +151,28 @@ export default function PlanCard({
                 {!planInfo.priceId ? ( // freeプランの場合
                     !userInfo ? (
                         <Button
-                            className="mt-40-pc w-full"
+                            className="mt-40-pc w-full max-md:mt-40-sp"
                             onClick={() => push('/sign-up')}
                         >
                             無料で始める
                         </Button>
                     ) : !userPlan?.stripe_subscription_id ? (
-                        <Button className="mt-40-pc w-full" disabled>
+                        <Button
+                            className="mt-40-pc w-full max-md:mt-40-sp"
+                            disabled
+                        >
                             現在のプラン
                         </Button>
                     ) : userPlan.cancel_at_period_end ? (
-                        <Button className="mt-40-pc w-full" disabled>
+                        <Button
+                            className="mt-40-pc w-full max-md:mt-40-sp"
+                            disabled
+                        >
                             ダウングレード予定
                         </Button>
                     ) : (
                         <Button
-                            className="mt-40-pc w-full"
+                            className="mt-40-pc w-full max-md:mt-40-sp"
                             onClick={() => setConfirmDialogOpen(true)}
                             disabled={loading}
                         >
@@ -175,21 +184,24 @@ export default function PlanCard({
                         // 現在のプラン
                         userPlan.cancel_at_period_end ? (
                             <Button
-                                className="mt-40-pc w-full"
+                                className="mt-40-pc w-full max-md:mt-40-sp"
                                 onClick={handleReactivate}
                                 disabled={loading}
                             >
                                 {loading ? '解除しています…' : '解約を解除する'}
                             </Button>
                         ) : (
-                            <Button className="mt-40-pc w-full" disabled>
+                            <Button
+                                className="mt-40-pc w-full max-md:mt-40-sp"
+                                disabled
+                            >
                                 現在のプラン
                             </Button>
                         )
                     ) : (
                         // 他の有料プラン
                         <Button
-                            className="mt-40-pc w-full"
+                            className="mt-40-pc w-full max-md:mt-40-sp"
                             onClick={() => {
                                 const priceId = planInfo.priceId || ''
                                 if (!userPlan.stripe_subscription_id)
@@ -207,7 +219,7 @@ export default function PlanCard({
                     )
                 ) : (
                     <Button
-                        className="mt-40-pc w-full"
+                        className="mt-40-pc w-full max-md:mt-40-sp"
                         onClick={() => {
                             setPriceId(planInfo.priceId || '')
                             push('/sign-up')
@@ -218,19 +230,19 @@ export default function PlanCard({
                 )}
 
                 {planInfo.planFeatures.length > 0 && (
-                    <div className="flex flex-col gap-y-8-pc mt-40-pc">
+                    <div className="flex flex-col gap-y-8-pc mt-40-pc max-md:gap-y-8-sp max-md:mt-40-sp">
                         {planInfo.planFeatures.map((feature, index) => {
                             return (
                                 <div
                                     key={index}
-                                    className="flex items-center gap-x-4-pc"
+                                    className="flex items-center gap-x-4-pc max-md:gap-x-4-sp"
                                 >
                                     {feature.enabled ? (
-                                        <CircleCheck className="square block fill-text-success stroke-text-onPrimary w-pcvw-[20] h-auto" />
+                                        <CircleCheck className="square block fill-text-success stroke-text-onPrimary w-pcvw-[20] h-auto max-md:w-spvw-[20]" />
                                     ) : (
-                                        <CircleX className="square block fill-text-error stroke-text-onPrimary w-pcvw-[20] h-auto" />
+                                        <CircleX className="square block fill-text-error stroke-text-onPrimary w-pcvw-[20] h-auto max-md:w-spvw-[20]" />
                                     )}
-                                    <p className="text-body-default-pc">
+                                    <p className="text-body-default-pc max-md:text-body-default-sp">
                                         {feature.text}
                                     </p>
                                 </div>

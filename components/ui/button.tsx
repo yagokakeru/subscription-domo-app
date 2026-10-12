@@ -5,7 +5,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
 const buttonVariants = cva(
-    `flex items-center justify-center rounded-lg-pc font-base
+    `flex items-center justify-center rounded-lg-pc max-md:rounded-lg-sp max-md:whitespace-nowrap font-base
     disabled:pointer-events-none disabled:bg-background-disabled disabled:content-disabled
     transition-colors duration-button ease-button`,
     {
@@ -21,9 +21,10 @@ const buttonVariants = cva(
                         active:bg-background-surface-active`,
             },
             size: {
-                default: 'text-body-strong-pc px-32-pc py-12-pc',
-                sm: 'text-body-small-pc px-24-pc py-8-pc',
-                lg: 'text-body-strong-pc px-48-pc py-16-pc',
+                default:
+                    'text-body-strong-pc px-32-pc py-12-pc max-md:text-body-strong-sp max-md:px-32-sp max-md:py-12-sp',
+                sm: 'text-body-small-pc px-24-pc py-8-pc max-md:text-body-small-sp max-md:px-24-sp max-md:py-8-sp max-md:rounded-md-sp',
+                lg: 'text-body-strong-pc px-48-pc py-16-pc max-md:text-body-strong-sp max-md:px-48-sp max-md:py-16-sp',
             },
         },
         defaultVariants: {

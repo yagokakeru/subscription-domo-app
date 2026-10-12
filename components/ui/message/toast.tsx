@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 import { MESSAGE_ICONS } from '@/lib/consts/massageIcon'
 
 const toastVariants = cva(
-    'bg-background-surface border text-text-primary p-16-pc rounded-md-pc flex items-start p-12-pc w-full shadow-pcvw-[4] shadow-shadow',
+    'bg-background-surface border text-text-primary p-16-pc rounded-md-pc flex items-start p-12-pc w-full shadow-pcvw-[4] shadow-shadow max-md:p-12-sp max-md:rounded-md-sp max-md:shadow-spvw-[4]',
     {
         variants: {
             variant: {
@@ -44,21 +44,21 @@ export default function ToastMessage({ message, onClose }: ToastMessageProps) {
                 }}
             >
                 <Icon
-                    className="aspect-square w-pcvw-[24] shrink-0 block mr-8-pc h-auto"
+                    className="aspect-square w-pcvw-[24] shrink-0 block mr-8-pc h-auto max-md:w-spvw-[24] max-md:mr-8-sp"
                     strokeWidth={2}
                 />
 
-                <Toast.Description className="text-body-small-pc w-full">
+                <Toast.Description className="text-body-small-pc w-full max-md:text-body-small-sp">
                     {message.message}
                 </Toast.Description>
                 <Toast.Close>
                     <Cancel
-                        className="aspect-square w-pcvw-[16] shrink-0 block ml-16-pc h-auto"
+                        className="aspect-square w-pcvw-[16] shrink-0 block ml-16-pc h-auto max-md:w-spvw-[16] max-md:ml-16-sp"
                         strokeWidth={2}
                     />
                 </Toast.Close>
             </Toast.Root>
-            <Toast.Viewport className="fixed bottom-32-pc right-pcvw-[80] z-[9999] min-w-[300px] max-w-[100vw]" />
+            <Toast.Viewport className="fixed bottom-32-pc right-pcvw-[80] z-[9999] min-w-[300px] max-w-[100vw] max-md:bottom-16-sp max-md:left-16-sp max-md:right-16-sp max-md:min-w-0" />
         </Toast.Provider>
     )
 }

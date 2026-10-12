@@ -22,6 +22,7 @@ export async function getUserPlan(): Promise<userPlan | null> {
         .single()
 
     if (subError) {
+        console.error('Error fetching subscription data:', subError)
         return null
     }
 
@@ -33,6 +34,7 @@ export async function getUserPlan(): Promise<userPlan | null> {
         .single()
 
     if (planError) {
+        console.error('Error fetching plan data:', planError)
         return null
     }
 
@@ -43,6 +45,7 @@ export async function getUserPlan(): Promise<userPlan | null> {
         .eq('user_id', userID)
 
     if (scriptError) {
+        console.error('Error fetching script count:', scriptError)
         return null
     }
 

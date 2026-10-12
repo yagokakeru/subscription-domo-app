@@ -22,9 +22,11 @@ export const MypageAccount = ({
 
     return (
         <div>
-            <h2 className="text-heading-h2-pc">アカウント操作</h2>
+            <h2 className="text-heading-h2-pc max-md:text-heading-h2-sp">
+                アカウント操作
+            </h2>
 
-            <form className="mt-40-pc">
+            <form className="mt-40-pc max-md:mt-40-sp">
                 <SubmitButton
                     pendingText="ログアウト中..."
                     formAction={async () => {
@@ -38,7 +40,7 @@ export const MypageAccount = ({
             <Button
                 type="button"
                 variant={'secondary'}
-                className="mt-16-pc"
+                className="mt-16-pc max-md:mt-16-sp"
                 aria-disabled={isDeleting}
                 onClick={() => setConfirmDialogOpen(true)}
             >
