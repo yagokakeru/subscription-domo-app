@@ -332,6 +332,7 @@ describe('signUpAction', () => {
             priceid: null,
             email: 'new@example.com',
             password: 'Password1',
+            consent: true,
         })
 
         // Stripe顧客が正しいemailで作成されたか
@@ -345,18 +346,39 @@ describe('signUpAction', () => {
         expect(redirect).toHaveBeenCalledWith('/protected')
     })
 
-    it('emailかpasswordが空の場合、エラーメッセージを返す', async () => {
-        mockSignUpSupabase()
+    // 画面を経由せずServer Actionを直接呼ばれた場合に備え、サーバー側でもsignupSchemaで検証する
+    it('emailかpasswordが空の場合、ユーザーを作成せずエラーメッセージを返す', async () => {
+        const { signUp } = mockSignUpSupabase()
 
         const result = await signUpAction({
             priceid: null,
             email: '',
             password: '',
+            consent: true,
         })
 
+        expect(signUp).not.toHaveBeenCalled()
         expect(result).toEqual({
             messageType: 'error',
-            message: 'メールアドレスとパスワードを入力してください。',
+            message: '入力内容に誤りがあります。',
+        })
+    })
+
+    it('利用規約・プライバシーポリシーに同意していない場合、ユーザーを作成せずエラーメッセージを返す', async () => {
+        const { signUp } = mockSignUpSupabase()
+
+        const result = await signUpAction({
+            priceid: null,
+            email: 'new@example.com',
+            password: 'Password1',
+            consent: false,
+        })
+
+        expect(signUp).not.toHaveBeenCalled()
+        expect(mockCustomersCreate).not.toHaveBeenCalled()
+        expect(result).toEqual({
+            messageType: 'error',
+            message: '入力内容に誤りがあります。',
         })
     })
 
@@ -374,6 +396,7 @@ describe('signUpAction', () => {
             priceid: null,
             email: 'new@example.com',
             password: 'Password1',
+            consent: true,
         })
 
         // Stripe顧客はまだ存在しないので削除は呼ばれない
@@ -413,6 +436,7 @@ describe('signUpAction', () => {
             priceid: null,
             email: 'new@example.com',
             password: 'Password1',
+            consent: true,
         })
 
         expect(mockCustomersDel).toHaveBeenCalledWith('cus_123')
@@ -462,6 +486,7 @@ describe('signUpAction', () => {
             priceid: null,
             email: 'new@example.com',
             password: 'Password1',
+            consent: true,
         })
 
         // profile行が削除されたか
@@ -524,6 +549,7 @@ describe('signUpAction', () => {
             priceid: null,
             email: 'new@example.com',
             password: 'Password1',
+            consent: true,
         })
 
         // profile行が削除されたか
@@ -551,6 +577,7 @@ describe('signUpAction', () => {
             priceid: null,
             email: 'existing@example.com',
             password: 'Password1',
+            consent: true,
         })
 
         expect(result).toEqual({
@@ -571,6 +598,7 @@ describe('signUpAction', () => {
             priceid: null,
             email: 'new@example.com',
             password: 'Password1',
+            consent: true,
         })
 
         expect(result).toEqual({
@@ -595,6 +623,7 @@ describe('signUpAction', () => {
             priceid: 'price_123',
             email: 'new@example.com',
             password: 'Password1',
+            consent: true,
         })
 
         expect(result).toEqual({
@@ -632,6 +661,7 @@ describe('signUpAction', () => {
             priceid: 'price_123',
             email: 'new@example.com',
             password: 'Password1',
+            consent: true,
         })
 
         // customer ID / user ID はcheckout内でセッションから取るので、渡すのは選んだpriceだけ

@@ -11,6 +11,8 @@ import { stripeClient } from '@/utils/stripe/server'
 import { getUserInfo } from '@/lib/functions/profile/getUserInfo'
 import { checkout } from '@/lib/actions/stripe/checkout'
 
+import { signupSchema } from '@/lib/validation/schema'
+
 import {
     signupFormValues,
     loginFormValues,
@@ -22,6 +24,11 @@ import {
 export const signUpAction = async (
     formData: signupFormValues
 ): Promise<Message> => {
+    const validationResult = signupSchema.safeParse(formData)
+    if (!validationResult.success) {
+        return { messageType: 'error', message: '入力内容に誤りがあります。' }
+    }
+
     const priceID = formData.priceid
     const email = formData.email
     const password = formData.password
@@ -49,14 +56,6 @@ export const signUpAction = async (
             }
         } catch (rollbackError) {
             console.error('ロールバック失敗:', rollbackError)
-        }
-    }
-
-    // emailかpasswordの入力がなければサインアップページにリダイレクト
-    if (!email || !password) {
-        return {
-            messageType: 'error',
-            message: 'メールアドレスとパスワードを入力してください。',
         }
     }
 

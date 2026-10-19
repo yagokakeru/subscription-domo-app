@@ -31,6 +31,11 @@ export const nameValidation = z
     .string(MESSAGES.REQUIRED_FIELD(LABELS.NAME))
     .max(255, MESSAGES.MAX_LENGTH(LABELS.NAME, 255))
 
+// 同意のバリデーション
+export const consentValidation = z.boolean().refine((value) => value === true, {
+    message: MESSAGES.CONSENT_REQUIRED,
+})
+
 // アバター画像のバリデーション
 export const avatarValidation = z
     .any()

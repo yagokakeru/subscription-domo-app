@@ -5,6 +5,7 @@ import { FormMessage } from '@/components/form-message'
 import type { Message } from '@/types/message'
 import { SubmitButton } from '@/components/submit-button'
 import { Input } from '@/components/ui/input'
+import { Checkbox } from '@/components/ui/checkbox'
 import { InputPassword } from '@/components/ui/input-password'
 import { Label } from '@/components/ui/label'
 import Link from 'next/link'
@@ -12,6 +13,7 @@ import { priceIdAtom } from '@/lib/atoms/handOver'
 import { useSignupForm } from '@/lib/validation/hooks'
 import { useState } from 'react'
 import { signupFormValues } from '@/lib/validation/schema'
+import { LEGAL_PATHS } from '@/lib/consts/legal'
 
 export function SignUpForm() {
     const priceID = useAtomValue(priceIdAtom)
@@ -89,6 +91,44 @@ export function SignUpForm() {
                                 </div>
                             )}
                         </div>
+
+                        <Label
+                            htmlFor="consent"
+                            className="flex items-center justify-center gap-pcvw-[12] max-md:gap-spvw-[8] mt-24-pc max-md:mt-24-sp"
+                        >
+                            <Checkbox
+                                {...form.register('consent')}
+                                variant={
+                                    form.formState.errors.consent
+                                        ? 'error'
+                                        : 'default'
+                                }
+                                id="consent"
+                            />
+                            <div className="text-text-secondary text-body-small-pc max-md:text-body-small-sp mt-4-pc max-md:mt-4-sp">
+                                <Link
+                                    href={LEGAL_PATHS.TERMS}
+                                    className="underline"
+                                    target="_blank"
+                                >
+                                    利用規約
+                                </Link>
+                                および
+                                <Link
+                                    href={LEGAL_PATHS.PRIVACY}
+                                    className="underline"
+                                    target="_blank"
+                                >
+                                    プライバシーポリシー
+                                </Link>
+                                に同意する。
+                            </div>
+                        </Label>
+                        {form.formState.errors.consent && (
+                            <p className="text-status-error text-body-small-pc max-md:text-body-small-sp mt-4-pc max-md:mt-4-sp text-center">
+                                {form.formState.errors.consent.message}
+                            </p>
+                        )}
 
                         <SubmitButton
                             pendingText="新規登録中..."

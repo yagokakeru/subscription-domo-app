@@ -8,6 +8,7 @@ import {
     avatarValidation,
     contentValidation,
     plainContentValidation,
+    consentValidation,
 } from '@/lib/validation/validation'
 import { MESSAGES } from '@/lib/consts/messages'
 
@@ -16,6 +17,7 @@ export const signupSchema = z.object({
     priceid: priceidValidation,
     email: emailValidation,
     password: passwordValidation,
+    consent: consentValidation,
 })
 
 // ログイン用スキーマ

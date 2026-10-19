@@ -1,5 +1,4 @@
 // 共通メッセージ定義です
-// src/shared/libs/fields/fields.tsに定義されているルールに対応しています
 export const MESSAGES = {
     // 共通
     REQUIRED_FIELD: (field: string) => `${field}は必須です`,
@@ -31,6 +30,9 @@ export const MESSAGES = {
     PASSWORD_REGEX: (max: number) =>
         `パスワードは半角英数字（大文字・小文字）を含む${max}文字以上で入力してください。`,
     PASSWORD_CONFIRM_MISMATCH: 'パスワードが一致しません',
+
+    // 同意
+    CONSENT_REQUIRED: '同意が必要です',
 
     // 数値
     NUMBER_MIN: (field: string, min: number) =>

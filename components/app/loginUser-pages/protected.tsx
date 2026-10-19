@@ -93,22 +93,8 @@ export function Protected({
                     </div>
                     <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                         <InfoIcon size="16" strokeWidth={2} />
-                        リリース準備（R1・R2・R3-1・R3-2・A 完了）
-                        <br />
-                        【B アプリ側の残作業】
-                        <br />
-                        ーB-1（R3-3）最終確認画面：有料プラン申込時に料金・支払時期・自動更新・解約方法・利用規約同意を表示する確認ダイアログ
-                        → Stripe Checkoutへ
-                        <br />
-                        ーB-2（R3-3）有料プラン間の変更は全ケースで確認ダイアログを表示（新しい月額・日割り差額・次回更新日）
-                        <br />
-                        ーB-3（R3-3）Stripe Checkoutの custom_text と
-                        consent_collection.terms_of_service を設定
-                        <br />
-                        ーB-4（R3-3）サインアップ画面に「登録すると利用規約・プライバシーポリシーに同意したものとみなします」とリンクを追加
-                        <br />
-                        ーB-5 特商法ページの価格表示を supabase start
-                        した状態で確認
+                        リリース準備（R1・R2・A・B
+                        完了：残りは本番環境とリリース直前の確認）
                         <br />
                         【C 本番環境（後で）】
                         <br />
