@@ -17,6 +17,7 @@ import { checkout } from '@/lib/actions/stripe/checkout'
 import ToastMessage from '@/components/ui/message/toast'
 import { Unsubscription } from '@/lib/actions/stripe/unsubscription'
 import ConfirmDialog from '@/components/ui/comfirm/dialog'
+import PurchaseConfirmDialog from '@/components/ui/comfirm/purchase-dialog'
 import type { Message } from '@/types/message'
 
 const planCardVariants = cva(
@@ -52,7 +53,9 @@ export default function PlanCard({
     const [toastMessage, setToastMessage] = useState<Message | null>(null)
     const [loading, setLoading] = useState(false)
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
-    const [pendingPriceId, setPendingPriceId] = useState<string | null>(null)
+    const [regularDialogOpen, setRegularDialogOpen] = useState(false)
+    const [changeDialogOpen, setChangeDialogOpen] = useState(false)
+    const [paidDialogOpen, setPaidDialogOpen] = useState(false)
     const { push, refresh } = useRouter()
 
     const handleCheckout = async (priceId: string) => {
@@ -203,12 +206,9 @@ export default function PlanCard({
                         <Button
                             className="mt-40-pc w-full max-md:mt-40-sp"
                             onClick={() => {
-                                const priceId = planInfo.priceId || ''
                                 if (!userPlan.stripe_subscription_id)
-                                    return handleCheckout(priceId)
-                                if (userPlan.cancel_at_period_end)
-                                    return setPendingPriceId(priceId)
-                                handleUpgradeSubscription(priceId)
+                                    return setChangeDialogOpen(true)
+                                setPaidDialogOpen(true)
                             }}
                             disabled={loading}
                         >
@@ -221,8 +221,7 @@ export default function PlanCard({
                     <Button
                         className="mt-40-pc w-full max-md:mt-40-sp"
                         onClick={() => {
-                            setPriceId(planInfo.priceId || '')
-                            push('/sign-up')
+                            setRegularDialogOpen(true)
                         }}
                     >
                         {loading ? '今すぐ始める' : '今すぐ始める'}
@@ -260,19 +259,63 @@ export default function PlanCard({
                 description={`${userPlan?.current_period_end}までは現在のプランを利用できます。\nそれ以降はフリープランになり、上限を超えた台本はロックされます（編集・プロンプター表示は不可、削除は可能）。\n再度アップグレードすると、ロックされた台本も利用できるようになります。`}
                 confirmText="ダウングレード"
             />
-            <ConfirmDialog
-                open={pendingPriceId !== null}
-                onOpenChange={(open) => !open && setPendingPriceId(null)}
+            <PurchaseConfirmDialog
+                open={regularDialogOpen}
+                onOpenChange={setRegularDialogOpen}
                 onConfirm={async () => {
-                    if (!pendingPriceId) return
-                    await handleUpgradeSubscription(pendingPriceId)
-                    setPendingPriceId(null)
+                    setPriceId(planInfo.priceId || '')
+                    push('/sign-up')
                 }}
-                title={`${planInfo.name}に変更しますか？`}
-                description={
-                    '現在の解約予定は取り消され、プランは継続されます。\n料金の差額は日割りで請求されます。'
-                }
+                title={`${planInfo.name}プラン`}
+                amount={planInfo.amount}
+                interval={planInfo.interval}
+                confirmText="新規登録へ進む"
+            />
+            <PurchaseConfirmDialog
+                open={changeDialogOpen}
+                onOpenChange={setChangeDialogOpen}
+                onConfirm={async () => {
+                    const priceId = planInfo.priceId || ''
+                    handleCheckout(priceId)
+                }}
+                title={`${planInfo.name}プランに変更しますか？`}
+                amount={planInfo.amount}
+                interval={planInfo.interval}
+                confirmText="申し込む"
+            />
+            <PurchaseConfirmDialog
+                open={paidDialogOpen}
+                onOpenChange={setPaidDialogOpen}
+                onConfirm={async () => {
+                    const priceId = planInfo.priceId || ''
+                    await handleUpgradeSubscription(priceId)
+                    setPaidDialogOpen(false)
+                }}
+                title={`${planInfo.name}プランに変更しますか？`}
+                amount={planInfo.amount}
+                interval={planInfo.interval}
                 confirmText="変更する"
+                note={
+                    <ul className="list-disc pl-24-pc mt-16-pc max-md:pl-24-sp max-md:mt-16-sp">
+                        <li>プランの変更はすぐに反映されます。</li>
+                        <li>
+                            現在のプランとの差額は日割りで計算します。上位プランへの変更では変更時に請求し、
+                            下位プランへの変更では次回以降の請求から差し引きます。
+                        </li>
+                        <li>
+                            次回の更新日（{userPlan?.current_period_end}
+                            ）以降は、
+                            {planInfo.interval}額{' '}
+                            {planInfo.amount.toLocaleString('ja-JP')}
+                            円で請求されます。
+                        </li>
+                        {userPlan?.cancel_at_period_end && (
+                            <li>
+                                現在の解約予定は取り消され、プランは継続されます。
+                            </li>
+                        )}
+                    </ul>
+                }
             />
 
             {toastMessage && (

@@ -104,6 +104,11 @@ describe('checkout', () => {
                 customer: 'cus_123',
                 mode: 'subscription',
                 subscription_data: { metadata: { user_id: 'user_1' } },
+                // 最終確認画面としての表示：利用規約への同意を必須にし、自動更新・解約の説明を出す
+                consent_collection: { terms_of_service: 'required' },
+                custom_text: {
+                    submit: { message: expect.stringMatching(/\S/) },
+                },
             })
         )
         expect(redirect).toHaveBeenCalledWith(

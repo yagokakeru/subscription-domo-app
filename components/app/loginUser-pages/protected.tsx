@@ -93,100 +93,61 @@ export function Protected({
                     </div>
                     <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
                         <InfoIcon size="16" strokeWidth={2} />
-                        リリース準備
+                        リリース準備（R1・R2・R3-1・R3-2・A 完了）
                         <br />
-                        【R1 今すぐ】
+                        【B アプリ側の残作業】
                         <br />
-                        ーR1-1
-                        チェックリストExcel修正：CN-04のDB列を「フリープランに更新される」に、Stripe側列を「status=&apos;canceled&apos;」に戻す
+                        ーB-1（R3-3）最終確認画面：有料プラン申込時に料金・支払時期・自動更新・解約方法・利用規約同意を表示する確認ダイアログ
+                        → Stripe Checkoutへ
                         <br />
-                        ーR1-2
-                        チェックリストExcel修正：CN-04の画面表示（userPlanはnullにならない）・手順（stripe
-                        triggerは代替にならない）、RE-03の前提条件と★確認ポイント
+                        ーB-2（R3-3）有料プラン間の変更は全ケースで確認ダイアログを表示（新しい月額・日割り差額・次回更新日）
                         <br />
-                        ーR1-3 supabase db
-                        pullで現在のスキーマ（RLS・CASCADE・user_with_profileビュー・planの初期データ）をmigration化してGit管理
+                        ーB-3（R3-3）Stripe Checkoutの custom_text と
+                        consent_collection.terms_of_service を設定
                         <br />
-                        ーR1-4
-                        checkout()のcustomerID／userIDをセッションから取得し、price_idが有効なプランか検証する
+                        ーB-4（R3-3）サインアップ画面に「登録すると利用規約・プライバシーポリシーに同意したものとみなします」とリンクを追加
                         <br />
-                        ーR1-5 README：NEXT_PUBLIC_STRIPE_WEBHOOK_SECRET →
-                        STRIPE_WEBHOOK_SECRET に修正
+                        ーB-5 特商法ページの価格表示を supabase start
+                        した状態で確認
                         <br />
-                        ーR1-6 支払い失敗（past_due）時の扱い →
-                        【決定】猶予期間として許容（アプリ側の変更なし。Stripeの再請求がすべて失敗したら解約→フリーに戻る）
+                        【C 本番環境（後で）】
                         <br />
-                        ーR1-7
-                        チェックリスト：残りの古い記述（SU-08/10、CH-02〜05、DL-01/02/04）を修正し、新機能のケース（CH-06、LK-01〜04、SC-01、DL-06）を追加
+                        ーC-1 Supabase本番プロジェクトを新規作成 → supabase db
+                        push → planデータを本番価格IDで登録
                         <br />
-                        ーR1-8
-                        【重大】RLS修正migration（tighten_rls）：subscriptionのユーザー書き込み禁止・全員読み取り削除、profileの全員読み取り／無条件INSERT削除＋UPDATE列をname/avatar_urlに限定、user_with_profileを自分の行のみ＋anonからrevoke
+                        ーC-2 Supabase本番：Site URL／Redirect
+                        URLs、カスタムSMTP、「Confirm
+                        email」をOFF、メールテンプレート（recovery）を貼り付け
                         <br />
-                        ーR1-9
-                        R1-8に合わせてサインアップ時のprofile／subscriptionのINSERTをcreateClientRoleに変更し、テスト・手動確認
+                        ーC-3
+                        Stripe本番：商品・価格の作成、Webhookエンドポイント登録、Revenue
+                        recovery（再請求・失敗メール）設定、公開情報に規約URLを設定
                         <br />
-                        ーR1-10 get_script_countをanonからrevoke、未使用のStripe
-                        Wrapperをmigrationから除外、avatarsバケットをseed.sqlに追加
-                        <br />
-                        【R2 スマホ表示】
-                        <br />
-                        ーR2-1 スマホデザインをClaude
-                        Designで生成してコーディング
-                        <br />
-                        【R3 リリース直前】
-                        <br />
-                        ーR3-1 特定商取引法に基づく表記ページを作成
-                        <br />
-                        ーR3-2 利用規約・プライバシーポリシーページを作成
-                        <br />
-                        ーR3-3
-                        最終確認画面の表示（料金・契約期間・自動更新・解約方法）をプランページ／Checkout前に追加
-                        <br />
-                        ーR3-4
-                        Stripe本番：商品・価格を作成し、本番DBのplan.stripe_price_idに登録
-                        <br />
-                        ーR3-5
-                        Stripe本番：Webhookエンドポイント登録（subscription.created/updated/deleted
-                        ほか）とSTRIPE_WEBHOOK_SECRET設定
-                        <br />
-                        ーR3-11 Stripe本番：Billing → Revenue recovery
-                        で再請求スケジュール（全失敗時はサブスクを解約）と支払い失敗メールを設定（R1-6の決定に基づく）
-                        <br />
-                        ーR3-6 Supabase本番：Site
-                        URL／リダイレクトURLを本番ドメインに、カスタムSMTPを設定
-                        <br />
-                        ーR3-7
+                        ーC-4
                         Vercel環境変数：NEXT_PUBLIC_APP_URL、Stripe／Supabaseの本番キー（SERVICE_ROLE_KEYにNEXT_PUBLIC_を付けない）
                         <br />
-                        ーR3-8 next buildが通ることを確認
+                        【D リリース直前の確認】
                         <br />
-                        ーR3-9 本番相当環境で手動テストチェックリストを全件実施
+                        ーD-1 next buildが通ることを確認
                         <br />
-                        ーR3-10 この画面のタスクメモ（InfoIcon）をGitHub
-                        Issues等へ移して削除
+                        ーD-2
+                        本番相当環境で手動テストチェックリスト（docs/stripe_manual_test_checklist.xlsx）を全件実施
                         <br />
-                        ーR3-12
-                        メールテンプレート：recovery.htmlはローカル確認済み →
-                        本番はダッシュボード（Authentication → Email
-                        Templates）に手で貼る。【決定】サインアップ時のメール確認はしない
-                        → 本番の「Confirm
-                        email」をOFFにする（新規プロジェクトは初期値ONのため）
+                        ーD-3 この画面のタスクメモ（InfoIcon）を削除
                         <br />
-                        【R4 余裕があれば】
+                        【E 余裕があれば】
                         <br />
-                        ーR4-1 Webhookの絵文字入りconsole.logを整理
+                        ーE-1 Webhookの絵文字入りconsole.logを整理
                         <br />
-                        ーR4-2
+                        ーE-2
                         エラー監視（Sentry等）を導入し、Webhook処理失敗に気づけるようにする
                         <br />
-                        ーR4-3
+                        ーE-3
                         ProfileCard：userPlanがnullの時は台本数を表示しない
                         <br />
-                        ーR4-4 Lockアイコンにaria-labelを付ける
-                    </div>
-                    <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
-                        <InfoIcon size="16" strokeWidth={2} />
-                        actions.tsをリファクタリング
+                        ーE-4 Lockアイコンにaria-labelを付ける
+                        <br />
+                        ーE-5 actions.tsをリファクタリング
                     </div>
                 </div>
 
