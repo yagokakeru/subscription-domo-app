@@ -134,6 +134,29 @@ export function Protected({
                         ーE-4 Lockアイコンにaria-labelを付ける
                         <br />
                         ーE-5 actions.tsをリファクタリング
+                        <br />
+                        【E SEO関連】
+                        <br />
+                        ーE-6
+                        favicon・アイコン：app/favicon.ico（現在Next.jsの初期アイコン）を差し替え、app/icon.png・app/apple-icon.png
+                        を追加
+                        <br />
+                        ーE-7 metaタグ：app/layout.tsx の title・description
+                        が「Next.js and Supabase Starter Kit」のまま →
+                        サービス名に変更し title.template を設定。metadataBase
+                        を本番ドメインに。各ページに title・description
+                        を設定（ログイン後のページは robots:
+                        noindex）※ルートのtitleはリリース前に必須
+                        <br />
+                        ーE-8 OGP・Twitterカード：openGraph／twitter
+                        のメタデータと
+                        app/opengraph-image（SNSでシェアされたときの画像）を設定
+                        <br />
+                        ーE-9 GTM（Google Tag Manager）／GA4
+                        の導入（@next/third-parties）。導入する場合はプライバシーポリシーの「Cookie」「取得する情報」にアクセス解析の記載を追加
+                        <br />
+                        ーE-10 app/sitemap.ts と app/robots.ts
+                        を作成（/protected 配下・認証ページはクロール対象外）
                     </div>
                 </div>
 
